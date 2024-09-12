@@ -37,7 +37,7 @@ function App() {
           <Route path="register" element={<Register />} />
         </Route>
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/CVE/:id" element={<CVE />} />
+        <Route path="/CVE" element={<CVE />} />
         <Route path="/service" element={<Service />} />
         <Route path="/scan" element={<Scan />} />
         <Route path="/result/:id" element={<Result />} />

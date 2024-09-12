@@ -14,7 +14,7 @@ function Header({tittle, sidebarOpen, setSidebarOpen }) {
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 -mb-px">
           {/* Header: Left side */}
-          <div className="flex text-slate-100">
+          <div className="flex text-slate-100 text-xl">
             {tittle}
             <button
               className="text-slate-500 hover:text-slate-600 lg:hidden"

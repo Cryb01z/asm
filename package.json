@@ -18,6 +18,7 @@
     "@mui/material": "^5.15.19",
     "@mui/x-data-grid": "^7.6.2",
     "@tailwindcss/forms": "^0.5.7",
+    "@tailwindcss/line-clamp": "^0.4.4",
     "asm": "file:",
     "axios": "^1.7.2",
     "chart.js": "^4.4.3",

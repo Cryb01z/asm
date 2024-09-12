@@ -9,9 +9,42 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useState } from "react";
-import images from "../../../public/img/screenshot.png";
 const Summary = () => {
+  const technology = [
+    {
+      name: "WordPress ",
+      discript: "(CMS)",
+      overall: "100%",
+      pattern: "/wp-(?:content|includes)/",
+    },
+    {
+      name: " jQuery Mobile",
+      discript: "(Mobile Frameworks)",
+      overall: "100%",
+      pattern: "jquery[.-]mobile(?:-([d.]))?(?:.min)?.js(?:?ver=([d.]+))?",
+    },
+    {
+      name: "jQuery",
+      discript: "(JavaScript Libraries)",
+      overall: "100%",
+      pattern: "jquery.*.js(?:?ver(?:sion)?=([d.]+))?",
+    },
+    {
+      name: "jQuery Migrate",
+      discript: "(JavaScript Libraries)",
+      overall: "100%",
+      pattern: "jquery[.-]migrate(?:-([d.]+))?(?:.min)?.js(?:?ver=([d.]+))?",
+    },
+  ];
   const [option, setoption] = useState("ASNs");
+  const [expandTech, setexpandTech] = useState([]);
+  const handleExpandTech = (index) => {
+    setexpandTech((preExpandTech) =>
+      preExpandTech.includes(index)
+        ? preExpandTech.filter((i) => i !== index)
+        : [...preExpandTech, index]
+    );
+  };
   const handdleOption = (option) => {
     setoption((prev) => (prev = option));
   };
@@ -61,8 +94,8 @@ const Summary = () => {
           <div
             className={
               option === "ASNs"
-                ? "py-2 px-3 rounded-t-sm border-2 border-dotted"
-                : "py-2 text-green-500 px-3 rounded-t-sm hover:bg-gray-300"
+                ? "py-2 px-3 rounded-t-sm border-2 border-dotted cursor-pointer"
+                : "py-2 text-green-500 px-3 rounded-t-sm hover:bg-gray-300 cursor-pointer"
             }
             onClick={() => {
               handdleOption("ASNs");
@@ -73,8 +106,8 @@ const Summary = () => {
           <div
             className={
               option === "detail"
-                ? "py-2 px-3 rounded-t-sm border-2 border-dotted"
-                : "py-2 text-green-500 px-3 rounded-t-sm hover:bg-gray-300"
+                ? "py-2 px-3 rounded-t-sm border-2 border-dotted cursor-pointer"
+                : "py-2 text-green-500 px-3 rounded-t-sm hover:bg-gray-300 cursor-pointer"
             }
             onClick={() => {
               handdleOption("detail");
@@ -85,8 +118,8 @@ const Summary = () => {
           <div
             className={
               option === "domain"
-                ? "py-2 px-3 rounded-t-sm border-2 border-dotted"
-                : "py-2 text-green-500 px-3 rounded-t-sm hover:bg-gray-300"
+                ? "py-2 px-3 rounded-t-sm border-2 border-dotted cursor-pointer"
+                : "py-2 text-green-500 px-3 rounded-t-sm hover:bg-gray-300 cursor-pointer"
             }
             onClick={() => {
               handdleOption("domain");
@@ -97,8 +130,8 @@ const Summary = () => {
           <div
             className={
               option === "domainTree"
-                ? "py-2 px-3 rounded-t-sm border-2 border-dotted"
-                : "py-2 text-green-500 px-3 rounded-t-sm hover:bg-gray-300"
+                ? "py-2 px-3 rounded-t-sm border-2 border-dotted cursor-pointer"
+                : "py-2 text-green-500 px-3 rounded-t-sm hover:bg-gray-300 cursor-pointer"
             }
             onClick={() => {
               handdleOption("domainTree");
@@ -109,8 +142,8 @@ const Summary = () => {
           <div
             className={
               option === "link"
-                ? "py-2 px-3 rounded-t-sm border-2 border-dotted"
-                : "py-2 text-green-500 px-3 rounded-t-sm hover:bg-gray-300"
+                ? "py-2 px-3 rounded-t-sm border-2 border-dotted cursor-pointer"
+                : "py-2 text-green-500 px-3 rounded-t-sm hover:bg-gray-300 cursor-pointer"
             }
             onClick={() => {
               handdleOption("link");
@@ -121,8 +154,8 @@ const Summary = () => {
           <div
             className={
               option === "cert"
-                ? "py-2 px-3 rounded-t-sm border-2 border-dotted"
-                : "py-2 text-green-500 px-3 rounded-t-sm hover:bg-gray-300"
+                ? "py-2 px-3 rounded-t-sm border-2 border-dotted cursor-pointer"
+                : "py-2 text-green-500 px-3 rounded-t-sm hover:bg-gray-300 cursor-pointer"
             }
             onClick={() => {
               handdleOption("cert");
@@ -133,8 +166,8 @@ const Summary = () => {
           <div
             className={
               option === "frame"
-                ? "py-2 px-3 rounded-t-sm border-2 border-dotted"
-                : "py-2 text-green-500 px-3 rounded-t-sm hover:bg-gray-300"
+                ? "py-2 px-3 rounded-t-sm border-2 border-dotted cursor-pointer"
+                : "py-2 text-green-500 px-3 rounded-t-sm hover:bg-gray-300 cursor-pointer"
             }
             onClick={() => {
               handdleOption("frame");
@@ -451,33 +484,36 @@ const Summary = () => {
             </div>
           </div>
           <div className="font-bold text-xl">Detected technologies</div>
-          <div className="flex justify-between border-b-2">
-            <div className="text-green-500">
-              WordPress <span className="text-gray-500">(CMS)</span>
-            </div>
-            <div className="px-1 border-2 rounded-sm bg-gray-500">Expand</div>
-          </div>
-          <div className="flex justify-between border-b-2">
-            <div className="text-green-500">
-              jQuery Mobile{" "}
-              <span className="text-gray-500">(Mobile Frameworks)</span>
-            </div>
-            <div className="px-1 border-2 rounded-sm bg-gray-500">Expand</div>
-          </div>
-          <div className="flex justify-between border-b-2">
-            <div className="text-green-500">
-              jQuery{" "}
-              <span className="text-gray-500">(JavaScript Libraries)</span>
-            </div>
-            <div className="px-1 border-2 rounded-sm bg-gray-500">Expand</div>
-          </div>
-          <div className="flex justify-between border-b-2">
-            <div className="text-green-500">
-              jQuery Migrate{" "}
-              <span className="text-gray-500">(JavaScript Libraries) </span>
-            </div>
-            <div className="px-1 border-2 rounded-sm bg-gray-500">Expand</div>
-          </div>
+          {technology.map((item, index) => (
+            <React.Fragment key={index}>
+              <div className="border-b-2 pb-2">
+                <div className="flex justify-between">
+                  <div className="text-green-500">
+                    {item.name}{" "}
+                    <span className="text-gray-500">{item.discript}</span>
+                  </div>
+                  <div
+                    className="px-1 border-2 rounded-sm bg-gray-500 cursor-pointer"
+                    onClick={() => {
+                      handleExpandTech(index);
+                    }}
+                  >
+                    Expand
+                  </div>
+                </div>
+                {expandTech.includes(index) && (
+                  <div className="text-sm text-gray-400">
+                    <div>
+                      <span className="font-bold">Overall confidence:</span>{" "}
+                      {item.overall}
+                    </div>
+                    <div className="font-bold">Detected patterns</div>
+                    <li className="ml-4">{item.pattern}/</li>
+                  </div>
+                )}
+              </div>
+            </React.Fragment>
+          ))}
           <div className="font-bold text-xl">Page Statistics</div>
           <div className="flex space-x-4">
             <div className="flex flex-col text-center">
@@ -493,15 +529,24 @@ const Summary = () => {
               <div className="text-lg text-gray-400">Countries</div>
             </div>
             <div className="flex flex-col text-center">
-              <div className="text-2xl text-blue-500">0 <span className="text-base text-gray-500 align-bottom">%</span></div>
+              <div className="text-2xl text-blue-500">
+                0{" "}
+                <span className="text-base text-gray-500 align-bottom">%</span>
+              </div>
               <div className="text-lg text-gray-400">IPv6</div>
-              <div className="text-2xl text-blue-500">761 <span className="text-base text-gray-500 align-bottom">kB</span></div>
+              <div className="text-2xl text-blue-500">
+                761{" "}
+                <span className="text-base text-gray-500 align-bottom">kB</span>
+              </div>
               <div className="text-lg text-gray-400">Tranfer</div>
             </div>
             <div className="flex flex-col text-center">
               <div className="text-2xl text-blue-500">2</div>
               <div className="text-lg text-gray-400">Domains</div>
-              <div className="text-2xl text-blue-500">1325 <span className="text-base text-gray-500 align-bottom">kB</span></div>
+              <div className="text-2xl text-blue-500">
+                1325{" "}
+                <span className="text-base text-gray-500 align-bottom">kB</span>
+              </div>
               <div className="text-lg text-gray-400">Size</div>
             </div>
             <div className="flex flex-col text-center">

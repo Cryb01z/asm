@@ -3,6 +3,8 @@ import { NavLink, useLocation } from "react-router-dom";
 
 import SidebarLinkGroup from "./SidebarLinkGroup";
 import ThemeToggle from "../components/ThemeToggle";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faFingerprint, faMagnifyingGlass, faServer, faShieldHalved, faShoePrints, faUserSecret, faWrench } from "@fortawesome/free-solid-svg-icons";
 
 function Sidebar({ sidebarOpen, setSidebarOpen }) {
   const location = useLocation();
@@ -94,11 +96,11 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
             to="/dashboard"
             className="flex items-center space-x-3 rtl:space-x-reverse"
           >
-            <img
+            {/* <img
               src="https://flowbite.com/docs/images/logo.svg"
               className="h-8"
               alt="Flowbite Logo"
-            />
+            /> */}
             <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
               ASM Project
             </span>
@@ -117,7 +119,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                 •••
               </span>
               <span className="lg:hidden lg:sidebar-expanded:block 2xl:block">
-                Pages
+                MAIN NAVIGATION
               </span>
             </h3>
             <ul className="mt-3">
@@ -233,7 +235,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                 >
                   <div className="flex items-center">
                     <span className="text-base font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">
-                      Scan 
+                      <FontAwesomeIcon icon={faMagnifyingGlass}/> Scan
                     </span>
                   </div>
                 </NavLink>
@@ -254,7 +256,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                 >
                   <div className="flex items-center">
                     <span className="text-base font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">
-                      Domain Management  
+                      <FontAwesomeIcon icon={faServer}/> Domain Management
                     </span>
                   </div>
                 </NavLink>
@@ -275,7 +277,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                 >
                   <div className="flex items-center">
                     <span className="text-base font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">
-                      Service Management
+                      <FontAwesomeIcon icon={faWrench}/> Service Management
                     </span>
                   </div>
                 </NavLink>
@@ -296,7 +298,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                 >
                   <div className="flex items-center">
                     <span className="text-base font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">
-                      CVE Management
+                      <FontAwesomeIcon icon={faShieldHalved}/> Vulnerabilities
                     </span>
                   </div>
                 </NavLink>
@@ -317,7 +319,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                 >
                   <div className="flex items-center">
                     <span className="text-base font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">
-                      Digital Footprint
+                      <FontAwesomeIcon icon={faFingerprint}/> Digital Footprint
                     </span>
                   </div>
                 </NavLink>
@@ -338,7 +340,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                 >
                   <div className="flex items-center">
                     <span className="text-base font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">
-                      Dark Web Monitoring
+                      <FontAwesomeIcon icon={faUserSecret}/> Dark Web Monitoring
                     </span>
                   </div>
                 </NavLink>

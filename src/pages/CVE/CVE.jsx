@@ -3,9 +3,11 @@ import { dataCVE, CVEData } from "../../axios/data";
 import DoughnutChart from "../../charts/DoughnutChart";
 import Header from "../../partials/Header";
 import Sidebar from "../../partials/Sidebar";
-
+import axios from "axios";
 // Import utilities
 import { tailwindConfig } from "../../utils/Utils";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faShield, faShieldHalved } from "@fortawesome/free-solid-svg-icons";
 
 const CVE = () => {
   const [cveData, setcveData] = useState([
@@ -20,7 +22,7 @@ const CVE = () => {
   const searchParams = new URLSearchParams(window.location.search);
   const service = searchParams.get("name");
   useEffect(() => {
-    const data = CVEData(service);
+    const data = CVEData("domain");
     setcveData(data.vulnerabilities);
   }, []);
   const [currentPage, setcurrentPage] = useState(1);
@@ -81,7 +83,7 @@ const CVE = () => {
     ],
   };
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex bg-gray-900 h-screen overflow-hidden">
       {/* Sidebar */}
       <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
@@ -89,22 +91,68 @@ const CVE = () => {
       <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
         {/*  Site header */}
         <Header
-          tittle={"CVE"}
+          tittle={"Vulnerabilities"}
           sidebarOpen={sidebarOpen}
           setSidebarOpen={setSidebarOpen}
         />
 
         <main>
-          <div className="px-4 sm:px-6 lg:px-8 pb-8 w-full max-w-9xl bg-gray-900 text-slate-400">
-            <div className="flex justify-between py-5">
+          <div className="px-4 sm:px-6 lg:px-8 pb-8 w-full max-w-9xl text-white">
+            <div className="flex mt-5 space-x-3">
+              <div className="px-1 rounded-sm border bg-blue-500 hover:bg-blue-700 cursor-pointer">
+                CVE Management
+              </div>
+              <div className="px-1 rounded-sm border bg-lime-500 hover:bg-lime-700 cursor-pointer">
+                CVE of All Domain
+              </div>
+            </div>
+            <div className="flex mt-4 space-x-10">
+              <div className="flex p-4 border-t-4 rounded-sm border-blue-700 bg-slate-800 w-[900px]">
+                <select
+                  id="countries"
+                  class="border text-sm rounded-sm block p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option selected>Select a tag</option>
+                  <option value="US">No results found</option>
+                </select>
+                <select
+                  id="countries"
+                  class="border text-sm rounded-sm block p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option selected>Empty</option>
+                  <option value="CA">Low (0 - 3.9)</option>
+                  <option value="FR">Medium (4.0 - 6.9)</option>
+                  <option value="DE">High (7.0 - 8.9)</option>
+                  <option value="DE">Critical (9.0 - 10.0)</option>
+                </select>
+                <input
+                  type="text"
+                  className="border text-sm rounded-sm block p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Search in CVEs"
+                />
+                <div className="ml-10 border text-sm rounded-sm flex items-center justify-center px-4 bg-blue-600 hover:bg-blue-700 cursor-pointer">
+                  Search
+                </div>
+              </div>
+              <div className="flex rounded-sm bg-slate-800 w-[300px]">
+                <div className="flex items-center justify-center bg-blue-700 w-20 h-20">
+                  <FontAwesomeIcon icon={faShieldHalved} size="2xl" />
+                </div>
+                <div className="text-lg p-2">
+                  TOTAL <br />
+                  <span className="font-bold">262540 CVE</span>
+                </div>
+              </div>
+            </div>
+            {/*<div className="flex justify-between py-5">
               <div className="flex flex-col col-span-full sm:col-span-6 xl:col-span-4 bg-slate-800 shadow-lg rounded-md border border-slate-700">
                 <header className="px-5 py-4 border-b border-slate-700">
                   <h2 className="font-semibold text-slate-100">
                     Top Countries
                   </h2>
                 </header>
-                {/* Chart built with Chart.js 3 */}
-                {/* Change the height attribute to adjust the chart height */}
+                /~ Chart built with Chart.js 3 ~/
+                /~ Change the height attribute to adjust the chart height ~/
                 <DoughnutChart data={chartData} width={389} height={260} />
               </div>
               <div className="flex flex-col col-span-full sm:col-span-6 xl:col-span-4 bg-slate-800 shadow-lg rounded-md border border-slate-700">
@@ -113,8 +161,8 @@ const CVE = () => {
                     Top Countries
                   </h2>
                 </header>
-                {/* Chart built with Chart.js 3 */}
-                {/* Change the height attribute to adjust the chart height */}
+                /~ Chart built with Chart.js 3 ~/
+                /~ Change the height attribute to adjust the chart height ~/
                 <DoughnutChart data={chartData} width={389} height={260} />
               </div>
               <div className="flex flex-col col-span-full sm:col-span-6 xl:col-span-4 bg-slate-800 shadow-lg rounded-md border border-slate-700">
@@ -123,8 +171,8 @@ const CVE = () => {
                     Top Countries
                   </h2>
                 </header>
-                {/* Chart built with Chart.js 3 */}
-                {/* Change the height attribute to adjust the chart height */}
+                /~ Chart built with Chart.js 3 ~/
+                /~ Change the height attribute to adjust the chart height ~/
                 <DoughnutChart data={chartData} width={389} height={260} />
               </div>
             </div>
@@ -174,13 +222,15 @@ const CVE = () => {
             </div>
             <div className="col-span-full xl:col-span-8 bg-slate-800 shadow-lg rounded-sm border border-slate-700">
               <header className="px-5 py-4 border-b  border-slate-700">
-                <h2 className="font-semibold  text-slate-100">Total CVEs: {cveData.length}</h2>
+                <h2 className="font-semibold  text-slate-100">
+                  Total CVEs: {cveData.length}
+                </h2>
               </header>
               <div className="p-3">
-                {/* Table */}
+                /~ Table ~/
                 <div className="overflow-x-auto">
                   <table className="table-auto w-full text-slate-300">
-                    {/* Table header */}
+                    /~ Table header ~/
                     <thead className="text-xs uppercase  text-slate-500  bg-slate-700 bg-opacity-50 rounded-sm">
                       <tr>
                         <th className="p-2">
@@ -212,7 +262,7 @@ const CVE = () => {
                         </th>
                       </tr>
                     </thead>
-                    {/* Table body */}
+                    /~ Table body ~/
                     <tbody className="text-sm font-medium divide-y divide-slate-700">
                       {cveData.length > 0
                         ? records.map((cve) => (
@@ -325,7 +375,7 @@ const CVE = () => {
                   </div>
                 </div>
               </div>
-            </div>
+            </div>*/}
           </div>
         </main>
       </div>

@@ -21,6 +21,7 @@ import { faFile } from "@fortawesome/free-solid-svg-icons/faFile";
 import Summary from "./Summary";
 import Redirects from "./Redirects";
 import Links from "./Links";
+import HTTP from "./HTTP";
 const Result = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [options, setoptions] = useState("Summary");
@@ -36,7 +37,7 @@ const Result = () => {
       <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
         {/*  Site header */}
         <Header
-          tittle={"My Scan"}
+          tittle={"Scanning Result"}
           sidebarOpen={sidebarOpen}
           setSidebarOpen={setSidebarOpen}
         />
@@ -45,14 +46,14 @@ const Result = () => {
           <div className="flex justify-between">
             <div className="text-2xl font-bold">giz.proseed-al.de</div>
             <div className="flex space-x-2 text-sm">
-              <div className="bg-gray-400 px-2 py-1 rounded-sm hover:bg-gray-500">
+              <div className="bg-gray-400 px-2 py-1 rounded-sm hover:bg-gray-500  cursor-pointer">
                 <FontAwesomeIcon icon={faMagnifyingGlass} /> Lookup{" "}
                 <FontAwesomeIcon icon={faCaretDown} />
               </div>
-              <div className="bg-gray-400 px-2 py-1 rounded-sm hover:bg-gray-500">
+              <div className="bg-gray-400 px-2 py-1 rounded-sm hover:bg-gray-500  cursor-pointer">
                 <FontAwesomeIcon icon={faShare} /> Go To
               </div>
-              <div className="bg-gray-400 px-2 py-1 rounded-sm hover:bg-gray-500">
+              <div className="bg-gray-400 px-2 py-1 rounded-sm hover:bg-gray-500  cursor-pointer">
                 <FontAwesomeIcon icon={faArrowRightRotate} /> Rescan
               </div>
             </div>
@@ -61,7 +62,7 @@ const Result = () => {
             <div className="flex space-x-5">
               <div className="text-gray-400 text-xl">193.53.251.217</div>
               <div class="flex justify-center items-center">
-                <div class="text-xs bg-green-500 rounded-sm px-2 py-1 font-bold hover:bg-green-700">
+                <div class="text-xs bg-green-500 rounded-sm px-2 py-1 font-bold hover:bg-green-700 cursor-pointer">
                   Public Scan
                 </div>
               </div>
@@ -71,7 +72,7 @@ const Result = () => {
                 <FontAwesomeIcon icon={faMessage} /> {}
                 Add Verdict
               </div>
-              <div className="bg-gray-400 px-2 py-1 rounded-sm hover:bg-gray-500">
+              <div className="bg-gray-400 px-2 py-1 rounded-sm hover:bg-gray-500  cursor-pointer">
                 <FontAwesomeIcon icon={faCircleExclamation} /> {}
                 Report
               </div>
@@ -96,8 +97,8 @@ const Result = () => {
             <div
               className={
                 options === "Summary"
-                  ? "px-3 py-1.5 border-2 rounded-sm bg-blue-700 hover:bg-blue-900"
-                  : "px-3 py-1.5 border-2 rounded-sm bg-blue-500 hover:bg-blue-700"
+                  ? "px-3 py-1.5 border-2 rounded-sm bg-blue-700 hover:bg-blue-900 cursor-pointer"
+                  : "px-3 py-1.5 border-2 rounded-sm bg-blue-500 hover:bg-blue-700 cursor-pointer"
               }
               onClick={() => {
                 handdleOption("Summary");
@@ -108,8 +109,8 @@ const Result = () => {
             <div
               className={
                 options === "HTTP"
-                  ? "px-3 py-1.5 border-2 rounded-sm bg-blue-700 hover:bg-blue-900"
-                  : "px-3 py-1.5 border-2 rounded-sm bg-blue-500 hover:bg-blue-700"
+                  ? "px-3 py-1.5 border-2 rounded-sm bg-blue-700 hover:bg-blue-900 cursor-pointer"
+                  : "px-3 py-1.5 border-2 rounded-sm bg-blue-500 hover:bg-blue-700 cursor-pointer"
               }
               onClick={() => {
                 handdleOption("HTTP");
@@ -121,8 +122,8 @@ const Result = () => {
             <div
               className={
                 options === "Redirects"
-                  ? "px-3 py-1.5 border-2 rounded-sm bg-blue-700 hover:bg-blue-900"
-                  : "px-3 py-1.5 border-2 rounded-sm bg-blue-500 hover:bg-blue-700"
+                  ? "px-3 py-1.5 border-2 rounded-sm bg-blue-700 hover:bg-blue-900 cursor-pointer"
+                  : "px-3 py-1.5 border-2 rounded-sm bg-blue-500 hover:bg-blue-700 cursor-pointer"
               }
               onClick={() => {
                 handdleOption("Redirects");
@@ -133,8 +134,8 @@ const Result = () => {
             <div
               className={
                 options === "Links"
-                  ? "px-3 py-1.5 border-2 rounded-sm bg-blue-700 hover:bg-blue-900"
-                  : "px-3 py-1.5 border-2 rounded-sm bg-blue-500 hover:bg-blue-700"
+                  ? "px-3 py-1.5 border-2 rounded-sm bg-blue-700 hover:bg-blue-900 cursor-pointer"
+                  : "px-3 py-1.5 border-2 rounded-sm bg-blue-500 hover:bg-blue-700 cursor-pointer"
               }
               onClick={() => {
                 handdleOption("Links");
@@ -146,8 +147,8 @@ const Result = () => {
             <div
               className={
                 options === "Behaviour"
-                  ? "px-3 py-1.5 border-2 rounded-sm bg-blue-700 hover:bg-blue-900"
-                  : "px-3 py-1.5 border-2 rounded-sm bg-blue-500 hover:bg-blue-700"
+                  ? "px-3 py-1.5 border-2 rounded-sm bg-blue-700 hover:bg-blue-900 cursor-pointer"
+                  : "px-3 py-1.5 border-2 rounded-sm bg-blue-500 hover:bg-blue-700 cursor-pointer"
               }
               onClick={() => {
                 handdleOption("Behaviour");
@@ -158,8 +159,8 @@ const Result = () => {
             <div
               className={
                 options === "Indicators"
-                  ? "px-3 py-1.5 border-2 rounded-sm bg-blue-700 hover:bg-blue-900"
-                  : "px-3 py-1.5 border-2 rounded-sm bg-blue-500 hover:bg-blue-700"
+                  ? "px-3 py-1.5 border-2 rounded-sm bg-blue-700 hover:bg-blue-900 cursor-pointer"
+                  : "px-3 py-1.5 border-2 rounded-sm bg-blue-500 hover:bg-blue-700 cursor-pointer"
               }
               onClick={() => {
                 handdleOption("Indicators");
@@ -170,8 +171,8 @@ const Result = () => {
             <div
               className={
                 options === "Similar"
-                  ? "px-3 py-1.5 border-2 rounded-sm bg-blue-700 hover:bg-blue-900 ml-1"
-                  : "px-3 py-1.5 border-2 rounded-sm bg-blue-500 hover:bg-blue-700 ml-1"
+                  ? "px-3 py-1.5 border-2 rounded-sm bg-blue-700 hover:bg-blue-900 cursor-pointer ml-1"
+                  : "px-3 py-1.5 border-2 rounded-sm bg-blue-500 hover:bg-blue-700 cursor-pointer ml-1"
               }
               onClick={() => {
                 handdleOption("Similar");
@@ -182,8 +183,8 @@ const Result = () => {
             <div
               className={
                 options === "DOM"
-                  ? "px-3 py-1.5 border-2 rounded-sm bg-blue-700 hover:bg-blue-900"
-                  : "px-3 py-1.5 border-2 rounded-sm bg-blue-500 hover:bg-blue-700"
+                  ? "px-3 py-1.5 border-2 rounded-sm bg-blue-700 hover:bg-blue-900 cursor-pointer"
+                  : "px-3 py-1.5 border-2 rounded-sm bg-blue-500 hover:bg-blue-700 cursor-pointer"
               }
               onClick={() => {
                 handdleOption("DOM");
@@ -194,8 +195,8 @@ const Result = () => {
             <div
               className={
                 options === "Content"
-                  ? "px-3 py-1.5 border-2 rounded-sm bg-blue-700 hover:bg-blue-900"
-                  : "px-3 py-1.5 border-2 rounded-sm bg-blue-500 hover:bg-blue-700"
+                  ? "px-3 py-1.5 border-2 rounded-sm bg-blue-700 hover:bg-blue-900 cursor-pointer"
+                  : "px-3 py-1.5 border-2 rounded-sm bg-blue-500 hover:bg-blue-700 cursor-pointer"
               }
               onClick={() => {
                 handdleOption("Content");
@@ -206,8 +207,8 @@ const Result = () => {
             <div
               className={
                 options === "API"
-                  ? "px-3 py-1.5 border-2 rounded-sm bg-blue-700 hover:bg-blue-900"
-                  : "px-3 py-1.5 border-2 rounded-sm bg-blue-500 hover:bg-blue-700"
+                  ? "px-3 py-1.5 border-2 rounded-sm bg-blue-700 hover:bg-blue-900 cursor-pointer"
+                  : "px-3 py-1.5 border-2 rounded-sm bg-blue-500 hover:bg-blue-700 cursor-pointer"
               }
               onClick={() => {
                 handdleOption("API");
@@ -215,11 +216,12 @@ const Result = () => {
             >
               <FontAwesomeIcon icon={faQrcode} /> API
             </div>
-            <div className="px-3 py-1.5 border-2 rounded-sm bg-gray-400 ml-1">
+            <div className="px-3 py-1.5 border-2 rounded-sm bg-gray-400 ml-1 cursor-pointer">
               <FontAwesomeIcon icon={faMessage} /> Verdicts
             </div>
           </div>
           {options === "Summary" ? <Summary /> : <></>}
+          {options === "HTTP" ? <HTTP /> : <></>}
           {options === "Redirects" ? <Redirects/> : <></>}
           {options === "Links" ? <Links/> : <></>}
         </main>
