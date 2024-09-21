@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 import Tooltip from "../../components/Tooltip";
 
 const Domain = () => {
-  const test = data;
+  const test = data[0];
   const [service, setservice] = useState([
     {
       port: "",
@@ -224,13 +224,13 @@ const Domain = () => {
                               }
                             >
                               <div className="text-blue-700 hover:text-blue-500">
-                                {data.domain}
+                                giz.proseed-al.de
                               </div>
                             </Tooltip>
                           </div>
                         </td>
                         <td className="p-2">
-                          <div className="text-center ">{data.ip}</div>
+                          <div className="text-center ">{test.ip}</div>
                         </td>
                         <td className="p-2">
                           <div
@@ -243,17 +243,155 @@ const Domain = () => {
                           </div>
                         </td>
                         <td className="p-2">
-                          <div className="text-center">{data.discovery_on}</div>
+                          <div className="text-center">{test.discovery_on}</div>
                         </td>
                         <td className="p-2">
                           <div className="text-center ">
-                            {data.discovery_reason}
+                            {test.discovery_reason}
                           </div>
                         </td>
 
                         <td className="p-2">
                           <div className="text-center ">
-                            {data.discovery_reason}
+                            {test.discovery_reason}
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="p-2 py-4">
+                          <div className="flex items-center">
+                            <input type="checkbox" className="mr-5" />{" "}
+                            <Tooltip
+                              message={
+                                <>
+                                  <div className="grid w-auto items-center gap-4">
+                                    <table className="table-auto">
+                                      <tbody>
+                                        <tr>
+                                          <td>autonomous_system:</td>
+                                        </tr>
+                                        <tr>
+                                          <table className="table-auto ml-5">
+                                            <tbody>
+                                              <tr>
+                                                <td>asn:</td>
+                                                <td>
+                                                  {test.autonomous_system.asn}
+                                                </td>
+                                              </tr>
+                                              <tr>
+                                                <td>bgp_prefix:</td>
+                                                <td>
+                                                  {
+                                                    test.autonomous_system
+                                                      .bgp_prefix
+                                                  }
+                                                </td>
+                                              </tr>
+                                              <tr>
+                                                <td>country_code:</td>
+                                                <td>
+                                                  {
+                                                    test.autonomous_system
+                                                      .country_code
+                                                  }
+                                                </td>
+                                              </tr>
+                                              <tr>
+                                                <td>description:</td>
+                                                <td>
+                                                  {
+                                                    test.autonomous_system
+                                                      .description
+                                                  }
+                                                </td>
+                                              </tr>
+                                              <tr>
+                                                <td>name:</td>
+                                                <td>
+                                                  {test.autonomous_system.name}
+                                                </td>
+                                              </tr>
+                                            </tbody>
+                                          </table>
+                                        </tr>
+                                        <tr>
+                                          <td>dns:</td>
+                                        </tr>
+                                        <tr>
+                                          <table className="table-auto ml-5">
+                                            <tbody>
+                                              {test.dns.map((item, i) => (
+                                                <>
+                                                  <tr>{i + 1}:</tr>
+                                                  <tr>
+                                                    <table className="table-auto ml-5">
+                                                      <tbody>
+                                                        <tr>
+                                                          <td>Asset_Name:</td>
+                                                          <td>
+                                                            {item.Asset_Name}
+                                                          </td>
+                                                        </tr>
+                                                        <tr>
+                                                          <td>Record:</td>
+                                                          <td>{item.Record}</td>
+                                                        </tr>
+                                                        <tr>
+                                                          <td>Record_type:</td>
+                                                          <td>
+                                                            {item.Record_type}
+                                                          </td>
+                                                        </tr>
+                                                      </tbody>
+                                                    </table>
+                                                  </tr>
+                                                </>
+                                              ))}
+                                            </tbody>
+                                          </table>
+                                        </tr>
+                                        <tr>
+                                          <td>ssl:</td>
+                                          <td></td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                  </div>
+                                </>
+                              }
+                            >
+                              <div className="text-blue-700 hover:text-blue-500">
+                                {test.domain}
+                              </div>
+                            </Tooltip>
+                          </div>
+                        </td>
+                        <td className="p-2">
+                          <div className="text-center ">{test.ip}</div>
+                        </td>
+                        <td className="p-2">
+                          <div
+                            className="text-center underline text-blue-700 hover:text-blue-500"
+                            onClick={() => {
+                              nav("/service");
+                            }}
+                          >
+                            view more
+                          </div>
+                        </td>
+                        <td className="p-2">
+                          <div className="text-center">{test.discovery_on}</div>
+                        </td>
+                        <td className="p-2">
+                          <div className="text-center ">
+                            {test.discovery_reason}
+                          </div>
+                        </td>
+
+                        <td className="p-2">
+                          <div className="text-center ">
+                            {test.discovery_reason}
                           </div>
                         </td>
                       </tr>

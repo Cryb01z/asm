@@ -18,6 +18,7 @@ import Scan from "./pages/Scan/Scan";
 import Service from "./pages/ServiceManagement/Service";
 import Domain from "./pages/Domain/Domain";
 import Result from "./pages/Result/Result";
+import CVEDetail from "./pages/CVE/CVEDetail";
 
 function App() {
   const location = useLocation();
@@ -38,6 +39,7 @@ function App() {
         </Route>
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/CVE" element={<CVE />} />
+        <Route path="/CVE/:cveId" element={<CVEDetail />} />
         <Route path="/service" element={<Service />} />
         <Route path="/scan" element={<Scan />} />
         <Route path="/result/:id" element={<Result />} />

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     username: "",
@@ -40,9 +40,7 @@ const Login = () => {
           <div className="absolute bg-black opacity-60 inset-0 z-0"></div>
         </div>
         <div className="w-full py-6 z-20 text-white">
-          <h2 className="mt-3 text-3xl font-bold text-center">
-            Welcome Back!
-          </h2>
+          <h2 className="mt-3 text-3xl font-bold text-center">Welcome Back!</h2>
           <p className="mt-2 text-sm text-white text-center">
             Please sign in to your account
           </p>
@@ -63,7 +61,7 @@ const Login = () => {
                   className="border-b border-gray-300 py-1 focus:border-b-2 focus:border-blue-700 transition-colors focus:outline-none  bg-inherit"
                   value={formData.username}
                   onChange={(e) => {
-                    handleInput('username', e)
+                    handleInput("username", e);
                   }}
                 />
                 <label
@@ -87,7 +85,7 @@ const Login = () => {
                   className="border-b border-gray-300 py-1 focus:border-b-2 focus:border-blue-700 transition-colors focus:outline-none peer bg-inherit"
                   value={formData.password}
                   onChange={(e) => {
-                    handleInput('password', e)
+                    handleInput("password", e);
                   }}
                 />
                 <label
@@ -122,6 +120,9 @@ const Login = () => {
               <button
                 type="submit"
                 className="text-sm text-Blueviolet font-medium px-[70px] py-[12.5px] border-[0] rounded-[100px] bg-[#2ba8fb] text-[#ffffff] font-[Bold] [transition:all_0.5s] hover:bg-[#6fc5ff] hover:[box-shadow:0_0_20px_#6fc5ff50] hover:scale-110 active:bg-[#3d94cf] active:[transition:all_0.25s] active:[box-shadow:none] active:scale-[0.98]"
+                onClick={() => {
+                  navigate("/domain")
+                }}
               >
                 Log In
               </button>
@@ -132,7 +133,7 @@ const Login = () => {
               <span
                 className="hover:underline hover:text-blue-500 "
                 onClick={() => {
-                  navigate('/register')
+                  navigate("/register");
                 }}
               >
                 Sign up

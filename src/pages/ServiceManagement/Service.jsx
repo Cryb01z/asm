@@ -5,49 +5,44 @@ import { data, serviceData } from "../../axios/data";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faArrowUpRightFromSquare,
+  faFilter,
+  faMagnifyingGlass,
+  faSquareCheck,
+  faThumbsDown,
+} from "@fortawesome/free-solid-svg-icons";
 
 const Service = () => {
-  const [service, setservice] = useState([
-    {
-      port: "",
-      service_name: "",
-      software: [
-        {
-          product: "",
-          vendor: "",
-          version: "",
-        },
-      ],
-      vulnerabilities: [],
-    },
-  ]);
-  useEffect(() => {
-    setservice(serviceData);
-  }, []);
-  console.log(service);
-  const nav = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [currentPage, setcurrentPage] = useState(1);
-  const recordsPerPage = 10;
-  const lastIndex = currentPage * recordsPerPage;
-  const firstIndex = lastIndex - recordsPerPage;
-  const records = service.slice(firstIndex, lastIndex);
-  const npage = Math.ceil(service.length / recordsPerPage);
-  const numbers = [...Array(npage + 1).keys()].slice(1);
-  const prevPage = () => {
-    if (currentPage !== 1) {
-      setcurrentPage((prev) => prev - 1);
-    }
-  };
+  const [test, setTest] = useState([]); // Store domain and service data
+  const [services, setservices] = useState([]); // Flattened service
+  const [filterServices, setfilterServices] = useState([]); // Filtered service
+  const [filter, setFilter] = useState({
+    domain: "",
+  });
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10; // Number of vulnerabilities per page
 
-  const changePage = (id) => {
-    setcurrentPage(id);
-  };
-  const nextPage = () => {
-    if (currentPage !== numbers[numbers.length - 1]) {
-      setcurrentPage((prev) => prev + 1);
-    }
-  };
+  useEffect(() => {
+    setTest(data);
+    // Extract vulnerabilities across all domains and services
+    const flattenedServices = [];
+    data.forEach((domain) => {
+      if (domain.services.length > 0) {
+        domain.services.forEach((service) => {
+          flattenedServices.push({ domain: domain.domain, ...service });
+        });
+      }
+    });
+    setservices(flattenedServices);
+    setfilterServices(flattenedServices); // Initially set all service as filtered
+  }, []);
+
+  console.log(services);
+  const nav = useNavigate();
+  //Redirect to vul
   const handleRedirectToCVE = (service, vulnerabilities) => {
     if (vulnerabilities.length === 0) {
       toast.info(`There is no CVE of service:${service}`);
@@ -56,6 +51,45 @@ const Service = () => {
     nav(`/CVE/service?name=${service}`);
   };
 
+  //Update filterState
+  const handleFilterChange = (e) => {
+    const { id, value } = e.target;
+    setFilter((prev) => ({
+      ...prev,
+      [id]: value,
+    }));
+  };
+
+  // Filter service based on domain
+  useEffect(() => {
+    const filtered = services.filter((service) => {
+      // Filter by domain
+      const domainMatch = filter.domain
+        ? service.domain.toLowerCase().includes(filter.domain.toLowerCase())
+        : true;
+      return domainMatch;
+    });
+
+    setfilterServices(filtered);
+  }, [filter, services]);
+
+  console.log(filter);
+
+  // Pagination
+  const paginatedData = () => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filterServices.slice(startIndex, endIndex);
+  };
+
+  //Update current page
+  const handlePageChange = (newPage) => {
+    if (newPage < 1 || newPage > totalPages) {
+      return; // Prevent the page from changing if out of bounds
+    }
+    setCurrentPage(newPage);
+  };
+  const totalPages = Math.ceil(filterServices.length / itemsPerPage);
   return (
     <div className="bg-gray-900 flex h-screen overflow-hidden">
       {/* Sidebar */}
@@ -72,19 +106,49 @@ const Service = () => {
 
         <main>
           <div className="px-4 sm:px-6 lg:px-8 pb-8 w-full max-w-9xl  text-slate-400">
+            <div className="bg-slate-800 shadow-lg rounded-sm border px-5 py-4 border-b border-slate-700 mb-5 mt-5">
+              <h2 className="font-semibold text-slate-100 flex space-x-5">
+                <div className="flex">
+                  <div>
+                    <FontAwesomeIcon icon={faFilter} /> Filter:
+                  </div>
+                  <select
+                    className="bg-slate-800 outline-none px-1"
+                    name=""
+                    id="domain"
+                    value={filter.domain}
+                    onChange={handleFilterChange}
+                  >
+                    <option value="">All Domain</option>
+                    {test.map((domain) => (
+                      <option key={domain.domain} value={domain.domain}>
+                        {domain.domain}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <span>
+                  <FontAwesomeIcon icon={faMagnifyingGlass} />
+                </span>
+                <input
+                  className="bg-slate-800 outline-none"
+                  type="text"
+                  placeholder="Search ..."
+                />
+              </h2>
+            </div>
             <div className="mt-5 col-span-full xl:col-span-8 bg-slate-800 shadow-lg rounded-sm border border-slate-700">
               <header className="px-5 py-4 border-b  border-slate-700">
                 <h2 className="font-semibold  text-slate-100">
-                  Total Services
+                  Total Services: {filterServices.length}
                 </h2>
               </header>
               <div className="p-3">
                 {/* Table */}
                 <div className="overflow-x-auto">
-                  <table className="table-auto w-full text-slate-300">
-                    {/* Table header */}
-                    <thead className="text-xs uppercase  text-slate-500  bg-slate-700 bg-opacity-50 rounded-sm">
-                      <tr>
+                  <table className="w-full">
+                    <thead>
+                      <tr className="">
                         <th className="p-2">
                           <div className="font-semibold text-left flex items-center">
                             <input type="checkbox" className="mr-5" />{" "}
@@ -111,6 +175,11 @@ const Service = () => {
                         </th>
                         <th className="p-2">
                           <div className="font-semibold text-center">
+                            Domain
+                          </div>
+                        </th>
+                        <th className="p-2">
+                          <div className="font-semibold text-center">
                             Assets-Incidents
                           </div>
                         </th>
@@ -121,116 +190,150 @@ const Service = () => {
                         </th>
                       </tr>
                     </thead>
-                    {/* Table body */}
-                    <tbody className="text-sm font-medium divide-y divide-slate-700">
-                      {/* Row */}
-                      {records.map((data) => (
+                    <tbody>
+                      {paginatedData().map((service) => (
                         <tr>
                           <td className="p-2">
                             <div className="flex items-center">
                               <input type="checkbox" className="mr-5" />{" "}
                               <div className="text-blue-500">
-                                {data.service_name}
+                                {service.service_name}
                               </div>
                             </div>
                           </td>
                           <td className="p-2">
-                            <div className="text-center">{data.port}</div>
+                            <div className="text-center">{service.port}</div>
                           </td>
                           <td className="p-2">
-                              {data.software.map((item) =>
-                                <div className="text-center">
-                                  {item.product !== "" ? item.vendor : "Not Found"}
-                                </div>
-                              )}
+                            {service.software.map((item) => (
+                              <div className="text-center">
+                                {item.product !== ""
+                                  ? item.vendor
+                                  : "Not Found"}
+                              </div>
+                            ))}
                           </td>
                           <td className="p-2">
-                              {data.software.map((item) =>
-                                <div className="text-center">
-                                  {item.version !== "" ? item.version : "Not Found"}
-                                </div>
-                              )}
+                            {service.software.map((item) => (
+                              <div className="text-center">
+                                {item.version !== ""
+                                  ? item.version
+                                  : "Not Found"}
+                              </div>
+                            ))}
                           </td>
                           <td className="p-2">
                             <div
                               className="text-center underline text-blue-700 hover:text-blue-500"
                               onClick={(e) => {
                                 e.preventDefault();
-                                handleRedirectToCVE(data.service_name, data.vulnerabilities);
+                                handleRedirectToCVE(
+                                  service.service_name,
+                                  service.vulnerabilities
+                                );
                               }}
                             >
                               view more
                             </div>
                           </td>
+                          <td className="p-2">{service.domain}</td>
+                          <td className="p-2  text-blue-500 hover:text-blue-700 text-center cursor-pointer">
+                            {" "}
+                            View Assets{" "}
+                            <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
+                          </td>
+                          <td className="p-2  text-center cursor-pointer">
+                            <span className="text-red-500 hover:text-red-800 mr-3">
+                              <FontAwesomeIcon icon={faThumbsDown} />
+                            </span>{" "}
+                            <span className="text-blue-600 hover:text-blue-800">
+                              <FontAwesomeIcon icon={faSquareCheck} />
+                            </span>
+                          </td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
-                  <div className="flex items-center justify-center mt-3 gap-4">
-                    <button
-                      className="flex items-center gap-2 px-6 py-3 font-sans text-xs font-bold text-center text-white uppercase align-middle transition-all rounded-full select-none hover:bg-gray-700 active:bg-gray-900/20 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
-                      type="button"
-                      onClick={prevPage}
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth="2"
-                        stroke="currentColor"
-                        aria-hidden="true"
-                        className="w-4 h-4"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
-                        ></path>
-                      </svg>
-                      Previous
-                    </button>
-                    <div className="flex items-center gap-2">
-                      {numbers.map((n, i) => (
+
+                  {/* Pagination */}
+                  <div className="flex items-center justify-between border-t border-slate-700 bg-slate-800 px-4 py-3 sm:px-6 text-white">
+                    <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+                      <div>
+                        <p className="text-sm">
+                          Showing{" "}
+                          <span className="font-medium">
+                            {(currentPage - 1) * itemsPerPage + 1}
+                          </span>{" "}
+                          to{" "}
+                          <span className="font-medium">
+                            {Math.min(
+                              currentPage * itemsPerPage,
+                              filterServices.length
+                            )}
+                          </span>{" "}
+                          of{" "}
+                          <span className="font-medium">
+                            {filterServices.length}
+                          </span>{" "}
+                          results
+                        </p>
+                      </div>
+                      <div className="flex space-x-5">
                         <button
-                          className={
-                            currentPage === n
-                              ? "relative h-10 max-h-[40px] bg-gray-900 w-10 max-w-[40px] select-none rounded-full text-center align-middle font-sans text-xs font-medium uppercase text-white transition-all hover:bg-gray-700 active:bg-gray-900/20 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
-                              : "relative h-10 max-h-[40px] w-10 max-w-[40px] select-none rounded-full text-center align-middle font-sans text-xs font-medium uppercase text-white transition-all hover:bg-gray-700 active:bg-gray-900/20 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
-                          }
-                          type="button"
-                          key={i}
-                          onClick={() => {
-                            changePage(n);
-                          }}
+                          onClick={() => handlePageChange(currentPage - 1)}
+                          disabled={currentPage === 1}
+                          className={`flex items-center w-28 justify-center px-3 h-8 text-sm font-medium ${
+                            currentPage === 1
+                              ? "bg-gray-500 cursor-not-allowed"
+                              : "bg-white cursor-pointer"
+                          } border rounded-lg dark:bg-gray-800 border-gray-700 text-gray-400 hover:bg-gray-700 hover:text-white`}
                         >
-                          <span className="absolute transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">
-                            {n}
-                          </span>
+                          <svg
+                            className="w-3.5 h-3.5 me-2 rtl:rotate-180"
+                            aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 14 10"
+                          >
+                            <path
+                              stroke="currentColor"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M13 5H1m0 0 4 4M1 5l4-4"
+                            />
+                          </svg>
+                          Previous
                         </button>
-                      ))}
+
+                        <button
+                          onClick={() => handlePageChange(currentPage + 1)}
+                          disabled={currentPage === totalPages}
+                          className={`flex items-center w-24 justify-center px-3 h-8 text-sm font-medium ${
+                            currentPage === totalPages
+                              ? "bg-gray-500 cursor-not-allowed"
+                              : "bg-white cursor-pointer"
+                          } border rounded-lg dark:bg-gray-800 border-gray-700 text-gray-400 hover:bg-gray-700 hover:text-white`}
+                        >
+                          Next
+                          <svg
+                            className="w-3.5 h-3.5 ms-2 rtl:rotate-180"
+                            aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 14 10"
+                          >
+                            <path
+                              stroke="currentColor"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M1 5h12m0 0L9 1m4 4L9 9"
+                            />
+                          </svg>
+                        </button>
+                      </div>
                     </div>
-                    <button
-                      className="flex items-center gap-2 px-6 py-3 font-sans text-xs font-bold text-center text-white uppercase align-middle transition-all rounded-full select-none hover:bg-gray-700 active:bg-gray-900/20 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
-                      type="button"
-                      onClick={nextPage}
-                    >
-                      Next
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth="2"
-                        stroke="currentColor"
-                        aria-hidden="true"
-                        className="w-4 h-4"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
-                        ></path>
-                      </svg>
-                    </button>
                   </div>
                 </div>
               </div>

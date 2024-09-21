@@ -21,7 +21,7 @@ function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex h-screen overflow-hidden bg-gray-900">
 
       {/* Sidebar */}
       <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
@@ -33,7 +33,7 @@ function Dashboard() {
         <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
         <main>
-          <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto bg-gray-900 text-slate-400">
+          <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto  text-slate-400">
 
             {/* Welcome banner */}
             {/* <WelcomeBanner /> */}
@@ -64,32 +64,32 @@ function Dashboard() {
             {/* Cards */}
             <div className="grid grid-cols-12 gap-6">
 
-              {/* Line chart (Acme Plus) */}
-              {/* <DashboardCard01 /> */}
-              {/* Line chart (Acme Advanced) */}
-              {/* <DashboardCard02 /> */}
-              {/* Line chart (Acme Professional) */}
-              {/* <DashboardCard03 /> */}
-              {/* Bar chart (Direct vs Indirect) */}
+             {/* Line chart (Acme Plus)
+              <DashboardCard01 />
+              /~ Line chart (Acme Advanced) ~/
+              <DashboardCard02 />
+              /~ Line chart (Acme Professional) ~/
+              <DashboardCard03 />
+              /~ Bar chart (Direct vs Indirect) ~/
               <DashboardCard04 />
-              {/* Line chart (Real Time Value) */}
+              /~ Line chart (Real Time Value) ~/
               <DashboardCard05 />
-              {/* Doughnut chart (Top Countries) */}
+              /~ Doughnut chart (Top Countries) ~/
               <DashboardCard06 />
-              {/* Table (Top Channels) */}
+              /~ Table (Top Channels) ~/
               <DashboardCard07 />
-              {/* Line chart (Sales Over Time) */}
+              /~ Line chart (Sales Over Time) ~/
               <DashboardCard08 />
-              {/* Stacked bar chart (Sales VS Refunds) */}
+              /~ Stacked bar chart (Sales VS Refunds) ~/
               <DashboardCard09 />
-              {/* Card (Customers) */}
+              /~ Card (Customers) ~/
               <DashboardCard10 />
-              {/* Card (Reasons for Refunds) */}
+              /~ Card (Reasons for Refunds) ~/
               <DashboardCard11 />
-              {/* Card (Recent Activity) */}
+              /~ Card (Recent Activity) ~/
               <DashboardCard12 />
-              {/* Card (Income/Expenses) */}
-              <DashboardCard13 />
+              /~ Card (Income/Expenses) ~/
+              <DashboardCard13 />*/}
               
             </div>
 
