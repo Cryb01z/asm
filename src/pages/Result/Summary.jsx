@@ -1,6 +1,5 @@
 import {
   faArrowRightArrowLeft,
-  faArrowsUpDownLeftRight,
   faCaretDown,
   faCrosshairs,
   faMaximize,
@@ -49,11 +48,11 @@ const Summary = () => {
     setoption((prev) => (prev = option));
   };
   return (
-    <div className="flex justify-between h-[1000px]">
+    <div className="flex justify-between h-[calc(80%)] text-white">
       <div className="flex flex-col">
-        <div className="text-xl py-2 font-bold">Summary</div>
-        <div className="border-2 p-3 w-[650px] rounded-sm">
-          <div className="pb-2 border-b-2 border-gray-500">
+        <div className="text-xl py-2 font-bold ">Summary</div>
+        <div className="border-2 p-3 w-[650px] rounded-sm border-zinc-700/60">
+          <div className="pb-2 border-b-2 border-zinc-700/60">
             This website contacted <span className="font-bold">2 IPs</span> in 1
             countries across <span className="font-bold">2 domains</span> {}
             to perform <span className="font-bold">17 HTTP transactions</span>.
@@ -67,18 +66,18 @@ const Summary = () => {
             <span className="text-green-500"> giz.proseed-al.de</span>. TLS
             certificate: Issued by R11 on July 29th 2024. Valid for: 3 months.
           </div>
-          <div className="pb-2 border-b-2 border-gray-500">
+          <div className="pb-2 border-b-2 border-zinc-700/60">
             <span className="text-green-500">giz.proseed-al.de</span> scanned{" "}
             <span className="font-bold">2 times</span> on urlscan.io
           </div>
-          <div className="pb-2 border-b-2 border-gray-500">
+          <div className="pb-2 border-b-2 border-zinc-700/60">
             <span className="font-bold">urlscan.io Verdict:</span> No
             classification
           </div>
-          <div className="pb-2 border-b-2 border-gray-500 font-bold">
+          <div className="pb-2 border-b-2 border-zinc-700/60 font-bold">
             Live information
           </div>
-          <div className="pb-2 border-b-2 border-gray-500">
+          <div className="pb-2 border-b-2 border-zinc-700/60">
             <span className="font-bold">Google Safe Browsing:</span> No
             classification for giz.proseed-al.de
           </div>
@@ -95,7 +94,7 @@ const Summary = () => {
             className={
               option === "ASNs"
                 ? "py-2 px-3 rounded-t-sm border-2 border-dotted cursor-pointer"
-                : "py-2 text-green-500 px-3 rounded-t-sm hover:bg-gray-300 cursor-pointer"
+                : "py-2 text-green-500 px-3 rounded-t-sm hover:bg-zinc-900 cursor-pointer"
             }
             onClick={() => {
               handdleOption("ASNs");
@@ -107,7 +106,7 @@ const Summary = () => {
             className={
               option === "detail"
                 ? "py-2 px-3 rounded-t-sm border-2 border-dotted cursor-pointer"
-                : "py-2 text-green-500 px-3 rounded-t-sm hover:bg-gray-300 cursor-pointer"
+                : "py-2 text-green-500 px-3 rounded-t-sm hover:bg-zinc-900 cursor-pointer"
             }
             onClick={() => {
               handdleOption("detail");
@@ -119,7 +118,7 @@ const Summary = () => {
             className={
               option === "domain"
                 ? "py-2 px-3 rounded-t-sm border-2 border-dotted cursor-pointer"
-                : "py-2 text-green-500 px-3 rounded-t-sm hover:bg-gray-300 cursor-pointer"
+                : "py-2 text-green-500 px-3 rounded-t-sm hover:bg-zinc-900 cursor-pointer"
             }
             onClick={() => {
               handdleOption("domain");
@@ -131,7 +130,7 @@ const Summary = () => {
             className={
               option === "domainTree"
                 ? "py-2 px-3 rounded-t-sm border-2 border-dotted cursor-pointer"
-                : "py-2 text-green-500 px-3 rounded-t-sm hover:bg-gray-300 cursor-pointer"
+                : "py-2 text-green-500 px-3 rounded-t-sm hover:bg-zinc-900 cursor-pointer"
             }
             onClick={() => {
               handdleOption("domainTree");
@@ -143,7 +142,7 @@ const Summary = () => {
             className={
               option === "link"
                 ? "py-2 px-3 rounded-t-sm border-2 border-dotted cursor-pointer"
-                : "py-2 text-green-500 px-3 rounded-t-sm hover:bg-gray-300 cursor-pointer"
+                : "py-2 text-green-500 px-3 rounded-t-sm hover:bg-zinc-900 cursor-pointer"
             }
             onClick={() => {
               handdleOption("link");
@@ -155,7 +154,7 @@ const Summary = () => {
             className={
               option === "cert"
                 ? "py-2 px-3 rounded-t-sm border-2 border-dotted cursor-pointer"
-                : "py-2 text-green-500 px-3 rounded-t-sm hover:bg-gray-300 cursor-pointer"
+                : "py-2 text-green-500 px-3 rounded-t-sm hover:bg-zinc-900 cursor-pointer"
             }
             onClick={() => {
               handdleOption("cert");
@@ -167,7 +166,7 @@ const Summary = () => {
             className={
               option === "frame"
                 ? "py-2 px-3 rounded-t-sm border-2 border-dotted cursor-pointer"
-                : "py-2 text-green-500 px-3 rounded-t-sm hover:bg-gray-300 cursor-pointer"
+                : "py-2 text-green-500 px-3 rounded-t-sm hover:bg-zinc-900 cursor-pointer"
             }
             onClick={() => {
               handdleOption("frame");
@@ -435,7 +434,7 @@ const Summary = () => {
 
       <div>
         <div className="flex py-2 justify-between space-x-28">
-          <div className="text-xl">Screenshot</div>
+          <div className="text-xl font-bold">Screenshot</div>
           <div className="flex space-x-2">
             <div className="">
               <span className="align-middle px-1 text-sm rounded-sm border-2 bg-gray-500">

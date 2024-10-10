@@ -9484,3 +9484,6 @@ const dataCVE = data[0].services.filter(
 );
 
 export { data, dataCVE, CVEData, serviceData, allCVEData };
+
+
+

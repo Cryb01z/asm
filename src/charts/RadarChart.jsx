@@ -83,7 +83,7 @@ const RadarChart = ({ data }) => {
   };
 
   return (
-    <div className='w-[300px] h-[300px] bg-slate-800 ml-16'>
+    <div className='w-[300px] h-[300px] ml-16'>
       <Radar data={chartData} options={options} />
     </div>
   );

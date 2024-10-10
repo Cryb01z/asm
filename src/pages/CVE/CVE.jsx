@@ -1,49 +1,70 @@
 import React, { useState } from "react";
-import Header from "../../partials/Header";
-import Sidebar from "../../partials/Sidebar";
 // Import utilities
-import DomainCVE from "./domainCVE";
+
+import {
+  faBullseye,
+  faSquarePollVertical,
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Test from "../test";
+import DomainCVE from "./DomainCVE";
 import OpenCVE from "./openCVE";
 
 const CVE = () => {
   const [cve, setcve] = useState("openCVE");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  
   return (
-    <div className="flex bg-gray-900 h-screen overflow-hidden">
-      {/* Sidebar */}
-      <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-
-      {/* Content area */}
-      <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
+    <div className="flex bg-black h-screen overflow-hidden">
+      <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
         {/*  Site header */}
-        <Header
-          tittle={"Vulnerabilities"}
-          sidebarOpen={sidebarOpen}
-          setSidebarOpen={setSidebarOpen}
-        />
-
+        <Test site={"CVE"} />
         <main>
-          <div className="px-4 sm:px-6 lg:px-8 pb-8 w-full max-w-9xl text-white">
-            <div className="flex mt-5 space-x-3">
-              <div
-                className="px-1 rounded-sm border bg-blue-500 hover:bg-blue-700 cursor-pointer"
-                onClick={() => {
-                  setcve("openCVE");
-                }}
-              >
-                CVE Management
+          <div className="pb-8 w-full max-w-9xl text-gray-400 relative">
+            <div className="py-2 sticky top-[65px] z-10 bg-black">
+              <div className="flex space-x-1 text-sm px-8">
+                <div
+                  className={`px-2 pb-2 cursor-pointer ${
+                    cve === "openCVE" ? "border-b-2 border-indigo-400 z-10" : ""
+                  }`}
+                  onClick={() => {
+                    setcve("openCVE");
+                  }}
+                >
+                  <span
+                    className={`${cve === "openCVE" ? "text-indigo-400" : ""}`}
+                  >
+                    <FontAwesomeIcon icon={faBullseye} />
+                  </span>{" "}
+                  <span className={`${cve === "openCVE" ? "text-white" : ""}`}>
+                    CVE Management
+                  </span>
+                </div>
+                <div
+                  className={`px-2 pb-2 cursor-pointer ${
+                    cve === "domain" ? "border-b-2 border-indigo-400 z-10" : ""
+                  }`}
+                  onClick={() => {
+                    setcve("domain");
+                  }}
+                >
+                  <span
+                    className={`${cve === "domain" ? "text-indigo-400" : ""}`}
+                  >
+                    <FontAwesomeIcon icon={faSquarePollVertical} />
+                  </span>{" "}
+                  <span className={`${cve === "domain" ? "text-white" : ""}`}>
+                    CVE of All Domain
+                  </span>
+                </div>
               </div>
-              <div
-                className="px-1 rounded-sm border bg-lime-500 hover:bg-lime-700 cursor-pointer"
-                onClick={() => {
-                  setcve("domain");
-                }}
-              >
-                CVE of All Domain
-              </div>
+              <div className="absolute bottom-2 left-0 w-full border-b-2 border-neutral-800"></div>
             </div>
-            {cve === "openCVE" && <OpenCVE />}
-            {cve === "domain" && <DomainCVE />}
+            <div className="px-28 text-white">
+              {cve === "openCVE" && <OpenCVE />}
+              {cve === "domain" && <DomainCVE />}
+
+            </div>
           </div>
         </main>
       </div>

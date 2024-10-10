@@ -148,7 +148,7 @@ const Service = () => {
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
-                      <tr className="">
+                      <tr className="uppercase">
                         <th className="p-2">
                           <div className="font-semibold text-left flex items-center">
                             <input type="checkbox" className="mr-5" />{" "}

@@ -6,6 +6,7 @@ import {
   faArrowUpRightFromSquare,
   faFilter,
   faMagnifyingGlass,
+  faSort,
   faSquareCheck,
   faThumbsDown,
 } from "@fortawesome/free-solid-svg-icons";
@@ -21,6 +22,8 @@ const DomainCVE = () => {
     domain: "", // Selected domain
     scoreRange: "", // Selected CVSS score range
   });
+  const [searchQuery, setSearchQuery] = useState(""); // Search query
+  const [sortConfig, setSortConfig] = useState({ key: "", direction: "" }); // Sorting configuration
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10; // Number of vulnerabilities per page
 
@@ -69,24 +72,52 @@ const DomainCVE = () => {
     }));
   };
 
-  // Filter vulnerabilities based on domain and score
+  // Handle search query change
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  // Handle sorting
+  const handleSort = (key) => {
+    let direction = "ascending";
+    if (sortConfig.key === key && sortConfig.direction === "ascending") {
+      direction = "descending";
+    }
+    setSortConfig({ key, direction });
+  };
+
+  // Filter and sort vulnerabilities
   useEffect(() => {
-    const filtered = vulnerabilities.filter((vul) => {
+    let filtered = vulnerabilities.filter((vul) => {
       // Filter by domain
       const domainMatch = filter.domain
         ? vul.domain.toLowerCase().includes(filter.domain.toLowerCase())
         : true;
 
-      // // Filter by score range
-      // const score = parseFloat(vul.cvss);
-      // const scoreMatch =
-      //   score >= filter.scoreRange[0] && score <= filter.scoreRange[1];
+      // Filter by search query
+      const searchMatch = searchQuery
+        ? vul.id.toLowerCase().includes(searchQuery.toLowerCase())
+        : true;
 
-      return domainMatch;
+      return domainMatch && searchMatch;
     });
+
+    // Sort vulnerabilities
+    if (sortConfig.key) {
+      filtered = filtered.sort((a, b) => {
+        if (a[sortConfig.key] < b[sortConfig.key]) {
+          return sortConfig.direction === "ascending" ? -1 : 1;
+        }
+        if (a[sortConfig.key] > b[sortConfig.key]) {
+          return sortConfig.direction === "ascending" ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+
     setCurrentPage(1);
     setFilteredVulnerabilities(filtered);
-  }, [filter, vulnerabilities]);
+  }, [filter, searchQuery, sortConfig, vulnerabilities]);
 
   console.log(filter);
 
@@ -131,8 +162,8 @@ const DomainCVE = () => {
   return (
     <>
       <div className="flex justify-between py-5">
-        <div className="flex flex-col col-span-full sm:col-span-6 xl:col-span-4 bg-slate-800 shadow-lg rounded-md border border-slate-700">
-          <header className="px-5 py-4 border-b border-slate-700">
+        <div className="flex flex-col col-span-full sm:col-span-6 xl:col-span-4 bg-zinc-900 shadow-lg rounded-md border border-zinc-700/60">
+          <header className="px-5 py-4 border-b border-zinc-700/60">
             <h2 className="font-semibold text-slate-100">
               Top Affected Products
             </h2>
@@ -140,8 +171,8 @@ const DomainCVE = () => {
 
           <DoughnutChart data={chartData} width={389} height={260} />
         </div>
-        <div className="flex flex-col col-span-full sm:col-span-6 xl:col-span-4 bg-slate-800 shadow-lg rounded-md border border-slate-700">
-          <header className="px-5 py-4 border-b border-slate-700">
+        <div className="flex flex-col col-span-full sm:col-span-6 xl:col-span-4 bg-zinc-900  shadow-lg rounded-md border border-zinc-700/60">
+          <header className="px-5 py-4 border-b border-zinc-700/60">
             <h2 className="font-semibold text-slate-100">
               Vulnerabilities By Source
             </h2>
@@ -149,8 +180,8 @@ const DomainCVE = () => {
 
           <DoughnutChart data={chartData} width={389} height={260} />
         </div>
-        <div className="flex flex-col col-span-full sm:col-span-6 xl:col-span-4 bg-slate-800 shadow-lg rounded-md border border-slate-700">
-          <header className="px-5 py-4 border-b border-slate-700">
+        <div className="flex flex-col col-span-full sm:col-span-6 xl:col-span-4 bg-zinc-900  shadow-lg rounded-md border border-zinc-700/60">
+          <header className="px-5 py-4 border-b border-zinc-700/60">
             <h2 className="font-semibold text-slate-100">
               Vulnerabilities By Serverity
             </h2>
@@ -160,46 +191,46 @@ const DomainCVE = () => {
         </div>
       </div>
       <div className="flex justify-between py-5">
-        <div className="rounded-md bg-slate-800 p-5 w-[389px]">
+        <div className="rounded-md bg-zinc-900  p-5 w-[389px]">
           <div className="flex justify-between">
             <div className="flex space-x-5">
               <div className="rounded-md px-3 py-3  bg-red-600"></div>
-              <div className="border-l-2 border-slate-700 pl-2">
+              <div className="border-l-2 border-zinc-700/60 pl-2">
                 vulnerabilities
               </div>
             </div>
             <div className="text-right">386</div>
           </div>
         </div>
-        <div className="rounded-md bg-slate-800 p-5 w-[389px]">
+        <div className="rounded-md bg-zinc-900  p-5 w-[389px]">
           <div className="flex justify-between">
             <div className="flex space-x-5">
               <div className="rounded-md px-3 py-3  bg-green-600"></div>
-              <div className="border-l-2 border-slate-700 pl-2">
+              <div className="border-l-2 border-zinc-700/60 pl-2">
                 Domain Check
               </div>
             </div>
             <div className="text-right">20</div>
           </div>
         </div>
-        <div className="rounded-md bg-slate-800 p-5 w-[389px]">
+        <div className="rounded-md bg-zinc-900  p-5 w-[389px]">
           <div className="flex justify-between">
             <div className="flex space-x-5">
               <div className="rounded-md px-3 py-3  bg-blue-700"></div>
-              <div className="border-l-2 border-slate-700 pl-2">Security</div>
+              <div className="border-l-2 border-zinc-700/60 pl-2">Security</div>
             </div>
             <div className="text-right">115</div>
           </div>
         </div>
       </div>
-      <div className="bg-slate-800 shadow-lg rounded-sm border px-5 py-4 border-b border-slate-700 mb-5">
+      <div className="bg-zinc-900  shadow-lg rounded-sm border px-5 py-4 border-b border-zinc-700/60 mb-5">
         <h2 className="font-semibold text-slate-100 flex space-x-5">
           <div className="flex">
             <div>
               <FontAwesomeIcon icon={faFilter} /> Filter:
             </div>
             <select
-              className="bg-slate-800 outline-none px-1"
+              className="bg-zinc-900  outline-none px-1"
               name=""
               id="domain"
               value={filter.domain}
@@ -217,14 +248,16 @@ const DomainCVE = () => {
             <FontAwesomeIcon icon={faMagnifyingGlass} />
           </span>
           <input
-            className="bg-slate-800 outline-none"
+            className="bg-zinc-900  outline-none"
             type="text"
             placeholder="Search ..."
+            value={searchQuery}
+            onChange={handleSearchChange}
           />
         </h2>
       </div>
-      <div className="col-span-full xl:col-span-8 bg-slate-800 shadow-lg rounded-sm border border-slate-700">
-        <header className="px-5 py-4 border-b  border-slate-700">
+      <div className="col-span-full xl:col-span-8 bg-zinc-900  shadow-lg rounded-sm border border-zinc-700/60">
+        <header className="px-5 py-4 border-b  border-zinc-700/60">
           <h2 className="font-semibold  text-slate-100 ">
             Total CVEs: {filteredVulnerabilities.length}
           </h2>
@@ -241,13 +274,28 @@ const DomainCVE = () => {
                   </div>
                 </th>
                 <th className="p-2 ">
-                  <div className="font-semibold text-center">Type</div>
+                  <div
+                    className="font-semibold text-center cursor-pointer"
+                    onClick={() => handleSort("type")}
+                  >
+                    Type
+                  </div>
                 </th>
                 <th className="p-2 ">
-                  <div className="font-semibold text-center">CVSS</div>
+                  <div
+                    className="font-semibold text-center cursor-pointer"
+                    onClick={() => handleSort("cvss")}
+                  >
+                    CVSS <FontAwesomeIcon icon={faSort} />
+                  </div>
                 </th>
                 <th className="p-2 ">
-                  <div className="font-semibold text-center">Exploited</div>
+                  <div
+                    className="font-semibold text-center cursor-pointer"
+                    onClick={() => handleSort("is_exploit")}
+                  >
+                    Exploited <FontAwesomeIcon icon={faSort} />
+                  </div>
                 </th>
                 <th className="p-2">
                   <div className="font-semibold text-center">
@@ -312,7 +360,7 @@ const DomainCVE = () => {
             </tbody>
           </table>
           {/* Pagination */}
-          <div className="flex items-center justify-between border-t border-slate-700 bg-slate-800 px-4 py-3 sm:px-6 text-white">
+          <div className="flex items-center justify-between border-t border-zinc-700/60 bg-zinc-900  px-4 py-3 sm:px-6 text-white">
             <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
               <div>
                 <p className="text-sm">

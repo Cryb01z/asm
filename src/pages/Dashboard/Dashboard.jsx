@@ -15,25 +15,21 @@ import DashboardCard10 from '../../partials/dashboard/DashboardCard10';
 import DashboardCard11 from '../../partials/dashboard/DashboardCard11';
 import DashboardCard12 from '../../partials/dashboard/DashboardCard12';
 import DashboardCard13 from '../../partials/dashboard/DashboardCard13';
+import Test from '../test';
+import { Banner } from 'flowbite-react';
 
 function Dashboard() {
-
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
   return (
-    <div className="flex h-screen overflow-hidden bg-gray-900">
-
-      {/* Sidebar */}
-      <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+    <div className="flex h-screen overflow-hidden bg-black">
 
       {/* Content area */}
       <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
 
         {/*  Site header */}
-        <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+        <Test site={"dashboard"}/>
 
         <main>
-          <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto  text-slate-400">
+          <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto  text-gray-400">
 
             {/* Welcome banner */}
             {/* <WelcomeBanner /> */}
@@ -65,7 +61,7 @@ function Dashboard() {
             <div className="grid grid-cols-12 gap-6">
 
              {/* Line chart (Acme Plus)
-              <DashboardCard01 />
+             <DashboardCard01 />
               /~ Line chart (Acme Advanced) ~/
               <DashboardCard02 />
               /~ Line chart (Acme Professional) ~/
@@ -74,7 +70,7 @@ function Dashboard() {
               <DashboardCard04 />
               /~ Line chart (Real Time Value) ~/
               <DashboardCard05 />
-              /~ Doughnut chart (Top Countries) ~/
+              /~ Dou ghnut chart (Top Countries) ~/
               <DashboardCard06 />
               /~ Table (Top Channels) ~/
               <DashboardCard07 />

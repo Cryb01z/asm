@@ -16,9 +16,11 @@ import BlackMarket from "./pages/BlackMarket/BlackMarket";
 import DigitalFootprint from "./pages/DigitalFootprint/DigitalFootprint";
 import Scan from "./pages/Scan/Scan";
 import Service from "./pages/ServiceManagement/Service";
-import Domain from "./pages/Domain/Domain";
+import Domain from "./pages/Asset/Asset";
 import Result from "./pages/Result/Result";
 import CVEDetail from "./pages/CVE/CVEDetail";
+import Test from "./pages/test";
+import Asset from "./pages/Asset/Asset";
 
 function App() {
   const location = useLocation();
@@ -43,7 +45,8 @@ function App() {
         <Route path="/service" element={<Service />} />
         <Route path="/scan" element={<Scan />} />
         <Route path="/result/:id" element={<Result />} />
-        <Route path="/domain" element={<Domain />} />
+        <Route path="/asset" element={<Asset/>} />
+        <Route path="/test" element={<Test />} />
         <Route path="/digitalfootprint" element={<DigitalFootprint />} />
         <Route path="/darkwebmonitoring" element={<BlackMarket />} />
       </Routes>

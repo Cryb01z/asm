@@ -153,7 +153,6 @@ const CVEList = () => {
     }
   };
 
-
   //Update filterState
   const handleFilterChange = (e) => {
     const { id, value } = e.target;
@@ -204,16 +203,17 @@ const CVEList = () => {
 
   return (
     <>
-      <div className="flex mt-4 space-x-10">
-        <div className="flex space-x-7 p-4 border-t-4 rounded-sm border-blue-700 bg-slate-800 w-[900px]">
+      <div className="flex mt-4 justify-between">
+        <div className="flex space-x-7 p-4 border-2 rounded-lg border-zinc-700/60 hover:border-zinc-700 hover:bg-zinc-900 w-[900px]">
           <div className="py-2">
-            <FontAwesomeIcon icon={faFilter} size="lg"/> <span className="text-lg">Filter:</span>
+            <FontAwesomeIcon icon={faFilter} size="lg" />{" "}
+            <span className="text-lg">Filter:</span>
           </div>
           <select
             id="tag"
             value={cveFilter.tag}
             onChange={handleFilterChange}
-            className="w-48 border text-sm rounded-sm block p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 focus:ring-blue-500 focus:border-blue-500"
+            className="w-48 border text-sm rounded-sm block p-2.5 bg-black border-zinc-700/60 placeholder-gray-400"
           >
             <option value="">Select a tag</option>
             <option value="US">No results found</option>
@@ -222,7 +222,7 @@ const CVEList = () => {
             id="score"
             value={cveFilter.score}
             onChange={handleFilterChange}
-            className="w-48 border text-sm rounded-sm block p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 focus:ring-blue-500 focus:border-blue-500"
+            className="w-48 border text-sm rounded-sm block p-2.5 bg-black border-zinc-700/60 placeholder-gray-400"
           >
             <option value="">Empty</option>
             <option value="0 - 3.9">Low (0 - 3.9)</option>
@@ -235,16 +235,18 @@ const CVEList = () => {
             type="text"
             value={cveFilter.search}
             onChange={handleFilterChange}
-            className="w-52 border text-sm rounded-sm block p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 focus:ring-blue-500 focus:border-blue-500"
+            className="w-52 border text-sm rounded-sm block p-2.5 bg-black border-zinc-700/60 placeholder-gray-400"
             placeholder="Search in CVEs"
           />
-          <div className="ml-10 border text-sm rounded-sm flex items-center justify-center px-4 bg-blue-600 hover:bg-blue-700 cursor-pointer">
+          <div className="ml-10 font-semibold text-black text-sm rounded-md flex items-center justify-center px-4 bg-white hover:bg-white/80 cursor-pointer">
             Search
           </div>
         </div>
-        <div className="flex rounded-sm bg-slate-800 w-[320px]">
-          <div className="flex items-center justify-center bg-blue-700 w-20 h-20">
-            <FontAwesomeIcon icon={faShieldHalved} size="2xl" />
+        <div className="flex rounded-lg bg-black border border-zinc-700/60 w-[320px] hover:bg-zinc-900">
+          <div className="flex items-center justify-center w-20 h-20">
+            <span className="text-blue-600">
+              <FontAwesomeIcon icon={faShieldHalved} size="2xl" />
+            </span>
           </div>
           <div className="text-lg p-2">
             TOTAL <br />
@@ -252,8 +254,8 @@ const CVEList = () => {
           </div>
         </div>
       </div>
-      <table className="table-auto bg-slate-800 mt-4 w-full">
-        <thead className="border-t-4 border-blue-700 font-bold">
+      <table className="table-auto bg-zinc-900 mt-4 w-full">
+        <thead className="border border-zinc-700 font-bold">
           <tr>
             <th className="p-2 text-left w-56">CVE</th>
             <th className="p-2 text-left w-80">Vendors</th>
@@ -265,7 +267,7 @@ const CVEList = () => {
         <tbody>
           {paginatedData().map((cve) => (
             <>
-              <tr className="border-t-2 border-gray-500">
+              <tr className="border-t-2 border-zinc-700">
                 <NavLink to={`/CVE/${cve.id}`}>
                   <td className="p-2 text-left text-blue-600 cursor-pointer">
                     {cve.id}
@@ -294,7 +296,7 @@ const CVEList = () => {
         </tbody>
       </table>
       {/* Pagination */}
-      <div className="flex items-center justify-between border-t border-slate-700 bg-slate-800 px-4 py-3 sm:px-6 text-white">
+      <div className="flex items-center justify-between border-t border-slate-700  px-4 py-3 sm:px-6 text-white">
         <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
           <div>
             <p className="text-sm">
@@ -315,10 +317,8 @@ const CVEList = () => {
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
               className={`flex items-center w-28 justify-center px-3 h-8 text-sm font-medium ${
-                currentPage === 1
-                  ? "bg-gray-500 cursor-not-allowed"
-                  : "bg-white cursor-pointer"
-              } border rounded-lg dark:bg-gray-800 border-gray-700 text-gray-400 hover:bg-gray-700 hover:text-white`}
+                currentPage === 1 ? "cursor-not-allowed" : "cursor-pointer"
+              } border rounded-lg bg-black border-zinc-700/60 text-gray-400 hover:bg-zinc-900 hover:border-zinc-700 hover:text-white`}
             >
               <svg
                 className="w-3.5 h-3.5 me-2 rtl:rotate-180"
@@ -343,9 +343,9 @@ const CVEList = () => {
               disabled={currentPage === totalPages}
               className={`flex items-center w-24 justify-center px-3 h-8 text-sm font-medium ${
                 currentPage === totalPages
-                  ? "bg-gray-500 cursor-not-allowed"
-                  : "bg-white cursor-pointer"
-              } border rounded-lg dark:bg-gray-800 border-gray-700 text-gray-400 hover:bg-gray-700 hover:text-white`}
+                  ? "cursor-not-allowed"
+                  : "cursor-pointer"
+              } border rounded-lg bg-black border-zinc-700/60 text-gray-400 hover:bg-zinc-900 hover:border-zinc-700 hover:text-white`}
             >
               Next
               <svg

@@ -5,7 +5,7 @@ const POC = () => {
     <div className='px-4 mt-4'>
         <table>
             <thead>
-                <tr>
+                <tr className='text-white'>
                     <th className='p-2 text-left w-[400px]'>Exploit</th>
                     <th className='p-2 text-left w-32'>Platform</th>
                     <th className='p-2 text-left w-32'>Type</th>
@@ -14,7 +14,7 @@ const POC = () => {
                 </tr>
             </thead>
             <tbody>
-                <tr className='border-t-2'>
+                <tr className='border-t-2 border-zinc-700'>
                     <td className='p-2 text-left w-[400px]'>dhimasfuniv/CVE-2023-25690-POC</td>
                     <td className='p-2 text-left w-32'></td>
                     <td className='p-2 text-left w-32'></td>
