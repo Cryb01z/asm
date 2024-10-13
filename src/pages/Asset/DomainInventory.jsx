@@ -2,6 +2,7 @@ import {
   faHouse,
   faMagnifyingGlass,
   faMicrochip,
+  faReply,
   faServer,
   faShapes,
   faSort,
@@ -14,7 +15,7 @@ import { useNavigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Test from "../Test";
-const Inventory = () => {
+const DomainInventory = () => {
   const navigate = useNavigate();
   const [option, setoption] = useState("Inventory");
   const data = [
@@ -49,9 +50,9 @@ const Inventory = () => {
       contentLength: "2102",
     },
     {
-      asset: "s.fptshop.com.vn",
+      asset: "id.yenbai.gov.vn",
       port: "8080",
-      ip: "104.22.29.155",
+      ip: "113.160.153.26",
       technologies: ["Cloudflare", "Apache"],
       status: "301",
       tittle: "--",
@@ -59,19 +60,19 @@ const Inventory = () => {
       contentLength: "2102",
     },
     {
-      asset: "services.fptshop.com.vn",
+      asset: "hcc.yenbai.gov.vn",
       port: "8080",
-      ip: "172.67.36.187",
-      technologies: ["Apache"],
+      ip: "113.176.25.127",
+      technologies: ["Apache", "jQuery"],
       status: "403",
       tittle: "--",
       cname: "--",
       contentLength: "2102",
     },
     {
-      asset: "sales.fptshop.com.vn",
+      asset: "edr.yenbai.gov.vn",
       port: "8080",
-      ip: "104.22.28.155",
+      ip: "103.42.54.6",
       technologies: [],
       status: "200",
       tittle: "--",
@@ -97,23 +98,21 @@ const Inventory = () => {
           {/* nav site */}
           <div className="px-8 py-2 sticky top-[65px] z-10 bg-black">
             <div className="flex space-x-1 text-sm">
-              <div
-                className={`px-2 pb-2 cursor-pointer ${
-                  option === "asset" ? "border-b-2 border-indigo-400 z-10" : ""
-                }`}
-                onClick={() => {
-                  setoption("asset");
-                  navigate("/asset");
-                }}
-              >
-                <span
-                  className={`${option === "asset" ? "text-indigo-400" : ""}`}
+              <div className="flex items-center relative group">
+                {/* Icon with hover */}
+                <div
+                  className="px-2 pb-2 cursor-pointer z-10 text-gray-400"
+                  onClick={() => {
+                    navigate("/asset");
+                  }}
                 >
-                  <FontAwesomeIcon icon={faServer} />
-                </span>{" "}
-                <span className={`${option === "asset" ? "text-white" : ""}`}>
-                  Asset Groups
-                </span>
+                  <FontAwesomeIcon icon={faReply} size="lg" />
+                </div>
+
+                {/* Tooltip - only visible on hover */}
+                <div className="absolute text-black w-[68px] bg-white px-2 py-1.5 top-8 -left-3 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-default">
+                  Go back
+                </div>
               </div>
               <div
                 className={`px-2 pb-2 cursor-pointer ${
@@ -123,7 +122,6 @@ const Inventory = () => {
                 }`}
                 onClick={() => {
                   setoption("Inventory");
-                  navigate("/inventory");
                 }}
               >
                 <span
@@ -348,4 +346,4 @@ const Inventory = () => {
   );
 };
 
-export default Inventory;
+export default DomainInventory;

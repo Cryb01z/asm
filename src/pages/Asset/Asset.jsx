@@ -16,8 +16,9 @@ import { useNavigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { data } from "../../axios/data";
-import Test from "../test";
+
 import Inventory from "./Inventory";
+import Test from "../Test";
 
 const Asset = () => {
   const test = data[0];
@@ -59,6 +60,7 @@ const Asset = () => {
                 }`}
                 onClick={() => {
                   setoption("Inventory");
+                  navigate("/inventory");
                 }}
               >
                 <span
@@ -182,7 +184,9 @@ const Asset = () => {
                       </div>
 
                       <div class="mt-3 grid grid-cols-7 p-2 text-sm font-medium border rounded-lg  bg-black border-zinc-700  hover:bg-zinc-900 cursor-pointer">
-                        <div className="col-span-2">
+                        <div className="col-span-2" onClick={() => {
+                          navigate("/inventory/yenbai.gov.vn");
+                        }}>
                           <div class="flex flex-row items-center gap-2.5">
                             <input
                               id="hr2"
@@ -212,7 +216,7 @@ const Asset = () => {
                                 <FontAwesomeIcon icon={faCheck} />
                               </span>{" "}
                               <span className="font-semibold text-white">
-                                antoanthucpham.angiang.gov.vn
+                                yenbai.gov.vn
                               </span>
                             </div>
                           </div>
@@ -317,7 +321,6 @@ const Asset = () => {
           ) : (
             <></>
           )}
-          {option === "Inventory" && <Inventory/>}
           <ToastContainer />
         </main>
       </div>

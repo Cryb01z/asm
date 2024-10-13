@@ -19,8 +19,11 @@ import Service from "./pages/ServiceManagement/Service";
 import Domain from "./pages/Asset/Asset";
 import Result from "./pages/Result/Result";
 import CVEDetail from "./pages/CVE/CVEDetail";
-import Test from "./pages/test";
+
 import Asset from "./pages/Asset/Asset";
+import Inventory from "./pages/Asset/Inventory";
+import DomainInventory from "./pages/Asset/DomainInventory";
+import Test from "./pages/Test";
 
 function App() {
   const location = useLocation();
@@ -45,7 +48,9 @@ function App() {
         <Route path="/service" element={<Service />} />
         <Route path="/scan" element={<Scan />} />
         <Route path="/result/:id" element={<Result />} />
-        <Route path="/asset" element={<Asset/>} />
+        <Route path="/asset" element={<Asset />} />
+        <Route path="/inventory" element={<Inventory />} />
+        <Route path="/inventory/:id" element={<DomainInventory />} />
         <Route path="/test" element={<Test />} />
         <Route path="/digitalfootprint" element={<DigitalFootprint />} />
         <Route path="/darkwebmonitoring" element={<BlackMarket />} />

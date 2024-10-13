@@ -8,7 +8,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Test from "../test";
+import Test from "../Test";
 import CVSS from "./CVSS";
 import Details from "./Details";
 import POC from "./POC";
@@ -66,7 +66,7 @@ const CVEDetail = () => {
           <div className="flex px-28 mt-4 space-x-5 pb-10 text-gray-400">
             <div className="flex-col space-y-5">
               {/* Descriptions */}
-              <div className="w-[950px] border border-zinc-700 bg-black hover:bg-zinc-900 rounded-sm px-2">
+              <div className="w-full max-w-screen-xl border border-zinc-700 bg-black hover:bg-zinc-900 rounded-sm px-2">
                 <div className="text-xl font-bold text-white">Description</div>
                 <div className="flex">
                   <div>
@@ -328,7 +328,7 @@ const CVEDetail = () => {
               </div>
             </div>
             <div className="flex-col space-y-5">
-              <div className="w-[300px] border border-zinc-700 bg-black hover:bg-zinc-900 p-2">
+              <div className="w-full max-w-sm border border-zinc-700 bg-black hover:bg-zinc-900 p-2">
                 <div className="flex space-x-2">
                   <img
                     src="https://app.opencve.io/static/img/cve-icon.png"

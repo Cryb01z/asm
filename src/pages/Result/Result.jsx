@@ -20,7 +20,7 @@ import {
 import { faFile } from "@fortawesome/free-solid-svg-icons/faFile";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useState } from "react";
-import Test from "../test";
+import Test from "../Test";
 import HTTP from "./HTTP";
 import Links from "./Links";
 import Redirects from "./Redirects";

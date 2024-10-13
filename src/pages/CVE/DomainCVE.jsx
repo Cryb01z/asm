@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { allCVEData, CVEData, data } from "../../axios/data";
+import { data } from "../../axios/data";
 import DoughnutChart from "../../charts/DoughnutChart";
 // Import utilities
 import {
@@ -8,12 +8,14 @@ import {
   faMagnifyingGlass,
   faSort,
   faSquareCheck,
-  faThumbsDown,
+  faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { NavLink } from "react-router-dom";
 import { tailwindConfig } from "../../utils/Utils";
-
+import ExploitedModal from "./ExploitedModal";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 const DomainCVE = () => {
   const [test, setTest] = useState([]); // Store domain and service data
   const [vulnerabilities, setVulnerabilities] = useState([]); // Flattened vulnerabilities
@@ -26,7 +28,7 @@ const DomainCVE = () => {
   const [sortConfig, setSortConfig] = useState({ key: "", direction: "" }); // Sorting configuration
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10; // Number of vulnerabilities per page
-
+  const [modal, setmodal] = useState(false); //Exploited Modal
   useEffect(() => {
     setTest(data);
     // Extract vulnerabilities across all domains and services
@@ -256,13 +258,13 @@ const DomainCVE = () => {
           />
         </h2>
       </div>
+      {modal && <ExploitedModal modal={modal} setmodal={setmodal} />}
       <div className="col-span-full xl:col-span-8 bg-zinc-900  shadow-lg rounded-sm border border-zinc-700/60">
         <header className="px-5 py-4 border-b  border-zinc-700/60">
           <h2 className="font-semibold  text-slate-100 ">
             Total CVEs: {filteredVulnerabilities.length}
           </h2>
         </header>
-
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
@@ -335,8 +337,8 @@ const DomainCVE = () => {
                     <div
                       className={
                         cve.is_exploit === "true"
-                          ? "text-center text-green-600"
-                          : "text-center text-red-600"
+                          ? "text-center text-green-600 cursor-pointer"
+                          : "text-center text-red-600 cursor-pointer"
                       }
                     >
                       {cve.is_exploit}
@@ -347,13 +349,19 @@ const DomainCVE = () => {
                     View Assets{" "}
                     <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
                   </td>
-                  <td className="p-2  text-center cursor-pointer">
-                    <span className="text-red-500 hover:text-red-800 mr-3">
+                  <td className="p-2 flex justify-center items-center space-x-3 text-center cursor-pointer">
+                    {/* <div className="text-red-500 hover:text-red-800">
                       <FontAwesomeIcon icon={faThumbsDown} />
-                    </span>{" "}
-                    <span className="text-blue-600 hover:text-blue-800">
+                    </div>{" "} */}
+                    <div className="text-blue-600 hover:text-blue-800">
                       <FontAwesomeIcon icon={faSquareCheck} />
-                    </span>
+                    </div>
+                    <div
+                      className="text-red-500 hover:text-red-800"
+                      onClick={() => setmodal(true)}
+                    >
+                      <FontAwesomeIcon icon={faTrash} />
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -441,6 +449,7 @@ const DomainCVE = () => {
           </div>
         </div>
       </div>
+      <ToastContainer />
     </>
   );
 };

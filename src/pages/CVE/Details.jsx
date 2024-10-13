@@ -6,7 +6,7 @@ const Details = () => {
   return (
     <div className="px-2 mt-4">
       <div className="flex justify-between">
-        <div className="w-[440px] h-[350px] hover:bg-zinc-900 border border-zinc-700 rounded-sm ">
+        <div className="w-[500px] h-[350px] hover:bg-zinc-900 border border-zinc-700 rounded-sm ">
           <div className="p-2 text-white font-semibold">
             <FontAwesomeIcon icon={faMicrochip} /> Affected Software
           </div>
@@ -34,7 +34,7 @@ const Details = () => {
             </div>
           </div>
         </div>
-        <div className="w-[440px] h-[350px] rounded-sm border-2 border-zinc-700 overflow-y-scroll scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-zinc-700">
+        <div className="w-[550px] h-[350px] rounded-sm border-2 border-zinc-700 overflow-y-scroll scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-zinc-700">
           <div className="p-2 text-white font-semibold">
             <FontAwesomeIcon icon={faCube} /> References
           </div>

@@ -15,8 +15,9 @@ import DashboardCard10 from '../../partials/dashboard/DashboardCard10';
 import DashboardCard11 from '../../partials/dashboard/DashboardCard11';
 import DashboardCard12 from '../../partials/dashboard/DashboardCard12';
 import DashboardCard13 from '../../partials/dashboard/DashboardCard13';
-import Test from '../test';
+
 import { Banner } from 'flowbite-react';
+import Test from "../Test";
 
 function Dashboard() {
   return (
@@ -56,6 +57,8 @@ function Dashboard() {
               </div>
 
             </div>*/}
+
+            
 
             {/* Cards */}
             <div className="grid grid-cols-12 gap-6">
