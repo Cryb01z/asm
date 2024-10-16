@@ -184,9 +184,7 @@ const Asset = () => {
                       </div>
 
                       <div class="mt-3 grid grid-cols-7 p-2 text-sm font-medium border rounded-lg  bg-black border-zinc-700  hover:bg-zinc-900 cursor-pointer">
-                        <div className="col-span-2" onClick={() => {
-                          navigate("/inventory/yenbai.gov.vn");
-                        }}>
+                        <div className="col-span-2">
                           <div class="flex flex-row items-center gap-2.5">
                             <input
                               id="hr2"
@@ -215,7 +213,12 @@ const Asset = () => {
                               <span className="px-1 ml-3 text-green-500 bg-green-500/40 rounded-full">
                                 <FontAwesomeIcon icon={faCheck} />
                               </span>{" "}
-                              <span className="font-semibold text-white">
+                              <span
+                                className="font-semibold text-white"
+                                onClick={() => {
+                                  navigate("/inventory/yenbai.gov.vn");
+                                }}
+                              >
                                 yenbai.gov.vn
                               </span>
                             </div>

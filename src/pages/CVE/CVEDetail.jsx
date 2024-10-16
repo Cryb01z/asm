@@ -6,29 +6,227 @@ import {
   faStarOfLife,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import Test from "../Test";
 import CVSS from "./CVSS";
 import Details from "./Details";
 import POC from "./POC";
+import { getCVE } from "../../axios/cveService";
 const CVEDetail = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [option, setoption] = useState("cvss");
-  const [cvss, setcvss] = useState(4);
+  const [cvss, setcvss] = useState(3);
+  const [load, setload] = useState(false);
+  const location = useLocation();
+  const { cveid } = location.state || {};
   const navigate = useNavigate();
-  const data = [
-    {
-      url: "",
-      age: "",
-      size: "",
-      visibility: "",
-      http: 0,
-      ips: 0,
-      report: 0,
-      nation: "",
+  const [data, setdata] = useState({
+    id: "",
+    sourceIdentifier: "",
+    vulnStatus: "",
+    published: "",
+    lastModified: "",
+    descriptions: [
+      {
+        lang: "en",
+        value: "",
+      },
+    ],
+    references: [
+      {
+        url: "",
+        source: "",
+        tags: null,
+      },
+    ],
+    metrics: {
+      cvssMetricV4: null,
+      cvssMetricV31: [
+        {
+          source: "",
+          type: "",
+          cvssData: {
+            version: "",
+            vectorString: "",
+            attackVector: "",
+            attackComplexity: "",
+            privilegesRequired: "",
+            userInteraction: "",
+            scope: "",
+            confidentialityImpact: "",
+            integrityImpact: "",
+            availabilityImpact: "",
+            baseScore: 0,
+            baseSeverity: "",
+          },
+          exploitabilityScore: 0,
+          impactScore: 0,
+        },
+      ],
+      cvssMetricV30: null,
+      cvssMetricV2: [
+        {
+          source: "",
+          type: "",
+          cvssData: {
+            version: "",
+            vectorString: "",
+            accessVector: "",
+            accessComplexity: "",
+            authentication: "",
+            confidentialityImpact: "",
+            integrityImpact: "",
+            availabilityImpact: "",
+            baseScore: 0,
+          },
+          baseSeverity: "HIGH",
+          exploitabilityScore: 0,
+          impactScore: 0,
+          obtainAllPrivilege: false,
+          obtainUserPrivilege: false,
+          obtainOtherPrivilege: false,
+          userInteractionRequired: false,
+        },
+      ],
     },
-  ];
+    weaknesses: [
+      {
+        source: "",
+        type: "",
+        description: [
+          {
+            lang: "",
+            value: "",
+          },
+        ],
+      },
+    ],
+    configurations: null,
+  });
+
+  useEffect(() => {
+    console.log("useEffect running");
+    console.log("location.state:", location.state);
+    console.log("cveid:", cveid);
+
+    if (!cveid) {
+      console.error("cveid is undefined");
+      return;
+    }
+    console.log("useEffect running");
+    const fetchData = async () => {
+      try {
+        console.log(cveid);
+        const response = await getCVE(cveid);
+        console.log(response);
+        const cveDetail = response.data;
+        setdata(cveDetail);
+      } catch (error) {
+        console.error("Error fetching CVEs:", error);
+      } finally {
+        setload(true);
+      }
+    };
+    fetchData();
+  }, [cveid]);
+  console.log(data);
+  console.log(cveid);
+
+  //Get stroke for cvss circle
+  const getStroke = (metrics, type) => {
+    switch (type) {
+      case "cvss":
+        if (metrics.cvssMetricV31 !== null) {
+          return cvssCircle(metrics.cvssMetricV31[0].cvssData.baseScore);
+        } else if (metrics.cvssMetricV2 !== null) {
+          return cvssCircle(metrics.cvssMetricV2[0].cvssData.baseScore);
+        }
+        return cvssCircle(metrics.cvssMetricV30[0].cvssData.baseScore);
+
+      case "color":
+        if (metrics.cvssMetricV31 !== null) {
+          return getCircleColor(metrics.cvssMetricV31[0].cvssData.baseScore);
+        } else if (metrics.cvssMetricV2 !== null) {
+          return getCircleColor(metrics.cvssMetricV2[0].cvssData.baseScore);
+        }
+        return getCircleColor(metrics.cvssMetricV30[0].cvssData.baseScore);
+      case "score":
+        if (metrics.cvssMetricV31 !== null) {
+          return `${metrics.cvssMetricV31[0].cvssData.baseScore} /10`;
+        } else if (metrics.cvssMetricV2 !== null) {
+          return `${metrics.cvssMetricV2[0].cvssData.baseScore} /10`;
+        }
+        return `${metrics.cvssMetricV30[0].cvssData.baseScore} /10`;
+
+      default:
+    }
+  };
+
+  //Get stroke for cvss circle
+  const cvssCircle = (cvss) => {
+    return 100 - cvss * 10;
+  };
+
+  //Get color for cvss circle
+  const getCircleColor = (cvss) => {
+    if (cvss > 0 && cvss < 4) {
+      return "text-green-500";
+    } else if (cvss >= 4 && cvss < 7) {
+      return "text-yellow-500";
+    } else if (cvss >= 7 && cvss < 9) {
+      return "text-orange-600";
+    } else if (cvss >= 9 && cvss <= 10) {
+      return "text-red-600";
+    } else {
+      return "text-gray-500";
+    }
+  };
+
+  //Get color for cvss
+  const getScoreColor = (cvss) => {
+    if (cvss > 0 && cvss < 4) {
+      return "bg-green-500";
+    } else if (cvss >= 4 && cvss < 7) {
+      return "bg-yellow-500";
+    } else if (cvss >= 7 && cvss < 9) {
+      return "bg-orange-600";
+    } else if (cvss >= 9 && cvss <= 10) {
+      return "bg-red-600";
+    } else if (cvss === null) {
+      return "bg-gray-500";
+    } else {
+      return "bg-gray-500";
+    }
+  };
+
+  //Add score level
+  const getScore = (cvss) => {
+    if (cvss > 0 && cvss < 4) {
+      return `${cvss} Low`;
+    } else if (cvss >= 4 && cvss < 7) {
+      return `${cvss} Medium`;
+    } else if (cvss >= 7 && cvss < 9) {
+      return `${cvss} High`;
+    } else if (cvss >= 9 && cvss <= 10) {
+      return `${cvss} Critical`;
+    } else if (cvss === null) {
+      return "Undefined";
+    } else {
+      return "Undefined";
+    }
+  };
+
+  //Custom date
+  const customDate = (date) => {
+    if (!date) {
+      return "Invalid date";
+    }
+    const parsedDate = new Date(date);
+    if (isNaN(parsedDate)) {
+      return "Invalid date";
+    }
+    return parsedDate.toISOString().split("T")[0];
+  };
   return (
     <div className=" bg-black flex h-screen overflow-hidden">
       <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
@@ -58,36 +256,21 @@ const CVEDetail = () => {
                 <span className="text-indigo-400">
                   <FontAwesomeIcon icon={faBug} />
                 </span>{" "}
-                CVE-2024-8655
+                {data.id}
               </div>
             </div>
             <div className="absolute bottom-2 left-0 w-full border-b-2 border-neutral-800"></div>
           </div>
-          <div className="flex px-28 mt-4 space-x-5 pb-10 text-gray-400">
+          <div className="flex justify-center space-x-5 px-28 mt-4 pb-10 w-full text-gray-400">
             <div className="flex-col space-y-5">
               {/* Descriptions */}
-              <div className="w-full max-w-screen-xl border border-zinc-700 bg-black hover:bg-zinc-900 rounded-sm px-2">
+              <div className="w-full max-w-screen-xl border border-zinc-700 bg-black hover:bg-zinc-900 rounded-sm p-2">
                 <div className="text-xl font-bold text-white">Description</div>
-                <div className="flex">
-                  <div>
-                    A vulnerability classified as critical has been found in
-                    playSMS 1.4.4/1.4.5/1.4.6/1.4.7. Affected is an unknown
-                    function of the file
-                    /playsms/index.php?app=main&inc=core_auth&route=forgot&op=forgot
-                    of the component Template Handler. The manipulation of the
-                    argument username/email/captcha leads to code injection. It
-                    is possible to launch the attack remotely. The complexity of
-                    an attack is rather high. The exploitability is told to be
-                    difficult. The exploit has been disclosed to the public and
-                    may be used. It is recommended to upgrade the affected
-                    component. The project maintainer was informed early about
-                    the issue. Investigation shows that playSMS up to 1.4.3
-                    contained a fix but later versions re-introduced the flaw.
-                    As long as the latest version of the playsms/tpl package is
-                    used, the software is not affected. Version
-                    {">"}=1.4.4 shall fix this issue for sure.
+                <div className="flex p-2 justify-between relative">
+                  <div className="break-all w-full pr-20">
+                    {data.descriptions[0].value}
                   </div>
-                  <div>
+                  <div className="align-middle">
                     <div className="relative size-40">
                       <svg
                         className="size-full -rotate-90"
@@ -108,10 +291,13 @@ const CVEDetail = () => {
                           cy="18"
                           r="16"
                           fill="none"
-                          className="stroke-current text-red-500"
+                          className={`stroke-current ${getStroke(
+                            data.metrics,
+                            "color"
+                          )}`}
                           stroke-width="2"
                           stroke-dasharray="100"
-                          stroke-dashoffset="4"
+                          stroke-dashoffset={getStroke(data.metrics, "cvss")}
                           stroke-linecap="round"
                         ></circle>
                       </svg>
@@ -119,7 +305,9 @@ const CVEDetail = () => {
                         <span className="text-center text-2xl font-bold">
                           CVSSv3
                         </span>
-                        <div className="text-center">9.8/10</div>
+                        <div className="text-center">
+                          {getStroke(data.metrics, "score")}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -128,7 +316,7 @@ const CVEDetail = () => {
               <div className="bg-black border border-zinc-700  px-2 pb-4 ">
                 <div className="relative">
                   <div className="flex py-2 px-2 space-x-2 text-lg">
-                    <div
+                    {/* <div
                       className={
                         option === "country"
                           ? "px-1 border-b-2 border-indigo-400 z-10 rounded-sm cursor-pointer"
@@ -152,7 +340,7 @@ const CVEDetail = () => {
                       >
                         Affected Countries
                       </span>
-                    </div>
+                    </div> */}
                     <div
                       className={
                         option === "cvss"
@@ -201,7 +389,7 @@ const CVEDetail = () => {
                         Details
                       </span>
                     </div>
-                    <div
+                    {/* <div
                       className={
                         option === "poc"
                           ? "px-1 border-b-2 border-indigo-400 z-10 rounded-sm cursor-pointer"
@@ -223,7 +411,7 @@ const CVEDetail = () => {
                       >
                         Available PoC's & Exploits
                       </span>
-                    </div>
+                    </div> */}
                   </div>
                   <div className="absolute bottom-2 left-0 w-full border-b-2 border-zinc-700/60"></div>
                 </div>
@@ -234,25 +422,6 @@ const CVEDetail = () => {
                     <div className="mt-4 px-2">
                       <div className="relative">
                         <div className="flex space-x-2">
-                          <div
-                            className={
-                              cvss === 4
-                                ? "p-2 border-b-2 border-indigo-400 cursor-pointer"
-                                : "p-2 cursor-pointer"
-                            }
-                            onClick={() => {
-                              setcvss(4);
-                            }}
-                          >
-                            <span
-                              className={`${cvss === 4 ? "text-white" : ""}`}
-                            >
-                              CVSS v4.0
-                            </span>{" "}
-                            <span className="px-1 bg-orange-500 round-sm text-sm text-white">
-                              6.3 Medium
-                            </span>
-                          </div>
                           <div
                             className={
                               cvss === 3
@@ -268,8 +437,22 @@ const CVEDetail = () => {
                             >
                               CVSS v3.1
                             </span>{" "}
-                            <span className="px-1 bg-orange-500 round-sm text-sm text-white">
-                              6.3 Medium
+                            <span
+                              className={`px-1 ${
+                                data.metrics.cvssMetricV31 !== null
+                                  ? getScoreColor(
+                                      data.metrics.cvssMetricV31[0].cvssData
+                                        .baseScore
+                                    )
+                                  : ""
+                              } round-md text-sm text-white`}
+                            >
+                              {data.metrics.cvssMetricV31 !== null
+                                ? getScore(
+                                    data.metrics.cvssMetricV31[0].cvssData
+                                      .baseScore
+                                  )
+                                : ""}
                             </span>
                           </div>
                           <div
@@ -287,8 +470,22 @@ const CVEDetail = () => {
                             >
                               CVSS v3.0
                             </span>{" "}
-                            <span className="px-1 bg-orange-500 round-sm text-sm text-white">
-                              6.3 Medium
+                            <span
+                              className={`px-1 ${
+                                data.metrics.cvssMetricV30 !== null
+                                  ? getScoreColor(
+                                      data.metrics.cvssMetricV30[0].cvssData
+                                        .baseScore
+                                    )
+                                  : ""
+                              } round-md text-sm text-white`}
+                            >
+                              {data.metrics.cvssMetricV30 !== null
+                                ? getScore(
+                                    data.metrics.cvssMetricV30[0].cvssData
+                                      .baseScore
+                                  )
+                                : ""}
                             </span>
                           </div>
                           <div
@@ -306,14 +503,37 @@ const CVEDetail = () => {
                             >
                               CVSS v2.0
                             </span>{" "}
-                            <span className="px-1 bg-orange-500 round-sm text-sm text-white">
-                              6.3 Medium
+                            <span
+                              className={`px-1 ${
+                                data.metrics.cvssMetricV2 !== null
+                                  ? getScoreColor(
+                                      data.metrics.cvssMetricV2[0].cvssData
+                                        .baseScore
+                                    )
+                                  : ""
+                              } round-md text-sm text-white`}
+                            >
+                              {data.metrics.cvssMetricV2 !== null
+                                ? getScore(
+                                    data.metrics.cvssMetricV2[0].cvssData
+                                      .baseScore
+                                  )
+                                : ""}
                             </span>
                           </div>
                         </div>
                         <div className="absolute  left-0 w-full border-b-2 border-zinc-700/60"></div>
                       </div>
-                      <CVSS version={cvss} />
+
+                      {cvss === 3 && (
+                        <CVSS metric={data.metrics.cvssMetricV31} />
+                      )}
+                      {cvss === 2 && (
+                        <CVSS metric={data.metrics.cvssMetricV30} />
+                      )}
+                      {cvss === 1 && (
+                        <CVSS metric={data.metrics.cvssMetricV2} />
+                      )}
                     </div>
                   </>
                 ) : (
@@ -321,7 +541,12 @@ const CVEDetail = () => {
                 )}
 
                 {/* CVEDetails */}
-                {option === "details" && <Details />}
+                {option === "details" && (
+                  <Details
+                    references={data.references}
+                    config={data.configurations}
+                  />
+                )}
 
                 {/* POC & Exploit */}
                 {option === "poc" && <POC />}
@@ -342,18 +567,20 @@ const CVEDetail = () => {
                     <div>Assigner:</div>
                     <div>Published:</div>
                     <div>Updated:</div>
-                    <div>Reserved:</div>
                     <div>Link:</div>
                   </div>
                   <div className="flex-col">
-                    <div>PUBLISHED</div>
-                    <div>VulDB</div>
-                    <div>2024-09-16</div>
-                    <div>2024-09-16</div>
-                    <div> 2024-09-15</div>
-                    <div className="text-blue-400 cursor-pointer">
-                      CVE-2024-8880
-                    </div>
+                    <div>{data.vulnStatus}</div>
+                    <div>{data.weaknesses[0].source}</div>
+                    <div>{customDate(data.published)}</div>
+                    <div>{customDate(data.lastModified)}</div>
+                    <a
+                      href={`https://www.cve.org/CVERecord?id=${data.id}`}
+                      target="_blank"
+                      className="text-blue-400 cursor-pointer"
+                    >
+                      {data.id}
+                    </a>
                   </div>
                 </div>
               </div>
@@ -387,12 +614,16 @@ const CVEDetail = () => {
                     <div>Link:</div>
                   </div>
                   <div className="flex-col">
-                    <div>Received</div>
-                    <div>2024-09-16</div>
-                    <div>2024-09-16</div>
-                    <div className="text-blue-400 cursor-pointer">
-                      CVE-2024-8880
-                    </div>
+                    <div>{data.vulnStatus}</div>
+                    <div>{customDate(data.published)}</div>
+                    <div>{customDate(data.lastModified)}</div>
+                    <a
+                      href={`https://nvd.nist.gov/vuln/detail/${data.id}`}
+                      target="_blank"
+                      className="text-blue-400 cursor-pointer"
+                    >
+                      {data.id}
+                    </a>
                   </div>
                 </div>
               </div>

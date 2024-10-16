@@ -178,8 +178,8 @@ const Inventory = () => {
                 <FontAwesomeIcon icon={faMagnifyingGlass} />
               </div>
             </div>
-            <div className="overflow-x-auto mt-5 scrollbar scrollbar-thumb-gray-500 scrollbar-track-zinc-700">
-              <table className="w-[130%] border-separate border-spacing-y-0 overflow-x-scroll scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-zinc-700">
+            <div className="overflow-x-auto mt-5 scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-black">
+              <table className="w-[130%] border-separate border-spacing-y-0 overflow-x-scroll scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-black">
                 <thead className="sticky top-0">
                   <tr className="bg-[#18181b] rounded-lg uppercase font-extralight font-mono">
                     <th className="sticky left-0 text-left w-96 px-4 rounded-l-lg shadow-[34px_0px_29px_1px_rgba(11,11,13,0.8)] bg-[#18181b] cursor-pointer z-10">

@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFilter, faShieldHalved } from "@fortawesome/free-solid-svg-icons";
+import { getCVES } from "../../axios/cveService";
 
-const CVEList = () => {
+const OpenCVE = () => {
   const [cveFilter, setcveFilter] = useState({
     tag: "",
     score: "",
@@ -11,121 +12,47 @@ const CVEList = () => {
   });
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+  const [loading, setloading] = useState(false);
+  const [cveData, setcveData] = useState({
+    cves: [
+      {
+        id: "",
+        descriptions: [
+          {
+            lang: "",
+            value: "",
+          },
+        ],
+        configurations: null,
+        lastModified: "",
+        score: 0,
+      },
+    ],
+    page: 0,
+    pageCount: 0,
+    pageSize: 0,
+  });
 
-  const data = [
-    {
-      id: "CVE-2024-8655",
-      vendor: "",
-      product: "",
-      update: "2024-09-12",
-      score: "3.2",
-      discription:
-        "A vulnerability was found in Mercury MNVR816 up to 2.0.1.0.5. It has been classified as problematic. This affects an unknown part of the file /web-static/. The manipulation leads to files or directories accessible. It is possible to initiate the attack remotely. The exploit has been disclosed to the public and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
-    },
-    {
-      id: "CVE-2024-8092",
-      vendor: "",
-      product: "",
-      update: "2024-09-12",
-      score: "5.3",
-      discription:
-        "A vulnerability was found in Mercury MNVR816 up to 2.0.1.0.5. It has been classified as problematic. This affects an unknown part of the file /web-static/. The manipulation leads to files or directories accessible. It is possible to initiate the attack remotely. The exploit has been disclosed to the public and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
-    },
-    {
-      id: "CVE-2024-8091",
-      vendor: "",
-      product: "",
-      update: "2024-09-12",
-      score: "6.9",
-      discription:
-        "A vulnerability was found in Mercury MNVR816 up to 2.0.1.0.5. It has been classified as problematic. This affects an unknown part of the file /web-static/. The manipulation leads to files or directories accessible. It is possible to initiate the attack remotely. The exploit has been disclosed to the public and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
-    },
-    {
-      id: "CVE-2024-8047",
-      vendor: "",
-      product: "",
-      update: "2024-09-12",
-      score: "9.8",
-      discription:
-        "A vulnerability was found in Mercury MNVR816 up to 2.0.1.0.5. It has been classified as problematic. This affects an unknown part of the file /web-static/. The manipulation leads to files or directories accessible. It is possible to initiate the attack remotely. The exploit has been disclosed to the public and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
-    },
-    {
-      id: "CVE-2024-8044",
-      vendor: "",
-      product: "",
-      update: "2024-09-12",
-      score: "7.8",
-      discription:
-        "A vulnerability was found in Mercury MNVR816 up to 2.0.1.0.5. It has been classified as problematic. This affects an unknown part of the file /web-static/. The manipulation leads to files or directories accessible. It is possible to initiate the attack remotely. The exploit has been disclosed to the public and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
-    },
-    {
-      id: "CVE-2024-8043",
-      vendor: "",
-      product: "",
-      update: "2024-09-12",
-      score: "5.4",
-      discription:
-        "A vulnerability was found in Mercury MNVR816 up to 2.0.1.0.5. It has been classified as problematic. This affects an unknown part of the file /web-static/. The manipulation leads to files or directories accessible. It is possible to initiate the attack remotely. The exploit has been disclosed to the public and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
-    },
-    {
-      id: "CVE-2024-38014",
-      vendor: "",
-      product: "",
-      update: "2024-09-12",
-      score: "6.6",
-      discription:
-        "A vulnerability was found in Mercury MNVR816 up to 2.0.1.0.5. It has been classified as problematic. This affects an unknown part of the file /web-static/. The manipulation leads to files or directories accessible. It is possible to initiate the attack remotely. The exploit has been disclosed to the public and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
-    },
-    {
-      id: "CVE-2022-25153",
-      vendor: "",
-      product: "",
-      update: "2024-09-12",
-      score: "8.4",
-      discription:
-        "A vulnerability was found in Mercury MNVR816 up to 2.0.1.0.5. It has been classified as problematic. This affects an unknown part of the file /web-static/. The manipulation leads to files or directories accessible. It is possible to initiate the attack remotely. The exploit has been disclosed to the public and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
-    },
-    {
-      id: "CVE-2022-24386",
-      vendor: "",
-      product: "",
-      update: "2024-09-12",
-      score: "9.2",
-      discription:
-        "A vulnerability was found in Mercury MNVR816 up to 2.0.1.0.5. It has been classified as problematic. This affects an unknown part of the file /web-static/. The manipulation leads to files or directories accessible. It is possible to initiate the attack remotely. The exploit has been disclosed to the public and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
-    },
-    {
-      id: "CVE-2022-24386",
-      vendor: "",
-      product: "",
-      update: "2024-09-12",
-      score: "9.2",
-      discription:
-        "A vulnerability was found in Mercury MNVR816 up to 2.0.1.0.5. It has been classified as problematic. This affects an unknown part of the file /web-static/. The manipulation leads to files or directories accessible. It is possible to initiate the attack remotely. The exploit has been disclosed to the public and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
-    },
-    {
-      id: "CVE-2022-24386",
-      vendor: "",
-      product: "",
-      update: "2024-09-12",
-      score: "9.2",
-      discription:
-        "A vulnerability was found in Mercury MNVR816 up to 2.0.1.0.5. It has been classified as problematic. This affects an unknown part of the file /web-static/. The manipulation leads to files or directories accessible. It is possible to initiate the attack remotely. The exploit has been disclosed to the public and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
-    },
-    {
-      id: "CVE-2022-24386",
-      vendor: "",
-      product: "",
-      update: "2024-09-12",
-      score: "9.2",
-      discription:
-        "A vulnerability was found in Mercury MNVR816 up to 2.0.1.0.5. It has been classified as problematic. This affects an unknown part of the file /web-static/. The manipulation leads to files or directories accessible. It is possible to initiate the attack remotely. The exploit has been disclosed to the public and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
-    },
-  ];
-
+  useEffect(() => {
+    console.log("useEffect running");
+    const fetchData = async () => {
+      try {
+        const response = await getCVES(currentPage, itemsPerPage);
+        const cves = response.data;
+        console.log(cves);
+        setcveData(cves);
+      } catch (error) {
+        console.error("Error fetching CVEs:", error);
+      } finally {
+        setloading(true);
+      }
+    };
+    fetchData();
+  }, [currentPage, itemsPerPage]);
+  console.log(cveData);
   //Render cvss score color
   const getScoreColor = (cvss) => {
-    if (cvss >= 0 && cvss < 4) {
+    if (cvss > 0 && cvss < 4) {
       return "bg-green-500";
     } else if (cvss >= 4 && cvss < 7) {
       return "bg-yellow-500";
@@ -133,6 +60,8 @@ const CVEList = () => {
       return "bg-orange-600";
     } else if (cvss >= 9 && cvss <= 10) {
       return "bg-red-600";
+    } else if (cvss === null) {
+      return "bg-gray-500";
     } else {
       return "bg-gray-500";
     }
@@ -140,7 +69,7 @@ const CVEList = () => {
 
   //Add score level
   const getScore = (cvss) => {
-    if (cvss >= 0 && cvss < 4) {
+    if (cvss > 0 && cvss < 4) {
       return `${cvss} Low`;
     } else if (cvss >= 4 && cvss < 7) {
       return `${cvss} Medium`;
@@ -148,58 +77,27 @@ const CVEList = () => {
       return `${cvss} High`;
     } else if (cvss >= 9 && cvss <= 10) {
       return `${cvss} Critical`;
+    } else if (cvss === null) {
+      return "Undefined";
     } else {
       return "Undefined";
     }
   };
 
-  //Update filterState
-  const handleFilterChange = (e) => {
-    const { id, value } = e.target;
-    setcveFilter((prev) => ({
-      ...prev,
-      [id]: value,
-    }));
-  };
-
-  //Filter by score and cve ID
-  const filterData = () => {
-    return data.filter((cve) => {
-      // Filter by score range
-      const score = parseFloat(cve.score);
-      let scoreMatch = true;
-      if (cveFilter.score) {
-        const [minScore, maxScore] = cveFilter.score.split(" - ").map(Number);
-        scoreMatch = score >= minScore && score <= maxScore;
-      }
-
-      // Filter by search text
-      const searchMatch = cve.id
-        .toLowerCase()
-        .includes(cveFilter.search.toLowerCase());
-
-      // Combine the filters
-      return scoreMatch && searchMatch;
-    });
-  };
-
-  // Pagination
-  const paginatedData = () => {
-    const filteredData = filterData();
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    return filteredData.slice(startIndex, endIndex);
-  };
-
   //Update current page
-  const handlePageChange = (newPage) => {
+  const handlePageChange = async (newPage) => {
     if (newPage < 1 || newPage > totalPages) {
       return; // Prevent the page from changing if out of bounds
     }
     setCurrentPage(newPage);
   };
 
-  const totalPages = Math.ceil(filterData().length / itemsPerPage);
+  //custom date format
+  const customDate = (date) => {
+    return new Date(date).toISOString().split("T")[0];
+  };
+
+  const totalPages = Math.ceil(cveData.pageCount / itemsPerPage);
 
   return (
     <>
@@ -212,7 +110,6 @@ const CVEList = () => {
           <select
             id="tag"
             value={cveFilter.tag}
-            onChange={handleFilterChange}
             className="w-48 border text-sm rounded-sm block p-2.5 bg-black border-zinc-700/60 placeholder-gray-400"
           >
             <option value="">Select a tag</option>
@@ -221,7 +118,6 @@ const CVEList = () => {
           <select
             id="score"
             value={cveFilter.score}
-            onChange={handleFilterChange}
             className="w-48 border text-sm rounded-sm block p-2.5 bg-black border-zinc-700/60 placeholder-gray-400"
           >
             <option value="">Empty</option>
@@ -234,7 +130,6 @@ const CVEList = () => {
             id="search"
             type="text"
             value={cveFilter.search}
-            onChange={handleFilterChange}
             className="w-52 border text-sm rounded-sm block p-2.5 bg-black border-zinc-700/60 placeholder-gray-400"
             placeholder="Search in CVEs"
           />
@@ -265,34 +160,48 @@ const CVEList = () => {
           </tr>
         </thead>
         <tbody>
-          {paginatedData().map((cve) => (
-            <>
-              <tr className="border-t-2 border-zinc-700">
-                <NavLink to={`/CVE/${cve.id}`}>
-                  <td className="p-2 text-left text-blue-600 cursor-pointer">
-                    {cve.id}
+          {loading ? (
+            cveData.cves.map((cve) => (
+              <>
+                <tr className="border-t-2 border-zinc-700">
+                  <NavLink to={`/CVE/${cve.id}`} state={{ cveid: cve.id }}>
+                    <td className="p-2 text-left text-blue-600 cursor-pointer">
+                      {cve.id}
+                    </td>
+                  </NavLink>
+                  <td className="p-2 text-left">
+                    {cve.configurations === null ? "" : ""}
                   </td>
-                </NavLink>
-                <td className="p-2 text-left"></td>
-                <td className="p-2 text-left"></td>
-                <td className="p-2 text-center">{cve.update}</td>
-                <td className="p-2 text-center">
-                  <span
-                    className={`px-2 text-sm rounded-sm ${getScoreColor(
-                      cve.score
-                    )}`}
-                  >
-                    {getScore(cve.score)}
-                  </span>
-                </td>
-              </tr>
-              <tr>
-                <td className="p-2 text-sm" colSpan={5}>
-                  {cve.discription}
-                </td>
-              </tr>
+                  <td className="p-2 text-left">
+                    {cve.configurations === null ? "" : ""}
+                  </td>
+                  <td className="p-2 text-center">
+                    {customDate(cve.lastModified)}
+                  </td>
+                  <td className="p-2 text-center">
+                    <span
+                      className={`px-2 text-sm rounded-sm ${getScoreColor(
+                        cve.score
+                      )}`}
+                    >
+                      {getScore(cve.score)}
+                    </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td className="p-2 text-sm" colSpan={5}>
+                    {cve.descriptions[0].value}
+                  </td>
+                </tr>
+              </>
+            ))
+          ) : (
+            <>
+            <div className="animate-pulse">
+              <div className="w-full h-96 bg-zinc-900"></div>
+            </div>
             </>
-          ))}
+          )}
         </tbody>
       </table>
       {/* Pagination */}
@@ -306,9 +215,9 @@ const CVEList = () => {
               </span>{" "}
               to{" "}
               <span className="font-medium">
-                {Math.min(currentPage * itemsPerPage, filterData().length)}
+                {Math.min(currentPage * itemsPerPage, cveData.pageCount)}
               </span>{" "}
-              of <span className="font-medium">{filterData().length}</span>{" "}
+              of <span className="font-medium">{cveData.pageCount}</span>{" "}
               results
             </p>
           </div>
@@ -371,4 +280,4 @@ const CVEList = () => {
   );
 };
 
-export default CVEList;
+export default OpenCVE;

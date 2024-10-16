@@ -16,6 +16,7 @@ import { tailwindConfig } from "../../utils/Utils";
 import ExploitedModal from "./ExploitedModal";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { getCVE, getCVES } from "../../axios/cveService";
 const DomainCVE = () => {
   const [test, setTest] = useState([]); // Store domain and service data
   const [vulnerabilities, setVulnerabilities] = useState([]); // Flattened vulnerabilities
@@ -29,27 +30,33 @@ const DomainCVE = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10; // Number of vulnerabilities per page
   const [modal, setmodal] = useState(false); //Exploited Modal
-  useEffect(() => {
-    setTest(data);
-    // Extract vulnerabilities across all domains and services
-    const flattenedVulnerabilities = [];
-    data.forEach((domain) => {
-      if (domain.services.length > 0) {
-        domain.services.forEach((service) => {
-          if (service.vulnerabilities.length > 0) {
-            service.vulnerabilities.map((vul) => {
-              flattenedVulnerabilities.push({
-                domain: domain.domain,
-                ...vul,
+  useEffect(
+    () => async () => {
+      const cve = await getCVES(1, 10);
+      console.log(cve);
+      setcveData(cve);
+      setTest(data);
+      // Extract vulnerabilities across all domains and services
+      const flattenedVulnerabilities = [];
+      data.forEach((domain) => {
+        if (domain.services.length > 0) {
+          domain.services.forEach((service) => {
+            if (service.vulnerabilities.length > 0) {
+              service.vulnerabilities.map((vul) => {
+                flattenedVulnerabilities.push({
+                  domain: domain.domain,
+                  ...vul,
+                });
               });
-            });
-          }
-        });
-      }
-    });
-    setVulnerabilities(flattenedVulnerabilities);
-    setFilteredVulnerabilities(flattenedVulnerabilities); // Initially set all vulnerabilities as filtered
-  }, []);
+            }
+          });
+        }
+      });
+      setVulnerabilities(flattenedVulnerabilities);
+      setFilteredVulnerabilities(flattenedVulnerabilities); // Initially set all vulnerabilities as filtered
+    },
+    []
+  );
 
   //Render cvss score color
   const cvssColor = (cvss) => {
@@ -136,6 +143,10 @@ const DomainCVE = () => {
       return; // Prevent the page from changing if out of bounds
     }
     setCurrentPage(newPage);
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth", // Optional for smooth scrolling
+    });
   };
 
   const totalPages = Math.ceil(filteredVulnerabilities.length / itemsPerPage);

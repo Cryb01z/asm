@@ -4,7 +4,7 @@ import React from "react";
 
 const Links = () => {
   return (
-    <div className="mt-4 h-[calc(80%)]">
+    <div className="mt-4">
       <div className="text-2xl font-bold">4 Outgoing links</div>
       <div className="py-4">
         These are links going to different origins than the main page.

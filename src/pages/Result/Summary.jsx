@@ -8,7 +8,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useState } from "react";
-const Summary = () => {
+const Summary = ({ data }) => {
   const technology = [
     {
       name: "WordPress ",
@@ -44,57 +44,122 @@ const Summary = () => {
         : [...preExpandTech, index]
     );
   };
+
+  console.log(data);
+
+  //calculate the months left from today
+  const monthsLeft = (expiry_date) => {
+    const expiryDate = new Date(expiry_date);
+    const currentDate = new Date(); // Current date
+
+    // Get the difference in years and months
+    let yearsDiff = expiryDate.getFullYear() - currentDate.getFullYear();
+    let monthsDiff = expiryDate.getMonth() - currentDate.getMonth();
+
+    // Calculate the total months difference
+    let totalMonths = yearsDiff * 12 + monthsDiff;
+
+    // If the current day is greater than the expiry day, subtract one month
+    if (expiryDate.getDate() < currentDate.getDate()) {
+      totalMonths--;
+    }
+
+    return totalMonths;
+  };
+
+  // Format the date
+  const formatDate = (timestamp) => {
+    const date = new Date(timestamp);
+
+    // Get day, month, and year
+    const day = date.getDate();
+    const year = date.getFullYear();
+
+    // Array of month names
+    const months = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+    const month = months[date.getMonth()];
+
+    // Add suffix to the day (st, nd, rd, th)
+    const suffix =
+      day % 10 === 1 && day !== 11
+        ? "st"
+        : day % 10 === 2 && day !== 12
+        ? "nd"
+        : day % 10 === 3 && day !== 13
+        ? "rd"
+        : "th";
+
+    // Return formatted date string
+    return `${month} ${day}${suffix}, ${year}`;
+  };
+
   const handdleOption = (option) => {
     setoption((prev) => (prev = option));
   };
   return (
-    <div className="flex justify-between h-[calc(80%)] text-white">
+    <div className="flex justify-between w-full space-x-20 text-white">
       <div className="flex flex-col">
         <div className="text-xl py-2 font-bold ">Summary</div>
-        <div className="border-2 p-3 w-[650px] rounded-sm border-zinc-700/60">
+        <div className="border-2 p-3 w-full rounded-sm border-zinc-700/60">
           <div className="pb-2 border-b-2 border-zinc-700/60">
-            This website contacted <span className="font-bold">2 IPs</span> in 1
-            countries across <span className="font-bold">2 domains</span> {}
+            This website contacted <span className="font-bold"> IPs</span> in 1
+            countries across <span className="font-bold">1 domains</span> {}
             to perform <span className="font-bold">17 HTTP transactions</span>.
             The main IP is
-            <span className="text-green-500"> 193.53.251.217</span>, located in{" "}
-            <span className="font-bold">Germany</span> and belongs to{" "}
+            <span className="text-green-500"> {data.ip}</span>, located in{" "}
+            <span className="font-bold">
+              {data.autonomous_system.country_code}
+            </span>{" "}
+            and belongs to{" "}
             <span className="text-green-500">
-              MITTWALD-AS Mittwald CM Service GmbH und Co. KG, DE
+              {data.autonomous_system.description}
             </span>
             . The main domain is
-            <span className="text-green-500"> giz.proseed-al.de</span>. TLS
-            certificate: Issued by R11 on July 29th 2024. Valid for: 3 months.
+            <span className="text-green-500"> {data.domain}</span>.
           </div>
           <div className="pb-2 border-b-2 border-zinc-700/60">
-            <span className="text-green-500">giz.proseed-al.de</span> scanned{" "}
-            <span className="font-bold">2 times</span> on urlscan.io
+            <span className="text-green-500">{data.domain}</span> scanned{" "}
+            <span className="font-bold">1 times</span> on asm
           </div>
-          <div className="pb-2 border-b-2 border-zinc-700/60">
+          {/* <div className="pb-2 border-b-2 border-zinc-700/60">
             <span className="font-bold">urlscan.io Verdict:</span> No
             classification
           </div>
           <div className="pb-2 border-b-2 border-zinc-700/60 font-bold">
             Live information
-          </div>
+          </div> */}
           <div className="pb-2 border-b-2 border-zinc-700/60">
             <span className="font-bold">Google Safe Browsing:</span> No
-            classification for giz.proseed-al.de
+            classification for {data.domain}
           </div>
           <div>
             <span className="font-bold">
-              Current DNS A record: 193.53.251.217
+              Current DNS A record: {data.domain}
             </span>{" "}
-            (AS15817 - MITTWALD-AS Mittwald CM Service GmbH und Co. KG, DE)
+            ({data.autonomous_system.bgp_prefix} -{" "}
+            {data.autonomous_system.description})
           </div>
         </div>
         <div className="text-xl font-bold py-2">Domain & information</div>
-        <div className="flex space-x-2 px-2 border-b-2">
+        <div className="flex space-x-2 p-2 border-2 rounded-md border-zinc-700">
           <div
             className={
               option === "ASNs"
-                ? "py-2 px-3 rounded-t-sm border-2 border-dotted cursor-pointer"
-                : "py-2 text-green-500 px-3 rounded-t-sm hover:bg-zinc-900 cursor-pointer"
+                ? "py-2 px-3 rounded-md bg-zinc-900 border border-zinc-700 font-bold cursor-pointer"
+                : "py-2  px-3 rounded-md hover:border hover:border-zinc-700 hover:text-indigo-400 hover:bg-zinc-900 cursor-pointer"
             }
             onClick={() => {
               handdleOption("ASNs");
@@ -105,8 +170,8 @@ const Summary = () => {
           <div
             className={
               option === "detail"
-                ? "py-2 px-3 rounded-t-sm border-2 border-dotted cursor-pointer"
-                : "py-2 text-green-500 px-3 rounded-t-sm hover:bg-zinc-900 cursor-pointer"
+                ? "py-2 px-3 rounded-md bg-zinc-900 border border-zinc-700 font-bold cursor-pointer"
+                : "py-2  px-3 rounded-md hover:border hover:border-zinc-700 hover:text-indigo-400 hover:bg-zinc-900 cursor-pointer"
             }
             onClick={() => {
               handdleOption("detail");
@@ -117,8 +182,8 @@ const Summary = () => {
           <div
             className={
               option === "domain"
-                ? "py-2 px-3 rounded-t-sm border-2 border-dotted cursor-pointer"
-                : "py-2 text-green-500 px-3 rounded-t-sm hover:bg-zinc-900 cursor-pointer"
+                ? "py-2 px-3 rounded-md bg-zinc-900 border border-zinc-700 font-bold cursor-pointer"
+                : "py-2  px-3 rounded-md hover:border hover:border-zinc-700 hover:text-indigo-400 hover:bg-zinc-900 cursor-pointer"
             }
             onClick={() => {
               handdleOption("domain");
@@ -129,8 +194,8 @@ const Summary = () => {
           <div
             className={
               option === "domainTree"
-                ? "py-2 px-3 rounded-t-sm border-2 border-dotted cursor-pointer"
-                : "py-2 text-green-500 px-3 rounded-t-sm hover:bg-zinc-900 cursor-pointer"
+                ? "py-2 px-3 rounded-md bg-zinc-900 border border-zinc-700 font-bold cursor-pointer"
+                : "py-2  px-3 rounded-md hover:border hover:border-zinc-700 hover:text-indigo-400 hover:bg-zinc-900 cursor-pointer"
             }
             onClick={() => {
               handdleOption("domainTree");
@@ -141,8 +206,8 @@ const Summary = () => {
           <div
             className={
               option === "link"
-                ? "py-2 px-3 rounded-t-sm border-2 border-dotted cursor-pointer"
-                : "py-2 text-green-500 px-3 rounded-t-sm hover:bg-zinc-900 cursor-pointer"
+                ? "py-2 px-3 rounded-md bg-zinc-900 border border-zinc-700 font-bold cursor-pointer"
+                : "py-2  px-3 rounded-md hover:border hover:border-zinc-700 hover:text-indigo-400 hover:bg-zinc-900 cursor-pointer"
             }
             onClick={() => {
               handdleOption("link");
@@ -153,8 +218,8 @@ const Summary = () => {
           <div
             className={
               option === "cert"
-                ? "py-2 px-3 rounded-t-sm border-2 border-dotted cursor-pointer"
-                : "py-2 text-green-500 px-3 rounded-t-sm hover:bg-zinc-900 cursor-pointer"
+                ? "py-2 px-3 rounded-md bg-zinc-900 border border-zinc-700 font-bold cursor-pointer"
+                : "py-2  px-3 rounded-md hover:border hover:border-zinc-700 hover:text-indigo-400 hover:bg-zinc-900 cursor-pointer"
             }
             onClick={() => {
               handdleOption("cert");
@@ -165,8 +230,8 @@ const Summary = () => {
           <div
             className={
               option === "frame"
-                ? "py-2 px-3 rounded-t-sm border-2 border-dotted cursor-pointer"
-                : "py-2 text-green-500 px-3 rounded-t-sm hover:bg-zinc-900 cursor-pointer"
+                ? "py-2 px-3 rounded-md bg-zinc-900 border border-zinc-700 font-bold cursor-pointer"
+                : "py-2  px-3 rounded-md hover:border hover:border-zinc-700 hover:text-indigo-400 hover:bg-zinc-900 cursor-pointer"
             }
             onClick={() => {
               handdleOption("frame");
@@ -177,35 +242,28 @@ const Summary = () => {
         </div>
         {/*IP/ASNs */}
         {option === "ASNs" ? (
-          <div className="table-auto text-sm">
+          <div className="table-auto border-2 border-zinc-700 rounded-sm text-sm mt-2 mb-10 p-2">
             <thead>
               <tr>
-                <th className="p-2"></th>
                 <th className="text-left p-2">
                   <FontAwesomeIcon icon={faArrowRightArrowLeft} />
                 </th>
-                <th className="text-right p-2">IP Address</th>
+                <th className="text-left p-2">IP Address</th>
                 <th className="text-left p-2">AS Autonomous System</th>
               </tr>
             </thead>
             <tbody>
               <tr className="border-b-2">
-                <td className="text-orange-400 p-2">
-                  4 <FontAwesomeIcon icon={faShare} />
+                <td className="text-left p-2 font-bold">
+                  {data.services.length}
                 </td>
-                <td className="text-left p-2 font-bold">19</td>
-                <td className="text-right p-2 text-green-500">
-                  193.53.251.217
-                </td>
+                <td className="text-left p-2 text-green-500">{data.ip}</td>
                 <td className="text-left p-2">
-                  <span className="text-green-500">15817</span> (MITTWALD-AS
-                  Mittwald CM Service GmbH und Co. KG)
+                  <span className="text-green-500">
+                    {data.autonomous_system.bgp_prefix}
+                  </span>{" "}
+                  ({data.autonomous_system.description})
                 </td>
-              </tr>
-              <tr className="border-b-2">
-                <td></td>
-                <td className="text-left p-2 font-bold">17</td>
-                <td className="text-right p-2">2</td>
               </tr>
             </tbody>
           </div>
@@ -214,41 +272,23 @@ const Summary = () => {
         )}
         {/* IP detail */}
         {option === "detail" ? (
-          <div className="border-2 rounded-sm text-sm mt-2 mb-10 pb-2">
+          <div className="border-2 border-zinc-700 rounded-sm text-sm mt-2 mb-10 p-2">
             <div className="font-bold px-2">
-              19 <FontAwesomeIcon icon={faArrowRightArrowLeft} /> 193.53.251.217
-              (Germany){" "}
-              <span className="text-orange-500">
+              {data.services.length}{" "}
+              <FontAwesomeIcon icon={faArrowRightArrowLeft} /> {data.ip}(
+              {data.autonomous_system.country_code}){" "}
+              {/* <span className="text-orange-500">
                 4 redirects <FontAwesomeIcon icon={faShare} />
-              </span>
+              </span> */}
             </div>
             <div className="px-4 text-green-500">
-              ASN15817 (MITTWALD-AS Mittwald CM Service GmbH und Co. KG, DE)
+              {data.autonomous_system.bgp_prefix} (
+              {data.autonomous_system.description})
             </div>
             <div className="space-y-2">
               <div className="px-4">
                 <div className="flex justify-between">
-                  <div className="px-4 text-green-500">
-                    gizdemo.civiservice.de{" "}
-                  </div>
-                  <div className="px-2 bg-gray-400 rounded-sm">
-                    Domain Lookup <FontAwesomeIcon icon={faCaretDown} />
-                  </div>
-                </div>
-              </div>
-              <div className="px-4">
-                <div className="flex justify-between">
-                  <div className="px-4 text-green-500">giz.proseed-al.de</div>
-                  <div className="px-2 bg-gray-400 rounded-sm">
-                    Domain Lookup <FontAwesomeIcon icon={faCaretDown} />
-                  </div>
-                </div>
-              </div>
-              <div className="px-4">
-                <div className="flex justify-between">
-                  <div className="px-4 text-green-500">
-                    proseed-albania.civiservice.de
-                  </div>
+                  <div className="px-4 text-green-500">{data.domain} </div>
                   <div className="px-2 bg-gray-400 rounded-sm">
                     Domain Lookup <FontAwesomeIcon icon={faCaretDown} />
                   </div>
@@ -262,9 +302,9 @@ const Summary = () => {
 
         {/* domains */}
         {option === "domain" ? (
-          <div className="px-4 mb-10">
+          <div className="border-2 border-zinc-700 rounded-sm text-sm mt-2 mb-10 p-2">
             <div className="font-bold ml-10">Apex Domain</div>
-            <div className="table-auto text-sm">
+            {/* <div className="table-auto text-sm">
               <thead>
                 <tr>
                   <th className="text-right px-2">
@@ -299,7 +339,7 @@ const Summary = () => {
                   <td className="text-left font-bold px-2">2</td>
                 </tr>
               </tbody>
-            </div>
+            </div> */}
           </div>
         ) : (
           ""
@@ -307,7 +347,7 @@ const Summary = () => {
 
         {/* Domain Tree */}
         {option === "domainTree" ? (
-          <div className="px-4 mt-2 mb-10">
+          <div className="border-2 border-zinc-700 rounded-sm text-sm mt-2 mb-10 p-2">
             <div className="table-auto text-sm">
               <thead>
                 <tr>
@@ -320,35 +360,15 @@ const Summary = () => {
               </thead>
               <tbody className="">
                 <tr>
-                  <td className="text-right font-bold px-2">15</td>
+                  <td className="text-right font-bold px-2">
+                    {data.services.length}
+                  </td>
                   <td className="text-left text-green-500 px-2">
-                    giz.proseed-al.de
+                    {data.domain}
                   </td>
                   <td className="text-left px-2 text-gray-500">
-                    giz.proseed-al.de
+                    {data.domain}
                   </td>
-                </tr>
-                <tr>
-                  <td className="text-right font-bold px-2">3</td>
-                  <td className="text-left text-green-500 px-2">
-                    proseed-albania.civiservice.de
-                  </td>
-                  <td className="text-left px-2 text-gray-500">
-                    giz.proseed-al.de
-                  </td>
-                </tr>
-                <tr>
-                  <td className="text-right font-bold px-2">1</td>
-                  <td className="text-left text-green-500 px-2">
-                    gizdemo.civiservice.de
-                  </td>
-                  <td className="text-left px-2 text-gray-500">
-                    giz.proseed-al.de
-                  </td>
-                </tr>
-                <tr>
-                  <td className="text-right font-bold px-2">17</td>
-                  <td className="text-left font-bold px-2">2</td>
                 </tr>
               </tbody>
             </div>
@@ -360,14 +380,21 @@ const Summary = () => {
         {/* Links */}
         {option === "link" ? (
           <>
-            <div>
-              This site contains links to these domains. Also see{" "}
-              <span className="text-green-500 hover:underline">Links</span>.
-            </div>
-            <div className="px-2 mt-4 font-bold">
-              Domain
-              <br />
-              <span className="text-green-500 hover:underline">www.giz.de</span>
+            <div className="border-2 border-zinc-700 rounded-sm text-sm mt-2 mb-10 p-2">
+              <div>
+                This site contains links to these domains. Also see{" "}
+                <span className="text-green-500 hover:underline cursor-pointer">
+                  Links
+                </span>
+                .
+              </div>
+              <div className="px-2 mt-2 font-bold">
+                Domain
+                <br />
+                <span className="text-green-500 hover:underline cursor-pointer">
+                  {data.domain}
+                </span>
+              </div>
             </div>
           </>
         ) : (
@@ -376,7 +403,7 @@ const Summary = () => {
 
         {/* Certs */}
         {option === "cert" ? (
-          <div className="px-2 mt-2 mb-10">
+          <div className="border-2 border-zinc-700 rounded-sm text-sm mt-2 mb-10 p-2">
             <div className="table-auto text-sm">
               <thead>
                 <tr>
@@ -388,21 +415,26 @@ const Summary = () => {
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td className="text-left text-green-500 px-2 ">
-                    <span className="font-medium">giz.proseed-al.de </span>
-                    <div className="text-gray-500">R11</div>
-                  </td>
-                  <td className="text-left px-2  align-top">
-                    2024-07-29 - 2024-10-27
-                  </td>
-                  <td className="text-left px-2  align-top">3 months</td>
-                  <td className="px-2 align-top ">
-                    <span className="px-1 py-1 rounded-sm border-2 bg-gray-500 hover:bg-gray-700">
-                      <FontAwesomeIcon icon={faSearch} /> crt.sh
-                    </span>
-                  </td>
-                </tr>
+                {data.ssl.map((item, index) => (
+                  <tr>
+                    <td className="text-left text-green-500 px-2 ">
+                      <span className="font-medium">{data.domain} </span>
+                      <div className="text-gray-500">R11</div>
+                    </td>
+                    <td className="text-left px-2  align-top">
+                      {formatDate(item.issue_date)} -{" "}
+                      {formatDate(item.expiry_date)}
+                    </td>
+                    <td className="text-left px-2  align-top">
+                      {monthsLeft(item.expiry_date)} months
+                    </td>
+                    <td className="px-2 align-top ">
+                      <span className="px-1 py-1 rounded-sm border-2 bg-gray-500 hover:bg-gray-700">
+                        <FontAwesomeIcon icon={faSearch} /> crt.sh
+                      </span>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </div>
           </div>
@@ -412,18 +444,20 @@ const Summary = () => {
         {/* Frames */}
         {option === "frame" ? (
           <>
-            <div>This page contains 1 frames:</div>
-            <div className="px-1 border-2 mt-3 rounded-md">
-              <div>
-                <span className="font-bold">Primary Page:</span> https://
-                <span className="text-green-500">giz.proseed-al.de/</span>
-              </div>
-              <div className="text-gray-400">
-                Frame ID: F3A268DA933FB0DC32E22C13DAE9DE05
-              </div>
-              <div>
-                <span className="font-bold">Requests:</span> 17 HTTP requests in
-                this frame
+            <div className="border-2 border-zinc-700 rounded-sm text-sm mt-2 mb-10 p-2">
+              <div>This page contains 1 frames:</div>
+              <div className="px-1 border-2 border-zinc-700 mt-3 rounded-md">
+                <div>
+                  <span className="font-bold">Primary Page:</span> https://
+                  <span className="text-green-500">{data.domain}/</span>
+                </div>
+                <div className="text-gray-400">
+                  Frame ID: F3A268DA933FB0DC32E22C13DAE9DE05
+                </div>
+                <div>
+                  <span className="font-bold">Requests:</span>{" "}
+                  {data.services.length} HTTP requests in this frame
+                </div>
               </div>
             </div>
           </>
@@ -432,8 +466,8 @@ const Summary = () => {
         )}
       </div>
 
-      <div>
-        <div className="flex py-2 justify-between space-x-28">
+      <div className="flex-col">
+        {/* <div className="flex py-2 justify-between space-x-28">
           <div className="text-xl font-bold">Screenshot</div>
           <div className="flex space-x-2">
             <div className="">
@@ -449,50 +483,52 @@ const Summary = () => {
           </div>
         </div>
         <img
-          className="rounded-sm w-[450px] h-[250px]"
+          className="rounded-sm w-full h-[250px]"
           src="../../../public/img/screenshot.png"
           alt="screenshot"
-        />
-        <div className="mt-4 w-[450px] space-y-4">
-          <div className="font-semibold text-xl">Page Title</div>
+        /> */}
+        <div className="mt-4 min-w-96 space-y-4">
+          {/* <div className="font-semibold text-xl">Page Title</div>
           <div>
             GIZ – ProSEED Albania | ProSEED - Programme for Sustainable Economic
             and Regional Development, Promoting Employment, Vocation
-          </div>
+          </div> */}
           <div className="flex justify-between">
             <div className="font-semibold text-xl">Page URL History</div>
-            <div className="p-1 text-xs rounded-sm bg-gray-500 hover:bg-gray-600">
+            <div className="py-1 px-2 text-xs rounded-md bg-zinc-700 hover:bg-zinc-700/60">
               Show full URLs
             </div>
           </div>
           <div className="flex flex-row">
             <div>1.</div>
             <div>
-              <div>
+              {/* <div>
                 https://
                 <span className="text-green-500">
                   gizdemo.civiservice.de/
                 </span>{" "}
                 <span className="px-1 rounded-sm bg-orange-400">HTTP 301</span>
-              </div>
+              </div> */}
               <div>
                 https://
-                <span className="text-green-500">giz.proseed-al.de/</span>{" "}
-                <span className="px-1 rounded-sm bg-green-700">Page URL</span>
+                <span className="text-green-500">{data.domain}/</span>{" "}
+                <span className="px-1 rounded-md bg-indigo-500 cursor-pointer">
+                  Page URL
+                </span>
               </div>
             </div>
           </div>
           <div className="font-bold text-xl">Detected technologies</div>
-          {technology.map((item, index) => (
+          {data.technology.map((item, index) => (
             <React.Fragment key={index}>
               <div className="border-b-2 pb-2">
                 <div className="flex justify-between">
                   <div className="text-green-500">
-                    {item.name}{" "}
-                    <span className="text-gray-500">{item.discript}</span>
+                    {item.subtech[0].technology} {" "}
+                    <span className="text-gray-500">({item.category})</span>
                   </div>
                   <div
-                    className="px-1 border-2 rounded-sm bg-gray-500 cursor-pointer"
+                    className="px-2 border-2 border-zinc-700/60 rounded-md bg-black hover:bg-zinc-900 cursor-pointer"
                     onClick={() => {
                       handleExpandTech(index);
                     }}
@@ -501,33 +537,33 @@ const Summary = () => {
                   </div>
                 </div>
                 {expandTech.includes(index) && (
-                  <div className="text-sm text-gray-400">
+                  <div className="text-md text-gray-400">
                     <div>
-                      <span className="font-bold">Overall confidence:</span>{" "}
-                      {item.overall}
+                      <span className="font-bold">Version:</span>{" "}
+                      {item.subtech[0].version}
                     </div>
-                    <div className="font-bold">Detected patterns</div>
-                    <li className="ml-4">{item.pattern}/</li>
+                    <div className="font-bold">Discription:</div>
+                    <li className="ml-4 max-w-sm">{item.subtech[0].description}/</li>
                   </div>
                 )}
               </div>
             </React.Fragment>
           ))}
           <div className="font-bold text-xl">Page Statistics</div>
-          <div className="flex space-x-4">
+          <div className="flex justify-around">
             <div className="flex flex-col text-center">
-              <div className="text-2xl text-blue-500">17</div>
+              <div className="text-2xl text-blue-500">{data.services.length}</div>
               <div className="text-lg text-gray-400">Requests</div>
-              <div className="text-2xl text-blue-500">2</div>
+              <div className="text-2xl text-blue-500">1</div>
               <div className="text-lg text-gray-400">IPs</div>
             </div>
-            <div className="flex flex-col text-center">
+            {/* <div className="flex flex-col text-center">
               <div className="text-2xl text-blue-500">71</div>
               <div className="text-lg text-gray-400">HTTPS</div>
               <div className="text-2xl text-blue-500">1</div>
               <div className="text-lg text-gray-400">Countries</div>
-            </div>
-            <div className="flex flex-col text-center">
+            </div> */}
+            {/* <div className="flex flex-col text-center">
               <div className="text-2xl text-blue-500">
                 0{" "}
                 <span className="text-base text-gray-500 align-bottom">%</span>
@@ -538,9 +574,9 @@ const Summary = () => {
                 <span className="text-base text-gray-500 align-bottom">kB</span>
               </div>
               <div className="text-lg text-gray-400">Tranfer</div>
-            </div>
+            </div> */}
             <div className="flex flex-col text-center">
-              <div className="text-2xl text-blue-500">2</div>
+              <div className="text-2xl text-blue-500">1</div>
               <div className="text-lg text-gray-400">Domains</div>
               <div className="text-2xl text-blue-500">
                 1325{" "}
@@ -549,10 +585,10 @@ const Summary = () => {
               <div className="text-lg text-gray-400">Size</div>
             </div>
             <div className="flex flex-col text-center">
-              <div className="text-2xl text-blue-500">3</div>
+              <div className="text-2xl text-blue-500">0</div>
               <div className="text-lg text-gray-400">Subdomains</div>
-              <div className="text-2xl text-blue-500">1</div>
-              <div className="text-lg text-gray-400">Cookies</div>
+              <div className="text-2xl text-blue-500">{data.ssl.length}</div>
+              <div className="text-lg text-gray-400">SSL cert</div>
             </div>
           </div>
         </div>

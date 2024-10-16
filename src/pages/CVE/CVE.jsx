@@ -1,6 +1,4 @@
 import React, { useState } from "react";
-// Import utilities
-
 import {
   faBullseye,
   faSquarePollVertical,
@@ -13,7 +11,7 @@ import OpenCVE from "./openCVE";
 const CVE = () => {
   const [cve, setcve] = useState("openCVE");
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  
+
   return (
     <div className="flex bg-black h-screen overflow-hidden">
       <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
@@ -63,7 +61,6 @@ const CVE = () => {
             <div className="px-28 text-white">
               {cve === "openCVE" && <OpenCVE />}
               {cve === "domain" && <DomainCVE />}
-
             </div>
           </div>
         </main>

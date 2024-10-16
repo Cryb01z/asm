@@ -2,7 +2,7 @@ import React from "react";
 
 const Redirects = () => {
   return (
-    <div className="mt-6 h-[calc(80%)]">
+    <div className="mt-6">
       <div className="text-2xl font-bold">Page URL History</div>
       <div className="mt-2">
         This captures the URL locations of the websites, including HTTP

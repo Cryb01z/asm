@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosClient = axios.create({
-  baseURL: "https://api.escuelajs.co/api/v1/auth",
+  baseURL: "http://4.194.251.93/",
   timeout: 300000,
 });
 
