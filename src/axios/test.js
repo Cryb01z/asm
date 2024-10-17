@@ -8,7 +8,7 @@ const testData = {
       http: {
         request: {
           method: "GET",
-          uri: "https://103.42.54.5:80",
+          uri: "http://127.0.0.1:80",
         },
         response: {
           protocol: "HTTP/1.1",
@@ -74,7 +74,7 @@ const testData = {
       http: {
         request: {
           method: "GET",
-          uri: "https://103.42.54.5:443",
+          uri: "http://127.0.0.1:443",
         },
         response: {
           protocol: "HTTP/1.1",
@@ -99,7 +99,7 @@ const testData = {
       http: {
         request: {
           method: "GET",
-          uri: "https://103.42.54.5:8080",
+          uri: "http://127.0.0.1:8080",
         },
         response: {
           protocol: "HTTP/1.1",
@@ -124,7 +124,7 @@ const testData = {
       http: {
         request: {
           method: "GET",
-          uri: "https://103.42.54.5:8080",
+          uri: "http://127.0.0.1:8080",
         },
         response: {
           protocol: "HTTP/1.1",
@@ -133,6 +133,25 @@ const testData = {
           header_location: "",
           html_title: "",
         },
+      },
+      port: "8080",
+      service_name: "http-proxy",
+      software: [
+        {
+          vendor: "",
+          product: "",
+          version: "",
+        },
+      ],
+      vulnerabilities: [],
+    },
+    {
+      http: {
+        request: {
+          method: "GET",
+          uri: "http://127.0.0.1:8080",
+        },
+        response: null,
       },
       port: "8080",
       service_name: "http-proxy",
@@ -206,6 +225,8 @@ const testData = {
             'Nginx (pronounced as "engine X") is a lightweight open source web server developed by Igor Sysoev.',
         },
       ],
+      port: "443",
+      status: "200",
     },
     {
       category: "Operating System",
@@ -217,6 +238,8 @@ const testData = {
             "Ubuntu is a free and open-source operating system on Linux for the enterprise server, desktop, cloud, and IoT.",
         },
       ],
+      port: "80",
+      status: "200",
     },
   ],
   autonomous_system: {

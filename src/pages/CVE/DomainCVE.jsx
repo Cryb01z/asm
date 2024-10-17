@@ -11,53 +11,17 @@ import {
   faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { tailwindConfig } from "../../utils/Utils";
 import ExploitedModal from "./ExploitedModal";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { getCVE, getCVES } from "../../axios/cveService";
+import { scanResult } from "../../axios/test";
 const DomainCVE = () => {
-  const [test, setTest] = useState([]); // Store domain and service data
-  const [vulnerabilities, setVulnerabilities] = useState([]); // Flattened vulnerabilities
-  const [filteredVulnerabilities, setFilteredVulnerabilities] = useState([]); // Filtered vulnerabilities
-  const [filter, setFilter] = useState({
-    domain: "", // Selected domain
-    scoreRange: "", // Selected CVSS score range
-  });
-  const [searchQuery, setSearchQuery] = useState(""); // Search query
-  const [sortConfig, setSortConfig] = useState({ key: "", direction: "" }); // Sorting configuration
-  const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10; // Number of vulnerabilities per page
   const [modal, setmodal] = useState(false); //Exploited Modal
-  useEffect(
-    () => async () => {
-      const cve = await getCVES(1, 10);
-      console.log(cve);
-      setcveData(cve);
-      setTest(data);
-      // Extract vulnerabilities across all domains and services
-      const flattenedVulnerabilities = [];
-      data.forEach((domain) => {
-        if (domain.services.length > 0) {
-          domain.services.forEach((service) => {
-            if (service.vulnerabilities.length > 0) {
-              service.vulnerabilities.map((vul) => {
-                flattenedVulnerabilities.push({
-                  domain: domain.domain,
-                  ...vul,
-                });
-              });
-            }
-          });
-        }
-      });
-      setVulnerabilities(flattenedVulnerabilities);
-      setFilteredVulnerabilities(flattenedVulnerabilities); // Initially set all vulnerabilities as filtered
-    },
-    []
-  );
-
+  const navigate = useNavigate();
   //Render cvss score color
   const cvssColor = (cvss) => {
     if (cvss >= 0 && cvss < 4) {
@@ -71,85 +35,105 @@ const DomainCVE = () => {
     }
     return "black";
   };
-
-  //Update filterState
-  const handleFilterChange = (e) => {
-    const { id, value } = e.target;
-    setFilter((prev) => ({
-      ...prev,
-      [id]: value,
-    }));
-  };
-
-  // Handle search query change
-  const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value);
-  };
-
-  // Handle sorting
-  const handleSort = (key) => {
-    let direction = "ascending";
-    if (sortConfig.key === key && sortConfig.direction === "ascending") {
-      direction = "descending";
-    }
-    setSortConfig({ key, direction });
-  };
-
-  // Filter and sort vulnerabilities
+  const [data, setdata] = useState({
+    domain: "",
+    discovery_reason: "",
+    discovery_on: "",
+    ip: "",
+    services: [
+      {
+        http: {
+          request: {
+            method: "",
+            uri: "",
+          },
+          response: {
+            protocol: "",
+            status_code: "",
+            status_reason: "",
+            header_location: "",
+            html_title: "",
+          },
+        },
+        port: "",
+        service_name: "",
+        software: [
+          {
+            vendor: "",
+            product: "",
+            version: "",
+          },
+        ],
+        vulnerabilities: [
+          {
+            id: "",
+            cvss: "",
+            type: "",
+            is_exploit: "",
+            reference: "",
+          },
+        ],
+      },
+    ],
+    ssl: [
+      {
+        expiry_date: 0,
+        issue_date: 0,
+        id: "",
+        grade: "",
+        issuerSubject: "",
+        subject_alt_names: [],
+        subject_cn: [""],
+        serialNumber: "",
+        raw: "",
+        sigAlg: "",
+        subject: "",
+        validationType: "",
+        version: "",
+      },
+    ],
+    technology: [
+      {
+        category: "",
+        subtech: [
+          {
+            technology: "",
+            version: "",
+            description: "",
+          },
+        ],
+        port: "",
+        status: "",
+      },
+    ],
+    autonomous_system: {
+      asn: "",
+      description: "",
+      bgp_prefix: "",
+      name: "",
+      country_code: "",
+    },
+    operating_system: {
+      vendor: "",
+      cpe: "",
+      kernel_version: "",
+    },
+    dns: [
+      {
+        Asset_Name: "",
+        Record_Type: "",
+        Record: "",
+      },
+    ],
+  });
   useEffect(() => {
-    let filtered = vulnerabilities.filter((vul) => {
-      // Filter by domain
-      const domainMatch = filter.domain
-        ? vul.domain.toLowerCase().includes(filter.domain.toLowerCase())
-        : true;
-
-      // Filter by search query
-      const searchMatch = searchQuery
-        ? vul.id.toLowerCase().includes(searchQuery.toLowerCase())
-        : true;
-
-      return domainMatch && searchMatch;
-    });
-
-    // Sort vulnerabilities
-    if (sortConfig.key) {
-      filtered = filtered.sort((a, b) => {
-        if (a[sortConfig.key] < b[sortConfig.key]) {
-          return sortConfig.direction === "ascending" ? -1 : 1;
-        }
-        if (a[sortConfig.key] > b[sortConfig.key]) {
-          return sortConfig.direction === "ascending" ? 1 : -1;
-        }
-        return 0;
-      });
-    }
-
-    setCurrentPage(1);
-    setFilteredVulnerabilities(filtered);
-  }, [filter, searchQuery, sortConfig, vulnerabilities]);
-
-  console.log(filter);
-
-  // Pagination
-  const paginatedData = () => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    return filteredVulnerabilities.slice(startIndex, endIndex);
-  };
-
-  //Update current page
-  const handlePageChange = (newPage) => {
-    if (newPage < 1 || newPage > totalPages) {
-      return; // Prevent the page from changing if out of bounds
-    }
-    setCurrentPage(newPage);
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth", // Optional for smooth scrolling
-    });
-  };
-
-  const totalPages = Math.ceil(filteredVulnerabilities.length / itemsPerPage);
+    const fetchData = async () => {
+      const response = await scanResult();
+      setdata(response);
+    };
+    fetchData();
+  }, []);
+  console.log(data);
 
   const chartData = {
     labels: ["Apache httpd", "Debian", "OpenSSH"],
@@ -246,15 +230,8 @@ const DomainCVE = () => {
               className="bg-zinc-900  outline-none px-1"
               name=""
               id="domain"
-              value={filter.domain}
-              onChange={handleFilterChange}
             >
               <option value="">All Domain</option>
-              {test.map((domain) => (
-                <option key={domain.domain} value={domain.domain}>
-                  {domain.domain}
-                </option>
-              ))}
             </select>
           </div>
           <span>
@@ -264,17 +241,13 @@ const DomainCVE = () => {
             className="bg-zinc-900  outline-none"
             type="text"
             placeholder="Search ..."
-            value={searchQuery}
-            onChange={handleSearchChange}
           />
         </h2>
       </div>
       {modal && <ExploitedModal modal={modal} setmodal={setmodal} />}
       <div className="col-span-full xl:col-span-8 bg-zinc-900  shadow-lg rounded-sm border border-zinc-700/60">
         <header className="px-5 py-4 border-b  border-zinc-700/60">
-          <h2 className="font-semibold  text-slate-100 ">
-            Total CVEs: {filteredVulnerabilities.length}
-          </h2>
+          <h2 className="font-semibold  text-slate-100 ">Total CVEs:</h2>
         </header>
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -321,65 +294,77 @@ const DomainCVE = () => {
               </tr>
             </thead>
             <tbody>
-              {paginatedData().map((cve) => (
-                <tr key={cve.id}>
-                  <td className="p-2">
-                    <div className="flex items-center">
-                      <input type="checkbox" className="mr-5" />{" "}
-                      <NavLink to={`/CVE/${cve.id}`}>
-                        <div className="text-blue-500 cursor-pointer line-clamp-1">
+              {data.services.map((item) =>
+                item.vulnerabilities.map((cve) => (
+                  <tr key={cve.id}>
+                    <td className="p-2">
+                      <div className="flex items-center">
+                        <input type="checkbox" className="mr-5" />{" "}
+                        <div
+                          className="text-blue-500 cursor-pointer line-clamp-1"
+                          onClick={() => {
+                            navigate(`/CVE/${cve.id}`, {
+                              state: { cveid: cve.id },
+                            });
+                          }}
+                        >
                           {cve.id}
                         </div>
-                      </NavLink>
-                    </div>
-                  </td>
-                  <td className="p-2">
-                    <div className="text-center">{cve.type}</div>
-                  </td>
-                  <td className="p-2">
-                    <div
-                      className="text-center"
-                      style={{ color: cvssColor(cve.cvss) }}
+                      </div>
+                    </td>
+                    <td className="p-2">
+                      <div className="text-center">{cve.type}</div>
+                    </td>
+                    <td className="p-2">
+                      <div
+                        className="text-center"
+                        style={{ color: cvssColor(cve.cvss) }}
+                      >
+                        {cve.cvss}
+                      </div>
+                    </td>
+                    <td className="p-2">
+                      <div
+                        className={
+                          cve.is_exploit === "true"
+                            ? "text-center text-green-600 cursor-pointer"
+                            : "text-center text-red-600 cursor-pointer"
+                        }
+                      >
+                        {cve.is_exploit}
+                      </div>
+                    </td>
+                    <td
+                      className="p-2  text-blue-500 hover:text-blue-700 text-center cursor-pointer"
+                      onClick={() => {
+                        navigate("/asset");
+                      }}
                     >
-                      {cve.cvss}
-                    </div>
-                  </td>
-                  <td className="p-2">
-                    <div
-                      className={
-                        cve.is_exploit === "true"
-                          ? "text-center text-green-600 cursor-pointer"
-                          : "text-center text-red-600 cursor-pointer"
-                      }
-                    >
-                      {cve.is_exploit}
-                    </div>
-                  </td>
-                  <td className="p-2  text-blue-500 hover:text-blue-700 text-center cursor-pointer">
-                    {" "}
-                    View Assets{" "}
-                    <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
-                  </td>
-                  <td className="p-2 flex justify-center items-center space-x-3 text-center cursor-pointer">
-                    {/* <div className="text-red-500 hover:text-red-800">
+                      {" "}
+                      View Assets{" "}
+                      <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
+                    </td>
+                    <td className="p-2 flex justify-center items-center space-x-3 text-center cursor-pointer">
+                      {/* <div className="text-red-500 hover:text-red-800">
                       <FontAwesomeIcon icon={faThumbsDown} />
                     </div>{" "} */}
-                    <div className="text-blue-600 hover:text-blue-800">
-                      <FontAwesomeIcon icon={faSquareCheck} />
-                    </div>
-                    <div
-                      className="text-red-500 hover:text-red-800"
-                      onClick={() => setmodal(true)}
-                    >
-                      <FontAwesomeIcon icon={faTrash} />
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                      <div className="text-blue-600 hover:text-blue-800">
+                        <FontAwesomeIcon icon={faSquareCheck} />
+                      </div>
+                      <div
+                        className="text-red-500 hover:text-red-800"
+                        onClick={() => setmodal(true)}
+                      >
+                        <FontAwesomeIcon icon={faTrash} />
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
           {/* Pagination */}
-          <div className="flex items-center justify-between border-t border-zinc-700/60 bg-zinc-900  px-4 py-3 sm:px-6 text-white">
+          {/* <div className="flex items-center justify-between border-t border-zinc-700/60 bg-zinc-900  px-4 py-3 sm:px-6 text-white">
             <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
               <div>
                 <p className="text-sm">
@@ -457,7 +442,7 @@ const DomainCVE = () => {
                 </button>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
       <ToastContainer />

@@ -140,23 +140,29 @@ const CVEDetail = () => {
           return cvssCircle(metrics.cvssMetricV31[0].cvssData.baseScore);
         } else if (metrics.cvssMetricV2 !== null) {
           return cvssCircle(metrics.cvssMetricV2[0].cvssData.baseScore);
+        } else if (metrics.cvssMetricV30 !== null) {
+          return cvssCircle(metrics.cvssMetricV30[0].cvssData.baseScore);
         }
-        return cvssCircle(metrics.cvssMetricV30[0].cvssData.baseScore);
+        return cvssCircle(0);
 
       case "color":
         if (metrics.cvssMetricV31 !== null) {
           return getCircleColor(metrics.cvssMetricV31[0].cvssData.baseScore);
         } else if (metrics.cvssMetricV2 !== null) {
           return getCircleColor(metrics.cvssMetricV2[0].cvssData.baseScore);
+        } else if (metrics.cvssMetricV30 !== null) {
+          return getCircleColor(metrics.cvssMetricV30[0].cvssData.baseScore);
         }
-        return getCircleColor(metrics.cvssMetricV30[0].cvssData.baseScore);
+        return getCircleColor(0);
       case "score":
         if (metrics.cvssMetricV31 !== null) {
           return `${metrics.cvssMetricV31[0].cvssData.baseScore} /10`;
         } else if (metrics.cvssMetricV2 !== null) {
           return `${metrics.cvssMetricV2[0].cvssData.baseScore} /10`;
+        } else if (metrics.cvssMetricV30 !== null) {
+          return `${metrics.cvssMetricV30[0].cvssData.baseScore} /10`;
         }
-        return `${metrics.cvssMetricV30[0].cvssData.baseScore} /10`;
+        return `0 /10`;
 
       default:
     }
@@ -571,7 +577,9 @@ const CVEDetail = () => {
                   </div>
                   <div className="flex-col">
                     <div>{data.vulnStatus}</div>
-                    <div>{data.weaknesses[0].source}</div>
+                    <div>
+                      {data.weaknesses ? data.weaknesses[0].source : ""}
+                    </div>
                     <div>{customDate(data.published)}</div>
                     <div>{customDate(data.lastModified)}</div>
                     <a

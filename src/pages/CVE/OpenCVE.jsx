@@ -1,15 +1,14 @@
-import React, { useEffect, useState } from "react";
-import { NavLink } from "react-router-dom";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFilter, faShieldHalved } from "@fortawesome/free-solid-svg-icons";
-import { getCVES } from "../../axios/cveService";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { getCVES, searchCVES } from "../../axios/cveService";
 
 const OpenCVE = () => {
   const [cveFilter, setcveFilter] = useState({
-    tag: "",
-    score: "",
     search: "",
   });
+  const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const [loading, setloading] = useState(false);
@@ -36,20 +35,42 @@ const OpenCVE = () => {
   useEffect(() => {
     console.log("useEffect running");
     const fetchData = async () => {
-      try {
-        const response = await getCVES(currentPage, itemsPerPage);
-        const cves = response.data;
-        console.log(cves);
-        setcveData(cves);
-      } catch (error) {
-        console.error("Error fetching CVEs:", error);
-      } finally {
-        setloading(true);
+      if (cveFilter.search === "") {
+        try {
+          const response = await getCVES(currentPage, itemsPerPage);
+          const cves = response.data;
+          console.log(cves);
+          setcveData(cves);
+        } catch (error) {
+          console.error("Error fetching CVEs:", error);
+        } finally {
+          setloading(true);
+        }
+      } else {
+        try {
+          const response = await searchCVES(
+            cveFilter.search,
+            currentPage,
+            itemsPerPage
+          );
+          const cves = response.data;
+          setcveData(cves);
+        } catch (error) {
+          console.error("Error fetching CVEs:", error);
+        } finally {
+          setloading(true);
+        }
       }
     };
     fetchData();
-  }, [currentPage, itemsPerPage]);
+  }, [currentPage, itemsPerPage, cveFilter]);
   console.log(cveData);
+
+  //Filter change
+  const handleFilterChange = async (key, e) => {
+    setcveFilter((prev) => ({ ...prev, [key]: e.target.value }));
+  };
+
   //Render cvss score color
   const getScoreColor = (cvss) => {
     if (cvss > 0 && cvss < 4) {
@@ -129,7 +150,7 @@ const OpenCVE = () => {
           <input
             id="search"
             type="text"
-            value={cveFilter.search}
+            onChange={(e) => handleFilterChange("search", e)}
             className="w-52 border text-sm rounded-sm block p-2.5 bg-black border-zinc-700/60 placeholder-gray-400"
             placeholder="Search in CVEs"
           />
@@ -164,11 +185,14 @@ const OpenCVE = () => {
             cveData.cves.map((cve) => (
               <>
                 <tr className="border-t-2 border-zinc-700">
-                  <NavLink to={`/CVE/${cve.id}`} state={{ cveid: cve.id }}>
-                    <td className="p-2 text-left text-blue-600 cursor-pointer">
-                      {cve.id}
-                    </td>
-                  </NavLink>
+                  <td
+                    className="p-2 text-left text-blue-600 cursor-pointer"
+                    onClick={() => {
+                      navigate(`/CVE/${cve.id}`, { state: { cveid: cve.id } });
+                    }}
+                  >
+                    {cve.id}
+                  </td>
                   <td className="p-2 text-left">
                     {cve.configurations === null ? "" : ""}
                   </td>
@@ -197,15 +221,15 @@ const OpenCVE = () => {
             ))
           ) : (
             <>
-            <div className="animate-pulse">
-              <div className="w-full h-96 bg-zinc-900"></div>
-            </div>
+              <div className="animate-pulse">
+                <div className="w-full h-96 bg-zinc-900"></div>
+              </div>
             </>
           )}
         </tbody>
       </table>
       {/* Pagination */}
-      <div className="flex items-center justify-between border-t border-slate-700  px-4 py-3 sm:px-6 text-white">
+      <div className="flex items-center justify-between border border-zinc-700 rounded-md bg-black px-4 py-3 sm:px-6 text-white">
         <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
           <div>
             <p className="text-sm">

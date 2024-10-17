@@ -1,17 +1,55 @@
+import axios from "axios";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import { postLogin } from "../../axios/AuthService";
+import { ToastContainer, toast, Bounce } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 const Login = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    username: "",
+    email: "",
     password: "",
   });
 
   const handleInput = (key, e) => {
     setFormData((prev) => ({ ...prev, [key]: e.target.value }));
   };
+
+  const handleLogin = async () => {
+    console.log(formData);
+    try {
+      const response = await postLogin(formData);
+      console.log(response);
+      toast.success("Login successfully !", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+        transition: Bounce,
+      });
+      setTimeout(() => {
+        navigate("/scan");
+      }, 3000);
+    } catch (error) {
+      toast.error("Login fail! Check username or password!", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+        transition: Bounce,
+      });
+    }
+  };
+
   return (
     <div className="pt-20 min-h-screen flex items-stretch">
       <div
@@ -30,7 +68,7 @@ const Login = () => {
           </p>
         </div>
       </div>
-      <div className="lg:w-1/2 w-full flex items-center justify-center  md:px-16 px-0 z-0 bg-gray-900">
+      <div className="lg:w-1/2 w-full flex items-center justify-center  md:px-16 px-0 z-0 bg-zinc-900">
         <div
           className="absolute lg:hidden z-10 inset-0 bg-gray-500 bg-no-repeat bg-cover items-center"
           style={{
@@ -49,7 +87,7 @@ const Login = () => {
             className="sm:w-2/3 w-full px-4 lg:px-0 mx-auto"
             onSubmit={(e) => {
               e.preventDefault();
-              hanndleLogin();
+              handleLogin();
             }}
           >
             <div className="flex items-center justify-center pb-2 pt-8">
@@ -59,18 +97,14 @@ const Login = () => {
                   name="username"
                   type="text"
                   className="border-b border-gray-300 py-1 focus:border-b-2 focus:border-blue-700 transition-colors focus:outline-none  bg-inherit"
-                  value={formData.username}
                   onChange={(e) => {
-                    handleInput("username", e);
+                    handleInput("email", e);
                   }}
                 />
                 <label
                   className={`absolute left-0 top-1.5 cursor-text peer-focus:text-xs peer-focus:-top-4 transition-all peer-focus:text-blue-700 ${
-                    formData.username
-                      ? "text-xs !-top-4 text-border-blue-70"
-                      : ""
+                    formData.email ? "text-xs !-top-4 text-border-blue-70" : ""
                   }`}
-                  htmlFor="username"
                 >
                   Username
                 </label>
@@ -83,7 +117,6 @@ const Login = () => {
                   name="password"
                   type="password"
                   className="border-b border-gray-300 py-1 focus:border-b-2 focus:border-blue-700 transition-colors focus:outline-none peer bg-inherit"
-                  value={formData.password}
                   onChange={(e) => {
                     handleInput("password", e);
                   }}
@@ -120,9 +153,6 @@ const Login = () => {
               <button
                 type="submit"
                 className="text-sm text-Blueviolet font-medium px-[70px] py-[12.5px] border-[0] rounded-[100px] bg-[#2ba8fb] text-[#ffffff] font-[Bold] [transition:all_0.5s] hover:bg-[#6fc5ff] hover:[box-shadow:0_0_20px_#6fc5ff50] hover:scale-110 active:bg-[#3d94cf] active:[transition:all_0.25s] active:[box-shadow:none] active:scale-[0.98]"
-                onClick={() => {
-                  navigate("/domain")
-                }}
               >
                 Log In
               </button>
@@ -142,6 +172,7 @@ const Login = () => {
           </form>
         </div>
       </div>
+      <ToastContainer />
     </div>
   );
 };

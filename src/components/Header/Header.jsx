@@ -5,7 +5,7 @@ const Header = () => {
   const navigate = useNavigate();
   return (
     <section className="fixed w-full">
-      <nav className="bg-white border-gray-200 py-5 dark:bg-gray-900">
+      <nav className="bg-white border-gray-200 py-5 dark:bg-zinc-900">
         <div className="flex flex-wrap items-center justify-between max-w-screen-xl px-4 mx-auto">
           <span
             className="flex items-center"

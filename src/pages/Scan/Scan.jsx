@@ -193,9 +193,9 @@ const Scan = () => {
       });
       return;
     }
-    toast.loading("Wait for scanning ...", {
+    const loadingToastId = toast.loading("Wait for scanning ...", {
       position: "top-right",
-      autoClose: 60000,
+      autoClose: 60000, // Adjust the time as needed
       hideProgressBar: true,
       closeOnClick: false,
       pauseOnHover: true,
@@ -204,10 +204,12 @@ const Scan = () => {
       theme: "dark",
       transition: Bounce,
     });
-    setInterval(() => {
+    loadingToastId;
+    setTimeout(() => {
       setscanData(dataChange);
       setloading(true);
       console.count("scan");
+      toast.dismiss(loadingToastId);
       toast.success("scan successfully !", {
         position: "top-right",
         autoClose: 5000,

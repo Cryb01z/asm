@@ -7,78 +7,115 @@ import {
   faSort,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import TechInfo from "./TechInfo";
 import getTechInfo from "../../axios/techinfo";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Test from "../Test";
+import { scanResult } from "../../axios/test";
 const Inventory = () => {
   const navigate = useNavigate();
   const [option, setoption] = useState("Inventory");
-  const data = [
-    {
-      asset: "webmail1.yenbai.gov.vn",
-      port: "8080",
-      ip: "103.42.54.6",
-      technologies: [],
-      status: "404",
-      tittle: "--",
-      cname: "--",
-      contentLength: "2102",
+  const [data, setdata] = useState({
+    domain: "",
+    discovery_reason: "",
+    discovery_on: "",
+    ip: "",
+    services: [
+      {
+        http: {
+          request: {
+            method: "",
+            uri: "",
+          },
+          response: {
+            protocol: "",
+            status_code: "",
+            status_reason: "",
+            header_location: "",
+            html_title: "",
+          },
+        },
+        port: "",
+        service_name: "",
+        software: [
+          {
+            vendor: "",
+            product: "",
+            version: "",
+          },
+        ],
+        vulnerabilities: [
+          {
+            id: "",
+            cvss: "",
+            type: "",
+            is_exploit: "",
+            reference: "",
+          },
+        ],
+      },
+    ],
+    ssl: [
+      {
+        expiry_date: 0,
+        issue_date: 0,
+        id: "",
+        grade: "",
+        issuerSubject: "",
+        subject_alt_names: [],
+        subject_cn: [""],
+        serialNumber: "",
+        raw: "",
+        sigAlg: "",
+        subject: "",
+        validationType: "",
+        version: "",
+      },
+    ],
+    technology: [
+      {
+        category: "",
+        subtech: [
+          {
+            technology: "",
+            version: "",
+            description: "",
+          },
+        ],
+        port: "",
+        status: "",
+      },
+    ],
+    autonomous_system: {
+      asn: "",
+      description: "",
+      bgp_prefix: "",
+      name: "",
+      country_code: "",
     },
-    {
-      asset: "vms.yenbai.gov.vn",
-      port: "8080",
-      ip: "103.42.54.6",
-      technologies: ["Windows Server", "Nginx"],
-      status: "301",
-      tittle: "--",
-      cname: "--",
-      contentLength: "2102",
+    operating_system: {
+      vendor: "",
+      cpe: "",
+      kernel_version: "",
     },
-    {
-      asset: "tu.yenbai.gov.vn",
-      port: "8080",
-      ip: "103.42.54.7",
-      technologies: ["WordPress", "Ubuntu"],
-      status: "404",
-      tittle: "--",
-      cname: "--",
-      contentLength: "2102",
-    },
-    {
-      asset: "s.fptshop.com.vn",
-      port: "8080",
-      ip: "104.22.29.155",
-      technologies: ["Cloudflare", "Apache"],
-      status: "301",
-      tittle: "--",
-      cname: "--",
-      contentLength: "2102",
-    },
-    {
-      asset: "services.fptshop.com.vn",
-      port: "8080",
-      ip: "172.67.36.187",
-      technologies: ["Apache"],
-      status: "403",
-      tittle: "--",
-      cname: "--",
-      contentLength: "2102",
-    },
-    {
-      asset: "sales.fptshop.com.vn",
-      port: "8080",
-      ip: "104.22.28.155",
-      technologies: [],
-      status: "200",
-      tittle: "--",
-      cname: "--",
-      contentLength: "2102",
-    },
-  ];
+    dns: [
+      {
+        Asset_Name: "",
+        Record_Type: "",
+        Record: "",
+      },
+    ],
+  });
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await scanResult();
+      setdata(response);
+    };
+    fetchData();
+  }, []);
 
   const getStatusColor = (status) => {
     if (status === "200") return "bg-green-500/20 text-green-400";
@@ -178,8 +215,8 @@ const Inventory = () => {
                 <FontAwesomeIcon icon={faMagnifyingGlass} />
               </div>
             </div>
-            <div className="overflow-x-auto mt-5 scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-black">
-              <table className="w-[130%] border-separate border-spacing-y-0 overflow-x-scroll scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-black">
+            <div className="overflow-x-auto mt-5 scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-black h-[500px]">
+              <table className="w-[130%] border-separate border-spacing-y-0 overflow-x-scroll scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-black">
                 <thead className="sticky top-0">
                   <tr className="bg-[#18181b] rounded-lg uppercase font-extralight font-mono">
                     <th className="sticky left-0 text-left w-96 px-4 rounded-l-lg shadow-[34px_0px_29px_1px_rgba(11,11,13,0.8)] bg-[#18181b] cursor-pointer z-10">
@@ -206,7 +243,7 @@ const Inventory = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {data.map((item, index) => (
+                  {data.technology.map((item, index) => (
                     <tr className="transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted border border-x-0 border-neutral-700 bg-[#0E0E12] group group-hover:bg-[#18181B] group-hover:border-neutral-900 relative h-12">
                       <td className="bg-[#121215] border-b px-4 border-zinc-700/60 m-0 group-first:border-t group-hover:bg-[#18181B] group-hover:border-neutral-900 border-l sticky left-0 group-first:rounded-tl-lg shadow-[34px_0px_29px_1px_rgba(11,11,13,0.8)] group-hover:shadow-none z-10 group-hover:z-20">
                         <div className="flex justify-between ">
@@ -214,7 +251,7 @@ const Inventory = () => {
                             <div className="bg-neutral-800 px-1 rounded-md">
                               <FontAwesomeIcon icon={faHouse} size="xs" />
                             </div>
-                            <div>{item.asset}</div>
+                            <div>{data.domain}</div>
                             <div>
                               <span class="relative flex h-2 w-2">
                                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-700/70 opacity-75"></span>
@@ -230,13 +267,18 @@ const Inventory = () => {
                       <td className="px-8 text-[#A1A1AB] border-b border-zinc-700/60 p-0 m-0 group-first:border-t group-hover:bg-[#18181B] group-hover:border-neutral-900 py-[1rem]">
                         <div className="flex justify-center items-center">
                           <div className="bg-[#3E3D3D] inline-block px-3 text-center rounded-md">
-                            {item.ip}
+                            {data.ip}
                           </div>
                         </div>
                       </td>
                       <td className="px-8 text-[#A1A1AB] border-b border-zinc-700/60 p-0 m-0 group-first:border-t group-hover:bg-[#18181B] group-hover:border-neutral-900 py-[1rem]">
                         <div className="flex justify-center items-center">
-                          {item.technologies.length === 0 ? (
+                          <div className="flex space-x-2">
+                            <TechInfo
+                              tech={getTechInfo(item.subtech[0].technology)}
+                            />
+                          </div>
+                          {/* {item.technologies.length === 0 ? (
                             <>
                               <div className="text-center">--</div>
                             </>
@@ -248,7 +290,7 @@ const Inventory = () => {
                                 ))}
                               </div>
                             </>
-                          )}
+                          )} */}
                         </div>
                       </td>
                       <td className="px-8 text-[#A1A1AB] border-b border-zinc-700/60 p-0 m-0 group-first:border-t group-hover:bg-[#18181B] group-hover:border-neutral-900 py-[1rem]">
@@ -264,79 +306,23 @@ const Inventory = () => {
                       </td>
                       <td className="px-8 text-[#A1A1AB] border-b border-zinc-700/60 p-0 m-0 group-first:border-t group-hover:bg-[#18181B] group-hover:border-neutral-900 py-[1rem]">
                         <div className="flex justify-center items-center">
-                          <div className="text-center">{item.tittle}</div>
+                          <div className="text-center">--</div>
                         </div>
                       </td>
                       <td className="px-8 text-[#A1A1AB] border-b border-zinc-700/60 p-0 m-0 group-first:border-t group-hover:bg-[#18181B] group-hover:border-neutral-900 py-[1rem]">
                         <div className="flex justify-center items-center">
-                          <div className="text-center">{item.cname}-</div>
+                          <div className="text-center">--</div>
                         </div>
                       </td>
                       <td className="px-8 text-[#A1A1AB] border-b border-zinc-700/60 p-0 m-0 group-first:border-t group-hover:bg-[#18181B] group-hover:border-neutral-900 py-[1rem]">
                         <div className="flex justify-center items-center">
                           <div className="bg-neutral-800/70 inline-block px-2 text-center rounded-md">
-                            {item.contentLength}
+                            --
                           </div>
                         </div>
                       </td>
                     </tr>
                   ))}
-
-                  {/* <tr className="transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted border border-x-0 border-neutral-700 bg-[#0E0E12] group group-hover:bg-[#18181B] group-hover:border-neutral-900 relative h-12">
-              <td className="bg-[#121215] border-b px-4 border-zinc-700/60 m-0 group-first:border-t group-hover:bg-[#18181B] group-hover:border-neutral-900 border-l sticky left-0 group-first:rounded-tl-lg shadow-[34px_0px_29px_1px_rgba(11,11,13,0.8)] group-hover:shadow-none z-10 group-hover:z-20">
-                <div className="flex justify-between ">
-                  <div className="flex items-center space-x-2">
-                    <div className="bg-neutral-800 px-1 rounded-md">
-                      <FontAwesomeIcon icon={faHouse} size="xs" />
-                    </div>
-                    <div>webmail1.yenbai.gov.vn</div>
-                    <div>
-                      <span class="relative flex h-2 w-2">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-700/70 opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-400/70"></span>
-                      </span>
-                    </div>
-                  </div>
-                  <div className="px-1 bg-[#3E3D3D] rounded-md">8080</div>
-                </div>
-              </td>
-              <td className="px-8 text-[#A1A1AB] border-b border-zinc-700/60 p-0 m-0 group-first:border-t group-hover:bg-[#18181B] group-hover:border-neutral-900 py-[1rem]">
-                <div className="flex justify-center items-center">
-                  <div className="bg-[#3E3D3D] inline-block px-3 text-center rounded-md">
-                    103.42.54.5
-                  </div>
-                </div>
-              </td>
-              <td className="px-8 text-[#A1A1AB] border-b border-zinc-700/60 p-0 m-0 group-first:border-t group-hover:bg-[#18181B] group-hover:border-neutral-900 py-[1rem]">
-                <div className="flex justify-center items-center">
-                  <div className="text-center">--</div>
-                </div>
-              </td>
-              <td className="px-8 text-[#A1A1AB] border-b border-zinc-700/60 p-0 m-0 group-first:border-t group-hover:bg-[#18181B] group-hover:border-neutral-900 py-[1rem]">
-                <div className="flex justify-center items-center">
-                  <div className="bg-neutral-800/70 inline-block px-3 text-center rounded-md">
-                    404
-                  </div>
-                </div>
-              </td>
-              <td className="px-8 text-[#A1A1AB] border-b border-zinc-700/60 p-0 m-0 group-first:border-t group-hover:bg-[#18181B] group-hover:border-neutral-900 py-[1rem]">
-                <div className="flex justify-center items-center">
-                  <div className="text-center">--</div>
-                </div>
-              </td>
-              <td className="px-8 text-[#A1A1AB] border-b border-zinc-700/60 p-0 m-0 group-first:border-t group-hover:bg-[#18181B] group-hover:border-neutral-900 py-[1rem]">
-                <div className="flex justify-center items-center">
-                  <div className="text-center">--</div>
-                </div>
-              </td>
-              <td className="px-8 text-[#A1A1AB] border-b border-zinc-700/60 p-0 m-0 group-first:border-t group-hover:bg-[#18181B] group-hover:border-neutral-900 py-[1rem]">
-                <div className="flex justify-center items-center">
-                  <div className="bg-neutral-800/70 inline-block px-2 text-center rounded-md">
-                    2102
-                  </div>
-                </div>
-              </td>
-            </tr> */}
                 </tbody>
               </table>
             </div>

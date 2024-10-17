@@ -11,19 +11,129 @@ import {
   faTrashCan,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { data } from "../../axios/data";
 
-import Inventory from "./Inventory";
+import { scanResult } from "../../axios/test";
 import Test from "../Test";
 
 const Asset = () => {
-  const test = data[0];
   const navigate = useNavigate();
   const [option, setoption] = useState("asset");
+  const [data, setdata] = useState({
+    domain: "",
+    discovery_reason: "",
+    discovery_on: "",
+    ip: "",
+    services: [
+      {
+        http: {
+          request: {
+            method: "",
+            uri: "",
+          },
+          response: {
+            protocol: "",
+            status_code: "",
+            status_reason: "",
+            header_location: "",
+            html_title: "",
+          },
+        },
+        port: "",
+        service_name: "",
+        software: [
+          {
+            vendor: "",
+            product: "",
+            version: "",
+          },
+        ],
+        vulnerabilities: [
+          {
+            id: "",
+            cvss: "",
+            type: "",
+            is_exploit: "",
+            reference: "",
+          },
+        ],
+      },
+    ],
+    ssl: [
+      {
+        expiry_date: 0,
+        issue_date: 0,
+        id: "",
+        grade: "",
+        issuerSubject: "",
+        subject_alt_names: [],
+        subject_cn: [""],
+        serialNumber: "",
+        raw: "",
+        sigAlg: "",
+        subject: "",
+        validationType: "",
+        version: "",
+      },
+    ],
+    technology: [
+      {
+        category: "",
+        subtech: [
+          {
+            technology: "",
+            version: "",
+            description: "",
+          },
+        ],
+        port: "",
+        status: "",
+      },
+    ],
+    autonomous_system: {
+      asn: "",
+      description: "",
+      bgp_prefix: "",
+      name: "",
+      country_code: "",
+    },
+    operating_system: {
+      vendor: "",
+      cpe: "",
+      kernel_version: "",
+    },
+    dns: [
+      {
+        Asset_Name: "",
+        Record_Type: "",
+        Record: "",
+      },
+    ],
+  });
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await scanResult();
+      setdata(response);
+    };
+    fetchData();
+  }, []);
+
+  // Calculate the last updated date
+  const calculateLastUpdated = (discovery_on) => {
+    const discoveryDate = new Date(discovery_on);
+    const currentDate = new Date();
+    console.log(currentDate, discoveryDate);
+    discoveryDate.setHours(0, 0, 0, 0);
+    currentDate.setHours(0, 0, 0, 0);
+    const timeDifference = currentDate - discoveryDate;
+    const updateDate = Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
+    console.log(updateDate);
+
+    return updateDate > 0 ? `${updateDate} days ago` : "Today";
+  };
 
   return (
     <div className="bg-black  text-gray-400 flex h-screen overflow-hidden">
@@ -146,7 +256,7 @@ const Asset = () => {
                 <div className="mt-4">
                   <div id="detailed-pricing" class="w-full overflow-x-auto">
                     <div class="overflow-hidden min-w-max">
-                      <div class="grid grid-cols-7 p-2 text-sm font-medium border-t border rounded-lg  bg-zinc-900 border-zinc-700 ">
+                      <div class="grid grid-cols-7 p-2 text-sm font-medium border-t border rounded-lg uppercase bg-zinc-900 border-zinc-700 ">
                         <div className="col-span-2">
                           <div class="flex flex-row items-center gap-2.5">
                             <input
@@ -175,10 +285,9 @@ const Asset = () => {
                             <span className="ml-4">ASSET NAME</span>
                           </div>
                         </div>
-
+                        <div>discovery_reason</div>
                         <div>SOURCE</div>
                         <div>TOTAL ASSETS</div>
-                        <div>DURATION</div>
                         <div>LAST UPDATED</div>
                         <div></div>
                       </div>
@@ -216,14 +325,17 @@ const Asset = () => {
                               <span
                                 className="font-semibold text-white"
                                 onClick={() => {
-                                  navigate("/inventory/yenbai.gov.vn");
+                                  navigate(`/inventory/${data.domain}`, {
+                                    state: { data: data },
+                                  });
                                 }}
                               >
-                                yenbai.gov.vn
+                                {data.domain}
                               </span>
                             </div>
                           </div>
                         </div>
+                        <div>{data.discovery_reason}</div>
                         <div>
                           <div className="text-xs px-2 inline-flex items-center gap-1 border border-zinc-700 rounded-md">
                             <span className="text-indigo-700">
@@ -238,75 +350,10 @@ const Asset = () => {
                             <span className="">
                               <FontAwesomeIcon icon={faCircle} size="xs" />
                             </span>
-                            161 assets
+                            {data.technology.length} assets
                           </div>
                         </div>
-                        <div>7m58s</div>
-                        <div>3d ago</div>
-                        <div>
-                          <div className="text-sm px-2 inline-flex items-center gap-1 border border-zinc-700 rounded-md">
-                            <span className="text-indigo-700">
-                              <FontAwesomeIcon icon={faBullseye} size="xs" />
-                            </span>
-                            Start vulnerability scan
-                          </div>
-                        </div>
-                      </div>
-                      <div class="mt-3 grid grid-cols-7 p-2 text-sm font-medium border rounded-lg  bg-black border-zinc-700  hover:bg-zinc-900 cursor-pointer">
-                        <div className="col-span-2">
-                          <div class="flex flex-row items-center gap-2.5">
-                            <input
-                              id="hr3"
-                              type="checkbox"
-                              class="peer hidden"
-                            />
-                            <label
-                              htmlFor="hr3"
-                              class="h-5 w-5 flex rounded-md border border-[#a2a1a833] light:bg-[#e8e8e8] dark:bg-[#212121] peer-checked:bg-white transition"
-                            >
-                              <svg
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                class="w-5 h-5 light:stroke-[#e8e8e8] dark:stroke-[#212121]"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path
-                                  d="M4 12.6111L8.92308 17.5L20 6.5"
-                                  stroke-width="2"
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                ></path>
-                              </svg>
-                            </label>
-                            <div>
-                              <span className="px-1 ml-3 text-green-500 bg-green-500/40 rounded-full">
-                                <FontAwesomeIcon icon={faCheck} />
-                              </span>{" "}
-                              <span className="font-semibold text-white">
-                                giz.proseed-al.de
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                        <div>
-                          <div className="text-xs px-2 inline-flex items-center gap-1 border border-zinc-700 rounded-md">
-                            <span className="text-indigo-700">
-                              <FontAwesomeIcon icon={faMagnifyingGlass} />
-                            </span>
-                            Auto Discovery
-                          </div>
-                        </div>
-                        <div>
-                          {" "}
-                          <div className="text-xs px-2 inline-flex items-center gap-1 border border-zinc-700 rounded-md">
-                            <span className="">
-                              <FontAwesomeIcon icon={faCircle} size="xs" />
-                            </span>
-                            161 assets
-                          </div>
-                        </div>
-                        <div>7m58s</div>
-                        <div>3d ago</div>
+                        <div>{calculateLastUpdated(data.discovery_on)}</div>
                         <div>
                           <div className="text-sm px-2 inline-flex items-center gap-1 border border-zinc-700 rounded-md">
                             <span className="text-indigo-700">
