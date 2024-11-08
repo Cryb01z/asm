@@ -273,7 +273,7 @@ const Result = () => {
                     </span>
                   </span>
                 </div>
-                <div
+                {/* <div
                   className={
                     options === "vulner"
                       ? "px-3 py-1.5 bg-zinc-900 border-2 border-zinc-700 rounded-md cursor-pointer"
@@ -295,7 +295,7 @@ const Result = () => {
                   >
                     Vulnerabilities
                   </span>
-                </div>
+                </div> */}
                 {/* <div
                   className={
                     options === "Redirects"

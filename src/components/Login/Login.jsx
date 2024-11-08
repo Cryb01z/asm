@@ -36,6 +36,7 @@ const Login = () => {
         navigate("/scan");
       }, 3000);
     } catch (error) {
+      console.log(error);
       toast.error("Login fail! Check username or password!", {
         position: "top-right",
         autoClose: 5000,

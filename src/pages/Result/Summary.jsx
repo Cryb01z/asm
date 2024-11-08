@@ -419,7 +419,7 @@ const Summary = ({ data }) => {
                   <tr>
                     <td className="text-left text-green-500 px-2 ">
                       <span className="font-medium">{data.domain} </span>
-                      <div className="text-gray-500">R11</div>
+                      <div className="text-gray-500">{item.version}</div>
                     </td>
                     <td className="text-left px-2  align-top">
                       {formatDate(item.issue_date)} -{" "}

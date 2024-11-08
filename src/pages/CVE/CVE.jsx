@@ -4,9 +4,9 @@ import {
   faSquarePollVertical,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Test from "../test";
 import DomainCVE from "./DomainCVE";
-import OpenCVE from "./openCVE";
+import Test from "../Test";
+import OpenCVE from "./OpenCVE";
 
 const CVE = () => {
   const [cve, setcve] = useState("openCVE");

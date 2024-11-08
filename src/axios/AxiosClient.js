@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosClient = axios.create({
-  baseURL: "http://4.194.251.93/",
+  baseURL: "https://api.caasm.tech/",
   timeout: 300000,
 });
 

@@ -12,7 +12,7 @@ import {
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Test from "../Test";
 import AllResult from "./AllResult";
@@ -127,7 +127,7 @@ const Scan = () => {
       },
     ],
   });
-
+  const flag = useRef(false);
   useEffect(() => {
     console.log("useEffect");
 
@@ -157,18 +157,20 @@ const Scan = () => {
             }
           });
         });
+        // setloading(true);
         setseverity(severity);
         setdata(response); // Corrected spread operator
       } catch (error) {
         console.log(error);
       } finally {
+        if (flag.current) {
+          setloading(true);
+        }
       }
     };
     fetchData();
   }, [scanData]);
-  // console.log(data);
-  // // console.log(testData);
-  // console.log(severity);
+  console.log(flag.current);
   console.log(dataChange);
   console.log(scanData);
 
@@ -193,6 +195,7 @@ const Scan = () => {
       });
       return;
     }
+    flag.current = true;
     const loadingToastId = toast.loading("Wait for scanning ...", {
       position: "top-right",
       autoClose: 60000, // Adjust the time as needed
@@ -221,7 +224,7 @@ const Scan = () => {
         theme: "dark",
         transition: Bounce,
       });
-    }, 60000);
+    }, 120000);
   };
 
   //close modal
@@ -466,7 +469,12 @@ const Scan = () => {
                       <div className="flex items-center justify-center px-4 border-2 border-zinc-700/60 rounded-md hover:bg-zinc-900 hover:border-zinc-700">
                         <FontAwesomeIcon icon={faTrashCan} />
                       </div>
-                      <div className="flex items-center justify-center px-4 border-2 border-zinc-700/60 rounded-md hover:bg-zinc-900 hover:border-zinc-700">
+                      <div
+                        className="flex items-center justify-center px-4 border-2 border-zinc-700/60 rounded-md hover:bg-zinc-900 hover:border-zinc-700"
+                        onClick={() => {
+                          setloading(true);
+                        }}
+                      >
                         <FontAwesomeIcon icon={faRotate} />
                       </div>
                     </div>

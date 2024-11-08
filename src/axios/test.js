@@ -1,6 +1,6 @@
 const testData = {
-  domain: "itb.com",
-  discovery_reason: "Cho zui ahihi :))",
+  domain: "itb.info",
+  discovery_reason: "testing",
   discovery_on: "2024-10-16",
   ip: "127.0.0.1",
   services: [
@@ -275,7 +275,15 @@ const testData = {
 };
 
 const scanResult = () => {
-  return testData
-}
+  return testData;
+};
+
+const scan = (domain, discovery_reason) => {
+  const data = testData;
+  data.domain = domain;
+  data.discovery_reason = discovery_reason;
+  return data;
+};
 
 export { testData, scanResult };
+
