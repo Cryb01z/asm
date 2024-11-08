@@ -19,11 +19,13 @@ import AllResult from "./AllResult";
 import { testData, scanResult } from "../../axios/test";
 import { ToastContainer, toast, Bounce } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import useAuthStore from "../../store/useAuthStore";
 const Scan = () => {
   const [option, setoption] = useState("scan");
   const [scanModal, setscanModal] = useState(false);
   const navigate = useNavigate();
   const [loading, setloading] = useState(false);
+  const isAuthenticated = useAuthStore.getState().isAuthenticated();
   const [scanData, setscanData] = useState({
     domain: "",
     discovery_reason: "",
@@ -128,6 +130,8 @@ const Scan = () => {
     ],
   });
   const flag = useRef(false);
+  console.log(isAuthenticated);
+
   useEffect(() => {
     console.log("useEffect");
 
@@ -170,9 +174,9 @@ const Scan = () => {
     };
     fetchData();
   }, [scanData]);
-  console.log(flag.current);
-  console.log(dataChange);
-  console.log(scanData);
+  // console.log(flag.current);
+  // console.log(dataChange);
+  // console.log(scanData);
 
   //set data change from input
   const handleScanChage = (value, e) => {
@@ -330,7 +334,10 @@ const Scan = () => {
                     </div>
                   </div>
                   {scanModal && (
-                    <div className="overflow-y-auto overflow-x-hidden fixed inset-0 z-50 flex justify-center items-center">
+                    <div
+                      className="overflow-y-auto overflow-x-hidden fixed inset-0 z-50 flex justify-center items-center"
+                      onClick={handleModal}
+                    >
                       <div className="relative p-4 w-full max-w-md max-h-full">
                         <div className="relative  rounded-lg shadow bg-black border-2 border-zinc-700/60 hover:border-zinc-700">
                           <button

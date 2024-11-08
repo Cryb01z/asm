@@ -27,10 +27,27 @@ const onRequest = (config) => {
   return config;
 };
 const onResponse = (response) => {
-  return { data: response.data };
+  if (response.status === 200) {
+    return { data: response.data }; // Successful response
+  } else {
+    return Promise.reject({ err: "Unexpected status code", details: response });
+  }
 };
+
 const onError = (error) => {
-  return { err: error };
+  if (error.response) {
+    // Server responded with an error
+    return Promise.reject({
+      err: `Error: ${error.response.status}`,
+      details: error.response.data,
+    });
+  } else if (error.request) {
+    // No response was received
+    return Promise.reject({ err: "Network error", details: error.request });
+  } else {
+    // Something else went wrong
+    return Promise.reject({ err: `Error: ${error.message}` });
+  }
 };
 axiosClient.interceptors.request.use(onRequest);
 axiosClient.interceptors.response.use(onResponse, onError);

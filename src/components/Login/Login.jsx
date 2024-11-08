@@ -4,13 +4,15 @@ import { useNavigate } from "react-router-dom";
 import { postLogin } from "../../axios/AuthService";
 import { ToastContainer, toast, Bounce } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import useAuthStore from "../../store/useAuthStore";
+import { jwtDecode } from "jwt-decode";
 const Login = () => {
   const navigate = useNavigate();
-
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+  const login = useAuthStore((state) => state.login);
 
   const handleInput = (key, e) => {
     setFormData((prev) => ({ ...prev, [key]: e.target.value }));
@@ -20,7 +22,13 @@ const Login = () => {
     console.log(formData);
     try {
       const response = await postLogin(formData);
-      console.log(response);
+      // console.log(response);
+      const token = response.data.token;
+      const decodedToken = jwtDecode(token);
+      // console.log(decodedToken);
+      const {sub: username, exp} = decodedToken;
+      login({username}, token);
+
       toast.success("Login successfully !", {
         position: "top-right",
         autoClose: 5000,

@@ -111,6 +111,10 @@ const OpenCVE = () => {
       return; // Prevent the page from changing if out of bounds
     }
     setCurrentPage(newPage);
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+    });
   };
 
   //custom date format

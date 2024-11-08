@@ -77,7 +77,7 @@ const Details = ({ references, config }) => {
                   <td className="p-2 text-left w-32">
                     <span className="align-middle">
                       <img
-                        src="../../../public/icon/vuldb.png"
+                        src="/icon/vuldb.png"
                         width={25}
                         height={25}
                         alt=""
