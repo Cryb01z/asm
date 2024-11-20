@@ -14,15 +14,18 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Test from "../Test";
-import AllResult from "./AllResult";
 import { testData, scanResult } from "../../axios/test";
 import { ToastContainer, toast, Bounce } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import useAuthStore from "../../store/useAuthStore";
+import AllResult from "../../components/Scan/AllResult";
+import Navbar from "../../components/Navbar/Navbar";
+import { getScanInfo, scanDomain } from "../../axios/ScanService/scanService";
+import { dataCVE } from "../../axios/data";
 const Scan = () => {
   const [option, setoption] = useState("scan");
   const [scanModal, setscanModal] = useState(false);
+  const modalRef = useRef(null);
   const navigate = useNavigate();
   const [loading, setloading] = useState(false);
   const isAuthenticated = useAuthStore.getState().isAuthenticated();
@@ -41,135 +44,157 @@ const Scan = () => {
     info: 0,
   });
   const [data, setdata] = useState({
-    domain: "",
-    discovery_reason: "",
-    discovery_on: "",
-    ip: "",
-    services: [
-      {
-        http: {
-          request: {
-            method: "",
-            uri: "",
+    status: "",
+    results: {
+      domain: "",
+      discovery_reason: "",
+      is_online: true,
+      discovery_on: "",
+      ip: [""],
+      services: [
+        {
+          http: {
+            request: {
+              method: "",
+              uri: "",
+            },
+            response: {
+              status_code: 0,
+              status_reason: "",
+              header_location: null,
+              html_title: "",
+            },
           },
-          response: {
-            protocol: "",
-            status_code: "",
-            status_reason: "",
-            header_location: "",
-            html_title: "",
-          },
+          port: "",
+          service_name: "",
+          cpe: null,
+          software: [
+            {
+              vendor: "",
+              product: "",
+              version: "",
+            },
+          ],
+          vulnerabilities: [],
         },
-        port: "",
-        service_name: "",
-        software: [
+      ],
+      ssl: [
+        {
+          expiry_date: 0,
+          issue_date: 0,
+          id: "",
+          grade: "",
+          issuerSubject: "",
+          subject_alt_names: [],
+          subject_cn: [],
+          serialNumber: "",
+          raw: "",
+          sigAlg: "",
+          subject: "",
+          validationType: "",
+          version: "",
+        },
+      ],
+      technology: [
+        {
+          categories: "",
+          subtech: [
+            {
+              technology: "",
+              version: "",
+              description: "",
+            },
+          ],
+        },
+      ],
+      autonomous_system: {
+        asn: "",
+        description: "",
+        bgp_prefix: [],
+        name: "",
+        country_code: "",
+      },
+      operating_system: {
+        vendor: "",
+        cpe: null,
+        port: 0,
+      },
+      dns: {
+        ttl: 0,
+        resolver: [],
+        a: [],
+        soa: [
           {
-            vendor: "",
-            product: "",
-            version: "",
+            name: "",
+            ns: "",
+            mailbox: "",
+            serial: 0,
+            refresh: 0,
+            retry: 0,
+            expire: 0,
+            minttl: 0,
           },
         ],
-        vulnerabilities: [
-          {
-            id: "",
-            cvss: "",
-            type: "",
-            is_exploit: "",
-            reference: "",
-          },
-        ],
+        txt: [],
+        all: [],
+        status_code: "",
+        axfr: {
+          host: "",
+        },
+        timestamp: "",
       },
-    ],
-    ssl: [
-      {
-        expiry_date: 0,
-        issue_date: 0,
-        id: "",
-        grade: "",
-        issuerSubject: "",
-        subject_alt_names: [],
-        subject_cn: [""],
-        serialNumber: "",
-        raw: "",
-        sigAlg: "",
-        subject: "",
-        validationType: "",
-        version: "",
-      },
-    ],
-    technology: [
-      {
-        category: "",
-        subtech: [
-          {
-            technology: "",
-            version: "",
-            description: "",
-          },
-        ],
-      },
-    ],
-    autonomous_system: {
-      asn: "",
-      description: "",
-      bgp_prefix: "",
-      name: "",
-      country_code: "",
     },
-    operating_system: {
-      vendor: "",
-      cpe: "",
-      kernel_version: "",
-    },
-    dns: [
-      {
-        Asset_Name: "",
-        Record_Type: "",
-        Record: "",
-      },
-    ],
   });
   const flag = useRef(false);
-  console.log(isAuthenticated);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (modalRef.current && !modalRef.current.contains(event.target)) {
+        setscanModal(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   useEffect(() => {
     console.log("useEffect");
-
     const fetchData = async () => {
       try {
-        const response = await scanResult();
-        // console.log(response);
-        const service = response.services.filter(
-          (service) => service.vulnerabilities.length > 0
-        );
-        const severity = {
-          high: 0,
-          medium: 0,
-          low: 0,
-          info: 0,
-        };
-        service.forEach((service) => {
-          service.vulnerabilities.forEach((vulnerability) => {
-            if (vulnerability.cvss >= 9) {
-              severity.high += 1;
-            } else if (vulnerability.cvss >= 7 && vulnerability.cvss < 9) {
-              severity.medium += 1;
-            } else if (vulnerability.cvss >= 4 && vulnerability.cvss < 7) {
-              severity.low += 1;
-            } else {
-              severity.info += 1;
-            }
-          });
-        });
+        const response = await getScanInfo("vulnweb.com");
+        console.log(response);
+        // const service = response.services.filter(
+        //   (service) => service.vulnerabilities.length > 0
+        // );
+        // const severity = {
+        //   high: 0,
+        //   medium: 0,
+        //   low: 0,
+        //   info: 0,
+        // };
+        // service.forEach((service) => {
+        //   service.vulnerabilities.forEach((vulnerability) => {
+        //     if (vulnerability.cvss >= 9) {
+        //       severity.high += 1;
+        //     } else if (vulnerability.cvss >= 7 && vulnerability.cvss < 9) {
+        //       severity.medium += 1;
+        //     } else if (vulnerability.cvss >= 4 && vulnerability.cvss < 7) {
+        //       severity.low += 1;
+        //     } else {
+        //       severity.info += 1;
+        //     }
+        //   });
+        // });
         // setloading(true);
-        setseverity(severity);
-        setdata(response); // Corrected spread operator
+        // setseverity(severity);
+        setdata(response.data.results); // Corrected spread operator
       } catch (error) {
         console.log(error);
       } finally {
-        if (flag.current) {
-          setloading(true);
-        }
+        setloading(true);
       }
     };
     fetchData();
@@ -177,14 +202,34 @@ const Scan = () => {
   // console.log(flag.current);
   // console.log(dataChange);
   // console.log(scanData);
+  console.log(data);
 
   //set data change from input
   const handleScanChage = (value, e) => {
     setsdataChange({ ...dataChange, [value]: e.target.value });
   };
 
+  //get domain from url
+  const getDomain = (url) => {
+    if (!url.includes("http")) {
+      if (url.includes("www")) {
+        return url.slice(4);
+      }
+      return url;
+    }
+    if (url === "") {
+      return "";
+    }
+    return url.split("/")[2].includes("www")
+      ? url.split("/")[2].slice(4)
+      : url.split("/")[2];
+  };
+
+  // console.log(getDomain("http://www.vulnweb.com/"));
+
   //set scan data
   const handleScan = () => {
+    //check if input is empty
     if (dataChange.domain === "" || dataChange.discovery_reason === "") {
       toast.error("Please fill all fields !", {
         position: "top-right",
@@ -199,7 +244,25 @@ const Scan = () => {
       });
       return;
     }
+    const domain = getDomain(dataChange.domain);
+    //check if domain is valid
+    if (!/^[a-zA-Z0-9-]+(\.[a-zA-Z]{2,})+$/.test(domain)) {
+      toast.error("Invalid domain !", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+        transition: Bounce,
+      });
+      return;
+    }
     flag.current = true;
+
+    // Show loading toast for the scanning process
     const loadingToastId = toast.loading("Wait for scanning ...", {
       position: "top-right",
       autoClose: 60000, // Adjust the time as needed
@@ -211,24 +274,174 @@ const Scan = () => {
       theme: "dark",
       transition: Bounce,
     });
-    loadingToastId;
-    setTimeout(() => {
-      setscanData(dataChange);
-      setloading(true);
-      console.count("scan");
-      toast.dismiss(loadingToastId);
-      toast.success("scan successfully !", {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "dark",
-        transition: Bounce,
+
+    const fetchScanAPI = async () => {
+      try {
+        const response = await scanDomain(domain);
+        return response;
+      } catch (error) {
+        throw new Error("Failed to trigger scan");
+      }
+    };
+
+    const fetchStream = async () => {
+      try {
+        const response = await fetch(
+          `http://171.244.21.38:65534/scan/${domain}/status/stream`,
+          {
+            headers: {
+              Accept: "text/event-stream", // Optional, depends on your API
+            },
+          }
+        );
+        return response;
+      } catch (error) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+    };
+
+    const fetchScanInfoAPI = async () => {
+      try {
+        const response = await getScanInfo(domain);
+        return response;
+      } catch (error) {
+        throw new Error("Failed to retrieve scan info");
+      }
+    };
+    const handleFetchStream = async (response) => {
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      // console.log(reader);
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        // console.log(done);
+        // console.log(value);
+        buffer += decoder.decode(value, { stream: true });
+        // console.log(buffer);
+        let boundary;
+        while ((boundary = buffer.indexOf("\n")) >= 0) {
+          const line = buffer.slice(0, boundary).trim();
+          buffer = buffer.slice(boundary + 1);
+          if (line) {
+            try {
+              const cleanLine = line.startsWith("data: ")
+                ? line.slice(6)
+                : line;
+              // Attempt to parse the cleaned line
+              const data = JSON.parse(cleanLine);
+              console.log("Received (fetchStream):", data);
+
+              if (data.status.startsWith("error")) {
+                toast.error("Error: " + data.status, {
+                  position: "top-right",
+                  autoClose: 5000,
+                  hideProgressBar: false,
+                  closeOnClick: true,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
+                  theme: "dark",
+                  transition: Bounce,
+                });
+                return; // Exit on error
+              }
+
+              // Update the toast with progress
+              toast.update(loadingToastId, {
+                render: `Processing: ${data.status} (${data.completed} of ${data.total})`,
+                type: "info",
+                autoClose: false,
+                isLoading: true,
+                position: "top-right",
+                hideProgressBar: true,
+                closeOnClick: false,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "dark",
+                transition: Bounce,
+              });
+
+              // Check if the process is completed
+              if (data.status === "completed") {
+                response.body.cancel();
+                console.log("Fetch stream completed.");
+                toast.success("Scan successfully completed!", {
+                  position: "top-right",
+                  autoClose: 5000,
+                  hideProgressBar: false,
+                  closeOnClick: true,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
+                  theme: "dark",
+                  transition: Bounce,
+                });
+                return true; // Exit on completion
+              }
+            } catch (err) {
+              console.error("Failed to parse JSON (fetchStream):", line);
+            }
+          }
+        }
+      }
+    };
+    // First, trigger the scan API
+    fetchScanAPI()
+      .then((scanResponse) => {
+        console.log(scanResponse.data);
+        // Fetch the stream
+        fetchStream()
+          .then((response) => {
+            handleFetchStream(response).then((response) => {
+              // if the stream finished successfully, fetch the scan info
+              response &&
+                fetchScanInfoAPI().then((scanInfoResponse) => {
+                  console.log(scanInfoResponse.data);
+                  setscanData(scanInfoResponse.data.results); // Set the scan data
+                });
+            }); // Call the stream handler
+          })
+          .catch((error) => {
+            console.error("Stream fetching error:", error);
+            toast.error("Failed to fetch stream", {
+              position: "top-right",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "dark",
+              transition: Bounce,
+            });
+          });
+      })
+      .catch((error) => {
+        console.error("Scan fetching error:", error);
+        toast.error("Failed to Scan", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+          transition: Bounce,
+        });
+      })
+      .finally(() => {
+        // This will be executed after the whole process (scan + stream)
+        setloading(true); // Ensure loading is false at the end of the process, just in case
       });
-    }, 120000);
+  };
+  console.log(data);
+
+  //custom date format
+  const customDate = (date) => {
+    return new Date(date).toISOString().split("T")[0];
   };
 
   //close modal
@@ -240,7 +453,7 @@ const Scan = () => {
     <div className=" bg-black text-gray-400 flex h-screen overflow-hidden">
       <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
         {/*  Site header */}
-        <Test site={"scan"} />
+        <Navbar site={"scan"} />
         <main className="">
           {/* nav site */}
           <div className="px-8 py-2 sticky top-[65px] z-10 bg-black">
@@ -334,12 +547,12 @@ const Scan = () => {
                     </div>
                   </div>
                   {scanModal && (
-                    <div
-                      className="overflow-y-auto overflow-x-hidden fixed inset-0 z-50 flex justify-center items-center"
-                      onClick={handleModal}
-                    >
+                    <div className="overflow-y-auto overflow-x-hidden fixed inset-0 z-50 flex justify-center items-center">
                       <div className="relative p-4 w-full max-w-md max-h-full">
-                        <div className="relative  rounded-lg shadow bg-black border-2 border-zinc-700/60 hover:border-zinc-700">
+                        <div
+                          className="relative  rounded-lg shadow bg-black border-2 border-zinc-700/60 hover:border-zinc-700"
+                          ref={modalRef}
+                        >
                           <button
                             type="button"
                             className="absolute top-3 end-2.5 text-gray-400 bg-transparent rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center hover:bg-gray-600 hover:text-white"
@@ -499,9 +712,7 @@ const Scan = () => {
                               DOMAIN
                             </th>
                             <th className="px-8 py-2 cursor-pointer">ip</th>
-                            <th className="px-8 py-2 cursor-pointer">
-                              severity breakdown
-                            </th>
+                            <th className="px-8 py-2 cursor-pointer">Status</th>
                             <th className="px-8 py-2 cursor-pointer">assets</th>
                             <th className="px-8 py-2 cursor-pointer">
                               discover reason
@@ -518,24 +729,25 @@ const Scan = () => {
                                 <td
                                   className="sticky left-0 text-left w-96 px-4 rounded-l-lg shadow-[34px_0px_29px_1px_rgba(11,11,13,0.8)] bg-[#18181b] cursor-pointer z-10"
                                   onClick={() => {
-                                    navigate(`/result/${data.domain}`);
+                                    navigate(
+                                      `/result/${getDomain(data.domain)}`,
+                                      {
+                                        state: { domain: getDomain(data.domain) },
+                                      }
+                                    );
                                   }}
                                 >
                                   <span className="px-1 text-green-500 bg-green-800/50 rounded-full">
                                     <FontAwesomeIcon icon={faCheck} />
                                   </span>{" "}
-                                  {data.domain}
+                                  {getDomain(data.domain)}
                                 </td>
                                 <td className="px-8 text-center py-2 cursor-pointer">
                                   {data.ip}
                                 </td>
                                 <td className="px-8 py-2 text-center  cursor-pointer">
-                                  {/* <div className="px-3 py-1.5 rounded-full inline-block border border-zinc-700 text-gray-400 text-xs uppercase">
-                                  <FontAwesomeIcon icon={faCheck} /> no
-                                  vulnerabilities found
-                                </div> */}
                                   <div className="flex space-x-1 justify-center">
-                                    <div className="px-4 rounded-md text-red-600 bg-red-600/40">
+                                    {/* <div className="px-4 rounded-md text-red-600 bg-red-600/40">
                                       {severity.high}
                                     </div>
                                     <div className="px-4 rounded-md text-amber-600 bg-amber-600/40">
@@ -546,17 +758,38 @@ const Scan = () => {
                                     </div>
                                     <div className="px-4 rounded-md text-green-500 bg-green-800/50">
                                       {severity.info}
-                                    </div>
+                                    </div> */}
+                                    {data.is_online ? (
+                                      <>
+                                        <div className="flex space-x-5">
+                                          <span className="absolute top-3.5 flex h-3 w-3 z-20">
+                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-700 opacity-75"></span>
+                                            <span className="relative inline-flex rounded-full h-3 w-3 bg-green-400/70"></span>
+                                          </span>
+                                          <div>Online</div>
+                                        </div>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <div className="flex space-x-5">
+                                          <span className="absolute top-3.5 flex h-3 w-3 z-20">
+                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-700 opacity-75"></span>
+                                            <span className="relative inline-flex rounded-full h-3 w-3 bg-red-400/70"></span>
+                                          </span>
+                                          <div>Down</div>
+                                        </div>
+                                      </>
+                                    )}
                                   </div>
                                 </td>
                                 <td className="px-8 py-2 text-center  cursor-pointer">
-                                  2 assets
+                                  {data.technology.length} assets
                                 </td>
                                 <td className="px-8 py-2 text-center  cursor-pointer">
                                   {data.discovery_reason}
                                 </td>
                                 <td className="px-8 py-2 text-center  cursor-pointer rounded-r-lg">
-                                  {data.discovery_on}
+                                  {customDate(data.discovery_on)}
                                 </td>
                               </tr>
                             </>

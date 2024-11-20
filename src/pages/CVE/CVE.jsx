@@ -4,9 +4,9 @@ import {
   faSquarePollVertical,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import DomainCVE from "./DomainCVE";
-import Test from "../Test";
-import OpenCVE from "./OpenCVE";
+import DomainCVE from "../../components/CVE/DomainCVE";
+import Navbar from "../../components/Navbar/Navbar";
+import OpenCVE from "../../components/CVE/OpenCVE";
 
 const CVE = () => {
   const [cve, setcve] = useState("openCVE");
@@ -16,7 +16,7 @@ const CVE = () => {
     <div className="flex bg-black h-screen overflow-hidden">
       <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
         {/*  Site header */}
-        <Test site={"CVE"} />
+        <Navbar site={"CVE"} />
         <main>
           <div className="pb-8 w-full max-w-9xl text-gray-400 relative">
             <div className="py-2 sticky top-[65px] z-10 bg-black">

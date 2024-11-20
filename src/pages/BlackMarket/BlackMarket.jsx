@@ -1,7 +1,4 @@
 import React, { useState } from "react";
-import Sidebar from "../../partials/Sidebar";
-import Header from "../../partials/Header";
-
 export default function BlackMarket() {
   const data = [
     {
@@ -69,16 +66,16 @@ export default function BlackMarket() {
   return (
     <div className=" bg-gray-900 text-slate-400 flex h-screen overflow-hidden">
       {/* Sidebar */}
-      <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+      {/* <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} /> */}
 
       {/* Content area */}
       <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
         {/*  Site header */}
-        <Header
+        {/* <Header
           tittle={"Dark Web Monitoring"}
           sidebarOpen={sidebarOpen}
           setSidebarOpen={setSidebarOpen}
-        />
+        /> */}
 
         <main>
           <div className="flex space-x-5">

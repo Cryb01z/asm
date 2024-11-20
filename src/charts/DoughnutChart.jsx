@@ -131,8 +131,8 @@ function DoughnutChart({
       <div>
         <canvas ref={canvas} width={width} height={height}></canvas>
       </div>
-      <div className="px-5 pt-2 pb-6">
-        <ul ref={legend} className="flex flex-wrap justify-center -m-1"></ul>
+      <div className="px-5 pt-2 pb-6 line-clamp-2">
+        <ul ref={legend} className="flex flex-wrap justify-center -m-1 max-w-xs"></ul>
       </div>
     </div>
   );

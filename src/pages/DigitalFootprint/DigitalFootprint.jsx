@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import Sidebar from "../../partials/Sidebar";
-import Header from "../../partials/Header";
+// import Sidebar from "../../partials/Sidebar";
+// import Header from "../../partials/Header";
 import DoughnutChart from "../../charts/DoughnutChart";
 import { tailwindConfig } from "../../utils/Utils";
 import { data } from "../../axios/data";
@@ -68,16 +68,16 @@ const DigitalFootprint = () => {
   return (
     <div className=" bg-gray-900 text-slate-400 flex h-screen overflow-hidden">
       {/* Sidebar */}
-      <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+      {/* <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} /> */}
 
       {/* Content area */}
       <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
         {/*  Site header */}
-        <Header
+        {/* <Header
           tittle={"Digital Footprint"}
           sidebarOpen={sidebarOpen}
           setSidebarOpen={setSidebarOpen}
-        />
+        /> */}
 
         <main>
           <div className="flex ml-8 mt-5 space-x-5">

@@ -17,109 +17,146 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import { scanResult } from "../../axios/test";
-import Test from "../Test";
+import Navbar from "../../components/Navbar/Navbar";
+import { getDomainInfo } from "../../axios/AssetService/assetService";
 
 const Asset = () => {
   const navigate = useNavigate();
   const [option, setoption] = useState("asset");
+  const [loading, setloading] = useState(true);
   const [data, setdata] = useState({
-    domain: "",
-    discovery_reason: "",
-    discovery_on: "",
-    ip: "",
-    services: [
+    status: "",
+    results: [
       {
-        http: {
-          request: {
-            method: "",
-            uri: "",
-          },
-          response: {
-            protocol: "",
-            status_code: "",
-            status_reason: "",
-            header_location: "",
-            html_title: "",
-          },
-        },
-        port: "",
-        service_name: "",
-        software: [
+        domain: "",
+        discovery_reason: "",
+        is_online: true,
+        discovery_on: "",
+        ip: [""],
+        services: [
           {
-            vendor: "",
-            product: "",
-            version: "",
+            http: {
+              request: {
+                method: "",
+                uri: "",
+              },
+              response: {
+                status_code: 0,
+                status_reason: "",
+                header_location: null,
+                html_title: "",
+              },
+            },
+            port: "",
+            service_name: "",
+            cpe: null,
+            software: [
+              {
+                vendor: "",
+                product: "",
+                version: "",
+              },
+            ],
+            vulnerabilities: [],
           },
         ],
-        vulnerabilities: [
+        ssl: [
           {
+            expiry_date: 0,
+            issue_date: 0,
             id: "",
-            cvss: "",
-            type: "",
-            is_exploit: "",
-            reference: "",
-          },
-        ],
-      },
-    ],
-    ssl: [
-      {
-        expiry_date: 0,
-        issue_date: 0,
-        id: "",
-        grade: "",
-        issuerSubject: "",
-        subject_alt_names: [],
-        subject_cn: [""],
-        serialNumber: "",
-        raw: "",
-        sigAlg: "",
-        subject: "",
-        validationType: "",
-        version: "",
-      },
-    ],
-    technology: [
-      {
-        category: "",
-        subtech: [
-          {
-            technology: "",
+            grade: "",
+            issuerSubject: "",
+            subject_alt_names: [],
+            subject_cn: [],
+            serialNumber: "",
+            raw: "",
+            sigAlg: "",
+            subject: "",
+            validationType: "",
             version: "",
-            description: "",
           },
         ],
-        port: "",
-        status: "",
-      },
-    ],
-    autonomous_system: {
-      asn: "",
-      description: "",
-      bgp_prefix: "",
-      name: "",
-      country_code: "",
-    },
-    operating_system: {
-      vendor: "",
-      cpe: "",
-      kernel_version: "",
-    },
-    dns: [
-      {
-        Asset_Name: "",
-        Record_Type: "",
-        Record: "",
+        technology: [
+          {
+            categories: "",
+            subtech: [
+              {
+                technology: "",
+                version: "",
+                description: "",
+              },
+            ],
+          },
+        ],
+        autonomous_system: {
+          asn: "",
+          description: "",
+          bgp_prefix: [],
+          name: "",
+          country_code: "",
+        },
+        operating_system: {
+          vendor: "",
+          cpe: null,
+          port: 0,
+        },
+        dns: {
+          ttl: 0,
+          resolver: [],
+          a: [],
+          soa: [
+            {
+              name: "",
+              ns: "",
+              mailbox: "",
+              serial: 0,
+              refresh: 0,
+              retry: 0,
+              expire: 0,
+              minttl: 0,
+            },
+          ],
+          txt: [],
+          all: [],
+          status_code: "",
+          axfr: {
+            host: "",
+          },
+          timestamp: "",
+        },
       },
     ],
   });
   useEffect(() => {
     const fetchData = async () => {
-      const response = await scanResult();
-      setdata(response);
+      try {
+        const response = await getDomainInfo("vulnweb.com");
+        console.log(response.data);
+        setdata(response.data);
+        setloading(false);
+      } catch (error) {
+        console.log(error);
+      }
     };
     fetchData();
   }, []);
+
+  //get domain from url
+  const getDomain = (url) => {
+    if (!url.includes("http")) {
+      if (url.includes("www")) {
+        return url.slice(4);
+      }
+      return url;
+    }
+    if (url === "") {
+      return "";
+    }
+    return url.split("/")[2].includes("www")
+      ? url.split("/")[2].slice(4)
+      : url.split("/")[2];
+  };
 
   // Calculate the last updated date
   const calculateLastUpdated = (discovery_on) => {
@@ -135,12 +172,24 @@ const Asset = () => {
     return updateDate > 0 ? `${updateDate} days ago` : "Today";
   };
 
+  if (loading) {
+    return (
+      <div className="bg-black  text-gray-400 flex h-screen overflow-hidden">
+        {/* Content area */}
+        <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
+          {/*  Site header */}
+          <Navbar site={"asset"} />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-black  text-gray-400 flex h-screen overflow-hidden">
       {/* Content area */}
       <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
         {/*  Site header */}
-        <Test site={"asset"} />
+        <Navbar site={"asset"} />
         <main>
           {/* nav site */}
           <div className="px-8 py-2 sticky top-[65px] z-10 bg-black">
@@ -256,8 +305,8 @@ const Asset = () => {
                 <div className="mt-4">
                   <div id="detailed-pricing" class="w-full overflow-x-auto">
                     <div class="overflow-hidden min-w-max">
-                      <div class="grid grid-cols-7 p-2 text-sm font-medium border-t border rounded-lg uppercase bg-zinc-900 border-zinc-700 ">
-                        <div className="col-span-2">
+                      <div class="grid grid-cols-6 p-2 text-sm font-medium border-t border rounded-lg uppercase bg-zinc-900 border-zinc-700 ">
+                        <div className="">
                           <div class="flex flex-row items-center gap-2.5">
                             <input
                               id="hr1"
@@ -292,8 +341,8 @@ const Asset = () => {
                         <div></div>
                       </div>
 
-                      <div class="mt-3 grid grid-cols-7 p-2 text-sm font-medium border rounded-lg  bg-black border-zinc-700  hover:bg-zinc-900 cursor-pointer">
-                        <div className="col-span-2">
+                      <div class="mt-3 grid grid-cols-6 p-2 text-sm font-medium border rounded-lg  bg-black border-zinc-700  hover:bg-zinc-900 cursor-pointer">
+                        <div className="">
                           <div class="flex flex-row items-center gap-2.5">
                             <input
                               id="hr2"
@@ -325,17 +374,24 @@ const Asset = () => {
                               <span
                                 className="font-semibold text-white"
                                 onClick={() => {
-                                  navigate(`/inventory/${data.domain}`, {
-                                    state: { data: data },
-                                  });
+                                  navigate(
+                                    `/inventory/${getDomain(
+                                      data.results.domain
+                                    )}`,
+                                    {
+                                      state: {
+                                        domain : getDomain(data.results.domain),
+                                      },
+                                    }
+                                  );
                                 }}
                               >
-                                {data.domain}
+                                {getDomain(data.results.domain)}
                               </span>
                             </div>
                           </div>
                         </div>
-                        <div>{data.discovery_reason}</div>
+                        <div>{data.results.discovery_reason}</div>
                         <div>
                           <div className="text-xs px-2 inline-flex items-center gap-1 border border-zinc-700 rounded-md">
                             <span className="text-indigo-700">
@@ -350,10 +406,12 @@ const Asset = () => {
                             <span className="">
                               <FontAwesomeIcon icon={faCircle} size="xs" />
                             </span>
-                            {data.technology.length} assets
+                            {data.results.technology.length} assets
                           </div>
                         </div>
-                        <div>{calculateLastUpdated(data.discovery_on)}</div>
+                        <div>
+                          {calculateLastUpdated(data.results.discovery_on)}
+                        </div>
                         <div>
                           <div className="text-sm px-2 inline-flex items-center gap-1 border border-zinc-700 rounded-md">
                             <span className="text-indigo-700">

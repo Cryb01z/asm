@@ -1,11 +1,12 @@
 import axios from "axios";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { postLogin } from "../../axios/AuthService";
+
 import { ToastContainer, toast, Bounce } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import useAuthStore from "../../store/useAuthStore";
 import { jwtDecode } from "jwt-decode";
+import { postLogin } from "../../axios/AuthService/AuthService";
 const Login = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({

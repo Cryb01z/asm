@@ -3,25 +3,23 @@ import { Route, Routes, useLocation } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
 import "./charts/ChartjsConfig";
 import "./css/style.css";
-
 // Import pages
 import Login from "./components/Login/Login";
 import Register from "./components/Register/Register";
 import Layout from "./Layout/Layout";
 import BlackMarket from "./pages/BlackMarket/BlackMarket";
 import CVE from "./pages/CVE/CVE";
-import CVEDetail from "./pages/CVE/CVEDetail";
+import CVEDetail from "./components/CVE/CVEDetail";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import DigitalFootprint from "./pages/DigitalFootprint/DigitalFootprint";
 import Result from "./pages/Result/Result";
 import Scan from "./pages/Scan/Scan";
-import Service from "./pages/ServiceManagement/Service";
-
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 import Asset from "./pages/Asset/Asset";
-import DomainInventory from "./pages/Asset/DomainInventory";
-import Inventory from "./pages/Asset/Inventory";
-import Test from "./pages/Test";
+import DomainInventory from "./components/Asset/DomainInventory";
+import Inventory from "./components/Asset/Inventory";
+import Navbar from "./components/Navbar/Navbar";
+
 
 function App() {
   const location = useLocation();
@@ -36,13 +34,12 @@ function App() {
     { path: "/dashboard", component: <Dashboard /> },
     { path: "/CVE", component: <CVE /> },
     { path: "/CVE/:cveId", component: <CVEDetail /> },
-    { path: "/service", component: <Service /> },
     { path: "/scan", component: <Scan /> },
     { path: "/result/:id", component: <Result /> },
     { path: "/asset", component: <Asset /> },
     { path: "/inventory", component: <Inventory /> },
     { path: "/inventory/:id", component: <DomainInventory /> },
-    { path: "/test", component: <Test /> },
+    { path: "/test", component: <Navbar /> },
     { path: "/digitalfootprint", component: <DigitalFootprint /> },
     { path: "/darkwebmonitoring", component: <BlackMarket /> },
   ];
