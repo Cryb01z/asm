@@ -18,10 +18,16 @@ const getTotalCVE = async () => {
   return await axiosClient.get(`/Cve/Count`);
 };
 
+const getCVEDetail = async (domain, cveId) => {
+  return await axios.get(
+    `http://171.244.21.38:65534/vulnerability?url=${domain}&vuln_id=${cveId}`
+  );
+};
+
 const getDomainCVE = async (domain) => {
   return await axios.get(
     `http://171.244.21.38:65534/result/domain/vuln/all?domain=${domain}`
   );
 };
 
-export { getCVE, getCVES, getTotalCVE, searchCVES, getDomainCVE };
+export { getCVE, getCVES, getTotalCVE, searchCVES, getDomainCVE, getCVEDetail };

@@ -72,6 +72,7 @@ const Navbar = ({ site }) => {
 
   const handleLogout = () => {
     logout();
+    localStorage.removeItem("domain"); 
     navigate("/login");
   };
 
@@ -120,7 +121,7 @@ const Navbar = ({ site }) => {
         {/* Centered navbar */}
         <div className="absolute left-1/2 top-9 -translate-x-1/2 -translate-y-1/2">
           <div className="flex flex-row items-center justify-center space-x-1 text-sm text-neutral-400 border-2 rounded-lg border-neutral-800 px-2 py-1">
-            <div
+            {/* <div
               className={`px-5 rounded-md cursor-pointer ${
                 options === "dashboard"
                   ? "bg-neutral-700/60"
@@ -143,7 +144,7 @@ const Navbar = ({ site }) => {
               >
                 Dashboard
               </span>
-            </div>
+            </div> */}
             <div
               className={`px-5 rounded-md cursor-pointer ${
                 options === "asset"

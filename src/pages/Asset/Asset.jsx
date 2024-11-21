@@ -130,13 +130,16 @@ const Asset = () => {
   });
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const response = await getDomainInfo("vulnweb.com");
-        console.log(response.data);
-        setdata(response.data);
-        setloading(false);
-      } catch (error) {
-        console.log(error);
+      const domain = localStorage.getItem("domain");
+      if (domain) {
+        try {
+          const response = await getDomainInfo(domain);
+          console.log(response.data);
+          setdata(response.data);
+          setloading(false);
+        } catch (error) {
+          console.log(error);
+        }
       }
     };
     fetchData();
@@ -172,18 +175,6 @@ const Asset = () => {
     return updateDate > 0 ? `${updateDate} days ago` : "Today";
   };
 
-  if (loading) {
-    return (
-      <div className="bg-black  text-gray-400 flex h-screen overflow-hidden">
-        {/* Content area */}
-        <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
-          {/*  Site header */}
-          <Navbar site={"asset"} />
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="bg-black  text-gray-400 flex h-screen overflow-hidden">
       {/* Content area */}
@@ -211,7 +202,7 @@ const Asset = () => {
                   Asset Groups
                 </span>
               </div>
-              <div
+              {/* <div
                 className={`px-2 pb-2 cursor-pointer ${
                   option === "Inventory"
                     ? "border-b-2 border-indigo-400 z-10"
@@ -257,7 +248,7 @@ const Asset = () => {
                 >
                   Technologies
                 </span>
-              </div>
+              </div> */}
             </div>
             <div className="absolute bottom-2 left-0 w-full border-b-2 border-neutral-800"></div>
           </div>
@@ -341,86 +332,97 @@ const Asset = () => {
                         <div></div>
                       </div>
 
-                      <div class="mt-3 grid grid-cols-6 p-2 text-sm font-medium border rounded-lg  bg-black border-zinc-700  hover:bg-zinc-900 cursor-pointer">
-                        <div className="">
-                          <div class="flex flex-row items-center gap-2.5">
-                            <input
-                              id="hr2"
-                              type="checkbox"
-                              class="peer hidden"
-                            />
-                            <label
-                              htmlFor="hr2"
-                              class="h-5 w-5 flex rounded-md border border-[#a2a1a833] light:bg-[#e8e8e8] dark:bg-[#212121] peer-checked:bg-white transition"
-                            >
-                              <svg
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                class="w-5 h-5 light:stroke-[#e8e8e8] dark:stroke-[#212121]"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path
-                                  d="M4 12.6111L8.92308 17.5L20 6.5"
-                                  stroke-width="2"
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                ></path>
-                              </svg>
-                            </label>
+                      {loading ? (
+                        <></>
+                      ) : (
+                        <>
+                          <div class="mt-3 grid grid-cols-6 p-2 text-sm font-medium border rounded-lg  bg-black border-zinc-700  hover:bg-zinc-900 cursor-pointer">
+                            <div className="">
+                              <div class="flex flex-row items-center gap-2.5">
+                                <input
+                                  id="hr2"
+                                  type="checkbox"
+                                  class="peer hidden"
+                                />
+                                <label
+                                  htmlFor="hr2"
+                                  class="h-5 w-5 flex rounded-md border border-[#a2a1a833] light:bg-[#e8e8e8] dark:bg-[#212121] peer-checked:bg-white transition"
+                                >
+                                  <svg
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    class="w-5 h-5 light:stroke-[#e8e8e8] dark:stroke-[#212121]"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <path
+                                      d="M4 12.6111L8.92308 17.5L20 6.5"
+                                      stroke-width="2"
+                                      stroke-linecap="round"
+                                      stroke-linejoin="round"
+                                    ></path>
+                                  </svg>
+                                </label>
+                                <div>
+                                  <span className="px-1 ml-3 text-green-500 bg-green-500/40 rounded-full">
+                                    <FontAwesomeIcon icon={faCheck} />
+                                  </span>{" "}
+                                  <span
+                                    className="font-semibold text-white"
+                                    onClick={() => {
+                                      navigate(
+                                        `/inventory/${getDomain(
+                                          data.results.domain
+                                        )}`,
+                                        {
+                                          state: {
+                                            domain: getDomain(
+                                              data.results.domain
+                                            ),
+                                          },
+                                        }
+                                      );
+                                    }}
+                                  >
+                                    {getDomain(data.results.domain)}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                            <div>{data.results.discovery_reason}</div>
                             <div>
-                              <span className="px-1 ml-3 text-green-500 bg-green-500/40 rounded-full">
-                                <FontAwesomeIcon icon={faCheck} />
-                              </span>{" "}
-                              <span
-                                className="font-semibold text-white"
-                                onClick={() => {
-                                  navigate(
-                                    `/inventory/${getDomain(
-                                      data.results.domain
-                                    )}`,
-                                    {
-                                      state: {
-                                        domain : getDomain(data.results.domain),
-                                      },
-                                    }
-                                  );
-                                }}
-                              >
-                                {getDomain(data.results.domain)}
-                              </span>
+                              <div className="text-xs px-2 inline-flex items-center gap-1 border border-zinc-700 rounded-md">
+                                <span className="text-indigo-700">
+                                  <FontAwesomeIcon icon={faMagnifyingGlass} />
+                                </span>
+                                Auto Discovery
+                              </div>
+                            </div>
+                            <div>
+                              {" "}
+                              <div className="text-xs px-2 inline-flex items-center gap-1 border border-zinc-700 rounded-md">
+                                <span className="">
+                                  <FontAwesomeIcon icon={faCircle} size="xs" />
+                                </span>
+                                {data.results.technology.length} assets
+                              </div>
+                            </div>
+                            <div>
+                              {calculateLastUpdated(data.results.discovery_on)}
+                            </div>
+                            <div>
+                              <div className="text-sm px-2 inline-flex items-center gap-1 border border-zinc-700 rounded-md">
+                                <span className="text-indigo-700">
+                                  <FontAwesomeIcon
+                                    icon={faBullseye}
+                                    size="xs"
+                                  />
+                                </span>
+                                Start vulnerability scan
+                              </div>
                             </div>
                           </div>
-                        </div>
-                        <div>{data.results.discovery_reason}</div>
-                        <div>
-                          <div className="text-xs px-2 inline-flex items-center gap-1 border border-zinc-700 rounded-md">
-                            <span className="text-indigo-700">
-                              <FontAwesomeIcon icon={faMagnifyingGlass} />
-                            </span>
-                            Auto Discovery
-                          </div>
-                        </div>
-                        <div>
-                          {" "}
-                          <div className="text-xs px-2 inline-flex items-center gap-1 border border-zinc-700 rounded-md">
-                            <span className="">
-                              <FontAwesomeIcon icon={faCircle} size="xs" />
-                            </span>
-                            {data.results.technology.length} assets
-                          </div>
-                        </div>
-                        <div>
-                          {calculateLastUpdated(data.results.discovery_on)}
-                        </div>
-                        <div>
-                          <div className="text-sm px-2 inline-flex items-center gap-1 border border-zinc-700 rounded-md">
-                            <span className="text-indigo-700">
-                              <FontAwesomeIcon icon={faBullseye} size="xs" />
-                            </span>
-                            Start vulnerability scan
-                          </div>
-                        </div>
-                      </div>
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>

@@ -47,7 +47,7 @@ const OpenCVE = () => {
           setloading(true);
         }
       } else {
-        try {    
+        try {
           const response = await searchCVES(
             searchQuery,
             currentPage,
@@ -112,8 +112,8 @@ const OpenCVE = () => {
     }
     setCurrentPage(newPage);
     window.scrollTo({
-        top: 0,
-        behavior: 'smooth',
+      top: 0,
+      behavior: "smooth",
     });
   };
 
@@ -225,9 +225,17 @@ const OpenCVE = () => {
             ))
           ) : (
             <>
-              <div className="animate-pulse">
-                <div className="w-full h-96 bg-zinc-900"></div>
-              </div>
+              <tr>
+                <td colSpan={5}>
+                  <div className="animate-pulse w-full h-96 bg-zinc-900 flex items-center justify-center">
+                    <div className="flex flex-col gap-4 items-center justify-center">
+                      <div className="w-20 h-20 border-4 border-transparent text-blue-400 text-4xl animate-spin flex items-center justify-center border-t-blue-400 rounded-full">
+                        <div className="w-16 h-16 border-4 border-transparent text-red-400 text-2xl animate-spin flex items-center justify-center border-t-red-400 rounded-full"></div>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
             </>
           )}
         </tbody>

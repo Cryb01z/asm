@@ -29,10 +29,7 @@ const Scan = () => {
   const navigate = useNavigate();
   const [loading, setloading] = useState(false);
   const isAuthenticated = useAuthStore.getState().isAuthenticated();
-  const [scanData, setscanData] = useState({
-    domain: "",
-    discovery_reason: "",
-  });
+  const [check, setcheck] = useState(false);
   const [dataChange, setsdataChange] = useState({
     domain: "",
     discovery_reason: "",
@@ -148,6 +145,27 @@ const Scan = () => {
   const flag = useRef(false);
 
   useEffect(() => {
+    const fetchData = async () => {
+      const domain = localStorage.getItem("domain");
+      if (domain) {
+        try {
+          const response = await getScanInfo(domain);
+          console.log(response);
+          setdata(response.data.results);
+          console.log(check);
+          
+          if(check){
+            setloading(true);
+          }
+        } catch (error) {
+          console.error("Failed to fetch data:", error);
+        }
+      }
+    };
+    fetchData();
+  }, [check]);
+
+  useEffect(() => {
     const handleClickOutside = (event) => {
       if (modalRef.current && !modalRef.current.contains(event.target)) {
         setscanModal(false);
@@ -160,49 +178,132 @@ const Scan = () => {
     };
   }, []);
 
-  useEffect(() => {
-    console.log("useEffect");
-    const fetchData = async () => {
-      try {
-        const response = await getScanInfo("vulnweb.com");
-        console.log(response);
-        // const service = response.services.filter(
-        //   (service) => service.vulnerabilities.length > 0
-        // );
-        // const severity = {
-        //   high: 0,
-        //   medium: 0,
-        //   low: 0,
-        //   info: 0,
-        // };
-        // service.forEach((service) => {
-        //   service.vulnerabilities.forEach((vulnerability) => {
-        //     if (vulnerability.cvss >= 9) {
-        //       severity.high += 1;
-        //     } else if (vulnerability.cvss >= 7 && vulnerability.cvss < 9) {
-        //       severity.medium += 1;
-        //     } else if (vulnerability.cvss >= 4 && vulnerability.cvss < 7) {
-        //       severity.low += 1;
-        //     } else {
-        //       severity.info += 1;
-        //     }
-        //   });
-        // });
-        // setloading(true);
-        // setseverity(severity);
-        setdata(response.data.results); // Corrected spread operator
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setloading(true);
+  // call scanning api
+  const fetchScanAPI = async (domain) => {
+    try {
+      const response = await scanDomain(domain);
+      return response;
+    } catch (error) {
+      throw new Error("Failed to trigger scan");
+    }
+  };
+
+  //fetch stream
+  const fetchStream = async (domain) => {
+    try {
+      const response = await fetch(
+        `http://171.244.21.38:65534/scan/${domain}/status/stream`,
+        {
+          headers: {
+            Accept: "text/event-stream", // Optional, depends on your API
+          },
+        }
+      );
+      return response;
+    } catch (error) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+  };
+
+  //fetch scan info
+  const fetchScanInfoAPI = async (domain) => {
+    try {
+      const response = await getScanInfo(domain);
+      return response;
+    } catch (error) {
+      throw new Error("Failed to retrieve scan info");
+    }
+  };
+
+  const handleFetchStream = async (response) => {
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+    let toastId = null;
+
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      let boundary;
+      while ((boundary = buffer.indexOf("\n")) >= 0) {
+        const line = buffer.slice(0, boundary).trim();
+        buffer = buffer.slice(boundary + 1);
+        if (line) {
+          try {
+            const cleanLine = line.startsWith("data: ") ? line.slice(6) : line;
+            const data = JSON.parse(cleanLine);
+            console.log("Received (fetchStream):", data);
+
+            if (data.status.startsWith("error")) {
+              toast.error("Error: " + data.status, {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "dark",
+                transition: Bounce,
+              });
+              return false; // Exit on error
+            }
+            if (data.status === "finished") {
+              console.log("Scanning completed.");
+              toast.update(toastId, {
+                render: "Scan completed!",
+                type: "success",
+                autoClose: 5000,
+                isLoading: false,
+                position: "top-right",
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "dark",
+                transition: Bounce,
+              });
+              return true; // Exit on completion
+            }
+            if (!toastId) {
+              toastId = toast.info(
+                `Processing: ${data.status} (${data.completed} of ${data.total})`,
+                {
+                  autoClose: false,
+                  isLoading: true,
+                  position: "top-right",
+                  hideProgressBar: true,
+                  closeOnClick: false,
+                  pauseOnHover: true,
+                  draggable: true,
+                  theme: "dark",
+                  transition: Bounce,
+                }
+              );
+            } else {
+              toast.update(toastId, {
+                render: `Processing: ${data.status} (${data.completed} of ${data.total})`,
+                type: "info",
+                autoClose: false,
+                isLoading: true,
+                position: "top-right",
+                hideProgressBar: true,
+                closeOnClick: false,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "dark",
+                transition: Bounce,
+              });
+            }
+          } catch (err) {
+            console.error("Failed to parse JSON (fetchStream):", line);
+          }
+        }
       }
-    };
-    fetchData();
-  }, [scanData]);
-  // console.log(flag.current);
-  // console.log(dataChange);
-  // console.log(scanData);
-  console.log(data);
+    }
+  };
 
   //set data change from input
   const handleScanChage = (value, e) => {
@@ -225,10 +326,9 @@ const Scan = () => {
       : url.split("/")[2];
   };
 
-  // console.log(getDomain("http://www.vulnweb.com/"));
-
   //set scan data
-  const handleScan = () => {
+  const handleScan = async () => {
+    const domain = getDomain(dataChange.domain);
     //check if input is empty
     if (dataChange.domain === "" || dataChange.discovery_reason === "") {
       toast.error("Please fill all fields !", {
@@ -244,7 +344,6 @@ const Scan = () => {
       });
       return;
     }
-    const domain = getDomain(dataChange.domain);
     //check if domain is valid
     if (!/^[a-zA-Z0-9-]+(\.[a-zA-Z]{2,})+$/.test(domain)) {
       toast.error("Invalid domain !", {
@@ -260,189 +359,61 @@ const Scan = () => {
       });
       return;
     }
-    flag.current = true;
 
-    // Show loading toast for the scanning process
-    const loadingToastId = toast.loading("Wait for scanning ...", {
-      position: "top-right",
-      autoClose: 60000, // Adjust the time as needed
-      hideProgressBar: true,
-      closeOnClick: false,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "dark",
-      transition: Bounce,
-    });
-
-    const fetchScanAPI = async () => {
-      try {
-        const response = await scanDomain(domain);
-        return response;
-      } catch (error) {
-        throw new Error("Failed to trigger scan");
-      }
-    };
-
-    const fetchStream = async () => {
-      try {
-        const response = await fetch(
-          `http://171.244.21.38:65534/scan/${domain}/status/stream`,
-          {
-            headers: {
-              Accept: "text/event-stream", // Optional, depends on your API
-            },
-          }
-        );
-        return response;
-      } catch (error) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-    };
-
-    const fetchScanInfoAPI = async () => {
-      try {
-        const response = await getScanInfo(domain);
-        return response;
-      } catch (error) {
-        throw new Error("Failed to retrieve scan info");
-      }
-    };
-    const handleFetchStream = async (response) => {
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let buffer = "";
-      // console.log(reader);
-      while (true) {
-        const { value, done } = await reader.read();
-        if (done) break;
-        // console.log(done);
-        // console.log(value);
-        buffer += decoder.decode(value, { stream: true });
-        // console.log(buffer);
-        let boundary;
-        while ((boundary = buffer.indexOf("\n")) >= 0) {
-          const line = buffer.slice(0, boundary).trim();
-          buffer = buffer.slice(boundary + 1);
-          if (line) {
+    try {
+      const scanResponse = await fetchScanAPI(domain);
+      console.log(scanResponse);
+      if (scanResponse.status) {
+        try {
+          const streamResponse = await fetchStream(domain);
+          const handleStream = await handleFetchStream(streamResponse);
+          console.log(handleStream);
+          if (handleStream) {
             try {
-              const cleanLine = line.startsWith("data: ")
-                ? line.slice(6)
-                : line;
-              // Attempt to parse the cleaned line
-              const data = JSON.parse(cleanLine);
-              console.log("Received (fetchStream):", data);
-
-              if (data.status.startsWith("error")) {
-                toast.error("Error: " + data.status, {
-                  position: "top-right",
-                  autoClose: 5000,
-                  hideProgressBar: false,
-                  closeOnClick: true,
-                  pauseOnHover: true,
-                  draggable: true,
-                  progress: undefined,
-                  theme: "dark",
-                  transition: Bounce,
-                });
-                return; // Exit on error
-              }
-
-              // Update the toast with progress
-              toast.update(loadingToastId, {
-                render: `Processing: ${data.status} (${data.completed} of ${data.total})`,
-                type: "info",
-                autoClose: false,
-                isLoading: true,
+              const scanInfoResponse = await fetchScanInfoAPI(domain);
+              console.log(scanInfoResponse);
+              setdata(scanInfoResponse.data.results);
+              localStorage.setItem("domain", domain);
+              setloading(true);
+            } catch (error) {
+              console.error("Scan fetching error:", error);
+              toast.error("Failed to Scan", {
                 position: "top-right",
-                hideProgressBar: true,
-                closeOnClick: false,
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
+                progress: undefined,
                 theme: "dark",
                 transition: Bounce,
               });
-
-              // Check if the process is completed
-              if (data.status === "completed") {
-                response.body.cancel();
-                console.log("Fetch stream completed.");
-                toast.success("Scan successfully completed!", {
-                  position: "top-right",
-                  autoClose: 5000,
-                  hideProgressBar: false,
-                  closeOnClick: true,
-                  pauseOnHover: true,
-                  draggable: true,
-                  progress: undefined,
-                  theme: "dark",
-                  transition: Bounce,
-                });
-                return true; // Exit on completion
-              }
-            } catch (err) {
-              console.error("Failed to parse JSON (fetchStream):", line);
             }
           }
+        } catch (error) {
+          console.error("Stream fetching error:", error);
+          toast.error("Failed to fetch stream", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+            transition: Bounce,
+          });
         }
       }
-    };
-    // First, trigger the scan API
-    fetchScanAPI()
-      .then((scanResponse) => {
-        console.log(scanResponse.data);
-        // Fetch the stream
-        fetchStream()
-          .then((response) => {
-            handleFetchStream(response).then((response) => {
-              // if the stream finished successfully, fetch the scan info
-              response &&
-                fetchScanInfoAPI().then((scanInfoResponse) => {
-                  console.log(scanInfoResponse.data);
-                  setscanData(scanInfoResponse.data.results); // Set the scan data
-                });
-            }); // Call the stream handler
-          })
-          .catch((error) => {
-            console.error("Stream fetching error:", error);
-            toast.error("Failed to fetch stream", {
-              position: "top-right",
-              autoClose: 5000,
-              hideProgressBar: false,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-              theme: "dark",
-              transition: Bounce,
-            });
-          });
-      })
-      .catch((error) => {
-        console.error("Scan fetching error:", error);
-        toast.error("Failed to Scan", {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "dark",
-          transition: Bounce,
-        });
-      })
-      .finally(() => {
-        // This will be executed after the whole process (scan + stream)
-        setloading(true); // Ensure loading is false at the end of the process, just in case
-      });
+    } catch (error) {
+      console.error("Scan fetching error:", error);
+    }
   };
-  console.log(data);
-
   //custom date format
   const customDate = (date) => {
     return new Date(date).toISOString().split("T")[0];
   };
+  console.log(data);
 
   //close modal
   const handleModal = () => {
@@ -475,7 +446,7 @@ const Scan = () => {
                   Scans
                 </span>
               </div>
-              <div
+              {/* <div
                 className={`px-2 pb-2 cursor-pointer ${
                   option === "result" ? "border-b-2 border-indigo-400 z-10" : ""
                 }`}
@@ -514,7 +485,7 @@ const Scan = () => {
                 >
                   Configurations
                 </span>
-              </div>
+              </div> */}
             </div>
             <div className="absolute bottom-2 left-0 w-full border-b-2 border-neutral-800"></div>
           </div>
@@ -692,7 +663,7 @@ const Scan = () => {
                       <div
                         className="flex items-center justify-center px-4 border-2 border-zinc-700/60 rounded-md hover:bg-zinc-900 hover:border-zinc-700"
                         onClick={() => {
-                          setloading(true);
+                          setcheck(true);
                         }}
                       >
                         <FontAwesomeIcon icon={faRotate} />
@@ -732,7 +703,9 @@ const Scan = () => {
                                     navigate(
                                       `/result/${getDomain(data.domain)}`,
                                       {
-                                        state: { domain: getDomain(data.domain) },
+                                        state: {
+                                          domain: getDomain(data.domain),
+                                        },
                                       }
                                     );
                                   }}
