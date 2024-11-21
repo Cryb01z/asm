@@ -6,13 +6,15 @@ import { getDorks } from "../../axios/GithubDorkService/githubService";
 const Repos = () => {
   const [search, setsearch] = useState("");
   const [loading, setloading] = useState(true);
-  const [dork, setdork] = useState([]);
-  const [data, setdata] = useState([]);
+  const [data, setdata] = useState({ status: "success", results: [] });
   useEffect(() => {
     const fetch = async (key) => {
       try {
         const response = await getDorks(key);
-        setdata(response.data.results);
+        setdata(response.data);
+        if (response.data.status === "success") {
+          setloading(false);
+        }
       } catch (error) {
         console.log(error);
       }
@@ -48,14 +50,14 @@ const Repos = () => {
       <div className="col-span-full w-full xl:col-span-8 bg-zinc-900  shadow-lg rounded-md border border-zinc-700/60">
         <header className="px-5 py-4 border-b  border-zinc-700/60">
           <h2 className="font-semibold pb-2 text-slate-100 ">
-            Total result: {data.length}
+            Total result: {data.status ? data.results.length : 0}
           </h2>
-          {data.length === 0 ? (
+          {loading ? (
             <></>
           ) : (
             <>
               <div className="overflow-auto h-80 scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-black">
-                {data.map((item, index) => (
+                {data.results.map((item, index) => (
                   <div className="flex space-x-5 p-2 border-b-2 border-zinc-700">
                     <a
                       href={`https://github.com/${getUser(item)}`}
