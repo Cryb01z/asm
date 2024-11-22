@@ -154,7 +154,7 @@ const Result = () => {
     if (isNaN(date)) {
       throw new Error("Invalid date format");
     }
-  
+
     // Format to "Month Day" (e.g., "July 31")
     return date.toLocaleDateString("en-US", { month: "long", day: "numeric" });
   };
@@ -258,8 +258,9 @@ const Result = () => {
                 <span className="text-green-500">{domain}/</span>
               </div>
               <div className="text-sm mb-2">
-                <span className="font-bold">Submission:</span> On {customDate(data.results.discovery_on)} via
-                automatic, source certstream-suspicious
+                <span className="font-bold">Submission:</span> On{" "}
+                {customDate(data.results.discovery_on)} via automatic, source
+                certstream-suspicious
               </div>
               <div className="flex flex-row text-sm">
                 <div
@@ -307,7 +308,9 @@ const Result = () => {
                         options === "HTTP" ? "bg-indigo-500" : "bg-zinc-700 "
                       } rounded-md`}
                     >
-                      {data.results.services.length}
+                      {data.results.services !== null
+                        ? data.results.services.length
+                        : 0}
                     </span>
                   </span>
                 </div>

@@ -165,7 +165,18 @@ const data = [
 
 const getTechInfo = (tech) => {
   // console.log(tech);
-  return data.filter((item) => item.name.toUpperCase().includes(tech.toUpperCase()));
+  const info = {
+    name: "Updating",
+    icon: "/techIcon/update.png",
+    description: "Updating",
+    version: "Updating",
+    link: "Updating",
+    ps: "Updating",
+  };
+  const techInfo = data.find((item) =>
+    item.name.toUpperCase().includes(tech.toUpperCase())
+  );
+  return techInfo ? techInfo : info;
 };
 
 export default getTechInfo;

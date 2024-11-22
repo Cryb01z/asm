@@ -136,6 +136,8 @@ const Summary = ({ data }) => {
     setoption((prev) => (prev = option));
     setShowMore(false);
   };
+  // console.log(data.ssl);
+
   return (
     <div className="flex justify-between w-full space-x-20 text-white">
       <div className="flex flex-col">
@@ -144,15 +146,20 @@ const Summary = ({ data }) => {
           <div className="pb-2 border-b-2 border-zinc-700/60">
             This website contacted <span className="font-bold"> IPs</span> in 1
             countries across <span className="font-bold">1 domains</span> {}
-            to perform <span className="font-bold">17 HTTP transactions</span>.
-            The main IP is
+            to perform{" "}
+            <span className="font-bold">
+              {data.services ? data.services.length : 0} HTTP transactions
+            </span>
+            . The main IP is
             <span className="text-green-500"> {data.ip}</span>, located in{" "}
             <span className="font-bold">
-              {data.autonomous_system.country_code}
+              {data.autonomous_system
+                ? data.autonomous_system.country_code
+                : ""}
             </span>{" "}
             and belongs to{" "}
             <span className="text-green-500 cursor-pointer">
-              {data.autonomous_system.name}
+              {data.autonomous_system ? data.autonomous_system.name : ""}
             </span>
             . The main domain is
             <span className="text-green-500"> {data.domain}</span>.
@@ -177,10 +184,13 @@ const Summary = ({ data }) => {
               Current DNS A record: {data.domain}
             </span>{" "}
             (
-            {data.autonomous_system.bgp_prefix.map((item) => {
-              return `"${item}"` + " ";
-            })}
-            - {data.autonomous_system.description})
+            {data.autonomous_system
+              ? data.autonomous_system.bgp_prefix.map((item) => {
+                  return `"${item}"` + " ";
+                })
+              : ""}
+            - {data.autonomous_system ? data.autonomous_system.description : ""}
+            )
           </div>
         </div>
         <div className="text-xl font-bold py-2">Domain & information</div>
@@ -285,17 +295,23 @@ const Summary = ({ data }) => {
             <tbody>
               <tr className="border-b-2">
                 <td className="text-left p-2 font-bold">
-                  {data.services.length}
+                  {data.services ? data.services.length : 0}
                 </td>
                 <td className="text-left p-2 text-green-500">{data.ip}</td>
                 <td className="text-left p-2">
                   (
                   <span className="text-green-500">
-                    {data.autonomous_system.bgp_prefix.map((item) => {
-                      return `"${item}"` + " ";
-                    })}
+                    {data.autonomous_system
+                      ? data.autonomous_system.bgp_prefix.map((item) => {
+                          return `"${item}"` + " ";
+                        })
+                      : ""}
                   </span>{" "}
-                  ({data.autonomous_system.description}))
+                  (
+                  {data.autonomous_system
+                    ? data.autonomous_system.description
+                    : ""}
+                  ))
                 </td>
               </tr>
             </tbody>
@@ -307,9 +323,12 @@ const Summary = ({ data }) => {
         {option === "detail" ? (
           <div className="border-2 border-zinc-700 rounded-sm text-sm mt-2 mb-10 p-2">
             <div className="font-bold px-6">
-              {data.services.length}{" "}
+              {data.services ? data.services.length : 0}{" "}
               <FontAwesomeIcon icon={faArrowRightArrowLeft} /> {data.ip}(
-              {data.autonomous_system.country_code}){" "}
+              {data.autonomous_system
+                ? data.autonomous_system.country_code
+                : ""}
+              ){" "}
               {/* <span className="text-orange-500">
                 4 redirects <FontAwesomeIcon icon={faShare} />
               </span> */}
@@ -327,14 +346,14 @@ const Summary = ({ data }) => {
                     <div className="flex space-x-5">
                       <div className="text-green-500">Resolver:</div>
                       <div className="font-semibold">
-                        {data.dns.resolver.map((item) => (
-                          <div>{item}</div>
-                        ))}
+                        {data.dns
+                          ? data.dns.resolver.map((item) => <div>{item}</div>)
+                          : ""}
                       </div>
                     </div>
                     <div className="">
                       <div className="text-green-500 uppercase">
-                        soa Record for {data.dns.soa[0].name}
+                        soa Record for {data.dns ? data.dns.soa[0].name : ""}
                       </div>
                       <div className="font-semibold">
                         <div className="flex space-x-4">
@@ -350,18 +369,34 @@ const Summary = ({ data }) => {
                           </div>
                           <div className="flex-col">
                             {}
-                            <div>{data.dns.soa[0].name}</div>
-                            <div>{data.dns.soa[0].ns}</div>
+                            <div>{data.dns ? data.dns.soa[0].name : ""}</div>
+                            <div>{data.dns ? data.dns.soa[0].ns : ""}</div>
                             <div>
-                              {data.dns.soa[0].mailbox.replace(".", "@")}
+                              {data.dns
+                                ? data.dns.soa[0].mailbox.replace(".", "@")
+                                : ""}
                             </div>
                             <div>
-                              {formatSerialDate(data.dns.soa[0].serial)}
+                              {data.dns
+                                ? formatSerialDate(data.dns.soa[0].serial)
+                                : ""}
                             </div>
-                            <div>{data.dns.soa[0].refresh / 3600} hours</div>
-                            <div>{data.dns.soa[0].retry / 3600} hours</div>
-                            <div>{data.dns.soa[0].expire / 86400} hours</div>
-                            <div>{data.dns.soa[0].minttl / 3600} hours</div>
+                            <div>
+                              {data.dns ? data.dns.soa[0].refresh / 3600 : ""}{" "}
+                              hours
+                            </div>
+                            <div>
+                              {data.dns ? data.dns.soa[0].retry / 3600 : ""}{" "}
+                              hours
+                            </div>
+                            <div>
+                              {data.dns ? data.dns.soa[0].expire / 86400 : ""}{" "}
+                              hours
+                            </div>
+                            <div>
+                              {data.dns ? data.dns.soa[0].minttl / 3600 : ""}{" "}
+                              hours
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -489,49 +524,48 @@ const Summary = ({ data }) => {
 
         {/* Certs */}
         {option === "cert" ? (
-          <div className="border-2 border-zinc-700 rounded-sm text-sm mt-2 mb-10 p-2">
-            <div className="table-auto text-sm">
-              <thead>
-                <tr>
-                  <th className="text-left px-2 font-bold">
-                    Subject <span className="text-gray-500">Issuer</span>
-                  </th>
-                  <th className="text-left px-2 font-bold">SValidity</th>
-                  <th className="text-left px-2 font-bold"> Valid</th>
-                </tr>
-              </thead>
-              <tbody>
-                {Array.isArray(data.ssl) && data.ssl.length > 0 ? (
-                  data.ssl.map((item, index) => (
-                    <tr key={index}>
-                      <td className="text-left text-green-500 px-2">
-                        <span className="font-medium">{data.domain} </span>
-                        <div className="text-gray-500">{item.version}</div>
-                      </td>
-                      <td className="text-left px-2 align-top">
-                        {formatDate(item.issue_date)} -{" "}
-                        {formatDate(item.expiry_date)}
-                      </td>
-                      <td className="text-left px-2 align-top">
-                        {monthsLeft(item.expiry_date)} months
-                      </td>
-                      <td className="px-2 align-top">
-                        <span className="px-1 py-1 rounded-sm border-2 bg-gray-500 hover:bg-gray-700">
-                          <FontAwesomeIcon icon={faSearch} /> crt.sh
-                        </span>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="4" className="px-2 text-left text-gray-500">
-                      No SSL data available.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </div>
-          </div>
+          <>
+            {data.ssl && (
+              <div className=" border-2 border-zinc-700 rounded-sm text-sm mt-2 mb-10 p-4">
+                {" "}
+                <div className="flex space-x-5">
+                  <div className="flex-col uppercase">
+                    <div>host:</div>
+                    <div>subject:</div>
+                    <div>subject_cn:</div>
+                    <div>subject_alt_names:</div>
+                    <div>version:</div>
+                    <div>issuerSubject:</div>
+                    <div>cipher:</div>
+                    <div>sigAlg:</div>
+                    <div>expiry_date:</div>
+                    <div>issue_date:</div>
+                    <div>grade:</div>
+                    <div>id:</div>
+                    <div>serialNumber:</div>
+                  </div>
+                  <div className="flex-col text-gray-400">
+                    <div>{data.ssl.host}</div>
+                    <div>{data.ssl.subject}</div>
+                    <div>{data.ssl.subject_cn}</div>
+                    <div>
+                      {data.ssl.subject_alt_names.map((item) => item + " ")}
+                    </div>
+                    <div>{data.ssl.version}</div>
+                    <div>{data.ssl.issuerSubject}</div>
+                    <div>{data.ssl.cipher}</div>
+                    <div>{data.ssl.sigAlg}</div>
+                    <div>{data.ssl.expiry_date}</div>
+                    <div>{data.ssl.issue_date}</div>
+                    <div>{data.ssl.grade}</div>
+                    <div>{data.ssl.id}</div>
+                    <div>{data.ssl.serialNumber}</div>
+                  </div>
+                </div>
+                <div className="mt-5 text-center pl-4 w-96">{data.ssl.raw}</div>
+              </div>
+            )}
+          </>
         ) : (
           ""
         )}
@@ -613,59 +647,71 @@ const Summary = ({ data }) => {
             </div>
           </div>
           <div className="font-bold text-xl">Detected technologies</div>
-          {data.technology.map((item, index) => (
-            <React.Fragment key={index}>
-              <div className="border-b-2 pb-2">
-                <div className="flex justify-between">
-                  <div className="text-green-500">
-                    {item.subtech[0].technology}{" "}
-                    <span className="text-gray-500">({item.categories})</span>
-                  </div>
-                  <div
-                    className="px-2 border-2 border-zinc-700/60 rounded-md bg-black hover:bg-zinc-900 cursor-pointer"
-                    onClick={() => {
-                      handleExpandTech(index);
-                    }}
-                  >
-                    Expand
-                  </div>
-                </div>
-                {expandTech.includes(index) && (
-                  <div className="text-md text-gray-400">
-                    <div>
-                      <span className="font-bold">Version:</span>{" "}
-                      {item.subtech[0].version}
+          {data.technology ? (
+            <>
+              {data.technology.map((item, index) => (
+                <React.Fragment key={index}>
+                  <div className="border-b-2 pb-2">
+                    <div className="flex justify-between">
+                      <div className="text-green-500">
+                        {item.subtech[0].technology}{" "}
+                        <span className="text-gray-500">
+                          ({item.categories})
+                        </span>
+                      </div>
+                      <div
+                        className="px-2 border-2 border-zinc-700/60 rounded-md bg-black hover:bg-zinc-900 cursor-pointer"
+                        onClick={() => {
+                          handleExpandTech(index);
+                        }}
+                      >
+                        Expand
+                      </div>
                     </div>
-                    <div className="font-bold">Discription:</div>
-                    <li className="ml-4 max-w-sm">
-                      {item.subtech[0].description}/
-                    </li>
+                    {expandTech.includes(index) && (
+                      <div className="text-md text-gray-400">
+                        <div>
+                          <span className="font-bold">Version:</span>{" "}
+                          {item.subtech[0].version}
+                        </div>
+                        <div className="font-bold">Discription:</div>
+                        <li className="ml-4 max-w-sm">
+                          {item.subtech[0].description}/
+                        </li>
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-            </React.Fragment>
-          ))}
+                </React.Fragment>
+              ))}
+            </>
+          ) : (
+            <></>
+          )}
           <div className="font-bold text-xl">Page Statistics</div>
           <div className="flex justify-around">
             <div className="flex flex-col text-center">
               <div className="text-2xl text-blue-500">
-                {data.services.length}
+                {data.services ? data.services.length : 0}
               </div>
               <div className="text-lg text-gray-400">Requests</div>
               <div className="text-2xl text-blue-500">
-                {data.autonomous_system.bgp_prefix.length}
+                {data.autonomous_system
+                  ? data.autonomous_system.bgp_prefix.length
+                  : 0}
               </div>
               <div className="text-lg text-gray-400">Prefix</div>
             </div>
             <div className="flex flex-col text-center">
-              <div className="text-2xl text-blue-500">{data.technology.length}</div>
+              <div className="text-2xl text-blue-500">
+                {data.services ? data.services.length : 0}
+              </div>
               <div className="text-lg text-gray-400">ASSETS</div>
               <div className="text-2xl text-blue-500">1</div>
               <div className="text-lg text-gray-400">Countries</div>
             </div>
             <div className="flex flex-col text-center">
               <div className="text-2xl text-blue-500">
-                {data.dns.resolver.length}
+                {data.dns ? data.dns.resolver.length : 0}
               </div>
               <div className="text-lg text-gray-400">DNS</div>
               <div className="text-2xl text-blue-500">
@@ -697,7 +743,7 @@ const Summary = ({ data }) => {
               </div>
               <div className="text-lg text-gray-400">Subdomains</div>
               <div className="text-2xl text-blue-500">
-                {data.ssl.length > 0 ? <>{data.ssl.length}</> : <>0</>}
+                {data.ssl ? data.ssl.version : "None"}
               </div>
               <div className="text-lg text-gray-400">SSL cert</div>
             </div>

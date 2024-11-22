@@ -64,7 +64,7 @@ const OpenCVE = () => {
     };
     fetchData();
   }, [currentPage, itemsPerPage, cveFilter]);
-  console.log(cveData);
+  // console.log(cveData);
 
   //Filter change
   const handleFilterChange = async (key, e) => {

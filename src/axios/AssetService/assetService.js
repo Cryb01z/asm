@@ -1,12 +1,12 @@
 import axios from "axios";
 
 const getDomainInfo = async (domain) => {
-  return await axios.get(`http://171.244.21.38:65534/info/${domain}`);
+  return await axios.get(`https://tools.caasm.tech/info/${domain}`);
 };
 
 const getSubDomainInfo = async (domain) => {
   return await axios.get(
-    `http://171.244.21.38:65534/result/domain/all?domain=${domain}`
+    `https://tools.caasm.tech/result/domain/all?domain=${domain}`
   );
 };
 

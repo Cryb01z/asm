@@ -156,7 +156,8 @@ const DomainInventory = () => {
     if (status === "403") return "bg-[#3E1B0D] text-[#FF6800]";
     if (status === "404") return "bg-neutral-800/70";
   };
-
+  console.log("Tech",getTechInfo("asdasd"));
+  
   if (loading) {
     return (
       <div className="bg-black  text-gray-400 flex h-screen overflow-hidden">
@@ -317,7 +318,7 @@ const DomainInventory = () => {
                             <td className="px-8 text-[#A1A1AB] border-b border-zinc-700/60 p-0 m-0 group-first:border-t group-hover:bg-[#18181B] group-hover:border-neutral-900 py-[1rem]">
                               <div className="flex justify-center items-center">
                                 <div className="bg-[#3E3D3D] inline-block px-3 text-center rounded-md">
-                                  {item.ip}
+                                  {item.ip[0]}
                                 </div>
                               </div>
                             </td>
@@ -328,6 +329,7 @@ const DomainInventory = () => {
                                     tech.subtech.map((subtech) => (
                                       <TechInfo
                                         tech={getTechInfo(subtech.technology)} // Pass the result of getTechInfo
+                                        name={subtech.technology}
                                         catagory={tech.categories}
                                         version={subtech.version}
                                         position={

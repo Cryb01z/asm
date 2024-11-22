@@ -25,6 +25,7 @@ const DomainCVE = () => {
   const [modal, setmodal] = useState(false); //Exploited Modal
   const navigate = useNavigate();
   const [loading, setloading] = useState(true);
+  const [chart, setchart] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [filteredVulnerabilities, setFilteredVulnerabilities] = useState([]);
@@ -119,8 +120,8 @@ const DomainCVE = () => {
       if (domain) {
         const domainSet = new Set();
         try {
-          const response = await getDomainCVE("vulnweb.com");
-          const domainResponse = await getSubDomain("vulnweb.com");
+          const response = await getDomainCVE(domain);
+          const domainResponse = await getSubDomain(domain);
           setdata(response.data);
           setallDomain(domainResponse.data);
           response.data.results
@@ -136,22 +137,36 @@ const DomainCVE = () => {
       }
     };
     fetchData();
+    console.log(data);
+    console.log(allDomain);
   }, []);
+
   //get the chart data
   useEffect(() => {
-    if (data.status && allDomain.status) {
-      vulChart();
-      domainChart();
-      securityChart();
+    try {
+      if (data.status && allDomain.status) {
+        setvulData(vulChart());
+        setdomainData(domainChart());
+        setsecurityData(securityChart());
+        setchart(true);
+      }
+    } catch (error) {
+      console.log(error);
     }
   }, [data, allDomain]);
 
   //filter and search vulnerabilities render
   useEffect(() => {
-    let filtered = filterVulnerabilities();
-    if (data.status && filtered.length > 0) {
-      setFilteredVulnerabilities(filtered);
-      setTotalPages(Math.ceil(filtered.length / itemsPerPage));
+    try {
+      let filtered = filterVulnerabilities();
+      if (data.status && filtered.length > 0) {
+        setFilteredVulnerabilities(filtered);
+        setTotalPages(Math.ceil(filtered.length / itemsPerPage));
+        console.log("filtered");
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
       setloading(false);
     }
   }, [data, searchTerm, selectedDomain, currentPage]);
@@ -224,7 +239,7 @@ const DomainCVE = () => {
       vul.datasets[0].backgroundColor.push(getBackgroundColor(item));
       vul.datasets[0].hoverBackgroundColor.push(getHoverBackgroundColor(item));
     });
-    setvulData(vul);
+    return vul;
   };
 
   //get the chart data for domain
@@ -247,14 +262,14 @@ const DomainCVE = () => {
       vul.datasets[0].backgroundColor.push(getBackgroundColor(item));
       vul.datasets[0].hoverBackgroundColor.push(getHoverBackgroundColor(item));
     });
-    setdomainData(vul);
+    return vul;
   };
   //get the chart data for security
   const securityChart = () => {
     const vulnerabilities = data.results.flatMap(
       (item) => item.vulnerabilities
     );
-    console.log(vulnerabilities);
+    // console.log(vulnerabilities);
     let percentage = [];
     let serviry = {
       Critical: 4,
@@ -285,7 +300,7 @@ const DomainCVE = () => {
       vul.datasets[0].backgroundColor.push(getBackgroundColor(item));
       vul.datasets[0].hoverBackgroundColor.push(getHoverBackgroundColor(item));
     });
-    setsecurityData(vul);
+    return vul;
   };
 
   //get vulnerability name
@@ -362,7 +377,7 @@ const DomainCVE = () => {
 
   // console.log("search", searchTerm);
   // console.log("domain", selectedDomain);
-  console.log("filtered useState", filteredVulnerabilities);
+  // console.log("filtered useState", filteredVulnerabilities);
   // console.log(totalPages);
   // console.log("alldomain", domain);
 
@@ -424,6 +439,10 @@ const DomainCVE = () => {
     }
   };
 
+  // console.log("vulData:", vulData);
+  // console.log("domainData:", domainData);
+  // console.log("securityData:", securityData);
+
   return (
     <>
       <div className="flex justify-between py-5">
@@ -433,11 +452,14 @@ const DomainCVE = () => {
               Vulnerabilities By Product
             </h2>
           </header>
-          {loading && (
-            <DoughnutChart data={loadingChart} width={389} height={260} />
-          )}
-          {vulData.labels.length !== 0 && (
+          {vulData.labels.length > 0 ? (
             <DoughnutChart data={vulData} width={389} height={260} />
+          ) : (
+            <>
+              <DoughnutChart data={loadingChart} width={389} height={260} />
+              {vulData.labels}
+            </>
+            
           )}
         </div>
         <div className="flex flex-col col-span-full sm:col-span-6 xl:col-span-4 bg-zinc-900  shadow-lg rounded-md border border-zinc-700/60">
@@ -446,11 +468,14 @@ const DomainCVE = () => {
               Vulnerabilities By Source
             </h2>
           </header>
-          {loading && (
-            <DoughnutChart data={loadingChart} width={389} height={260} />
-          )}
-          {domainData.labels.length !== 0 && (
+          {domainData.labels.length > 0 ? (
             <DoughnutChart data={domainData} width={389} height={260} />
+          ) : (
+            <>
+              <DoughnutChart data={loadingChart} width={389} height={260} />
+              {domainData.labels}
+            </>
+            
           )}
         </div>
         <div className="flex flex-col col-span-full sm:col-span-6 xl:col-span-4 bg-zinc-900  shadow-lg rounded-md border border-zinc-700/60">
@@ -459,11 +484,13 @@ const DomainCVE = () => {
               Vulnerabilities By Serverity
             </h2>
           </header>
-          {loading && (
-            <DoughnutChart data={loadingChart} width={389} height={260} />
-          )}
-          {securityData.labels.length !== 0 && (
+          {securityData.labels.length > 0 ? (
             <DoughnutChart data={securityData} width={389} height={260} />
+          ) : (
+            <>
+              <DoughnutChart data={loadingChart} width={389} height={260} />
+              {securityData.labels}
+            </>
           )}
         </div>
       </div>

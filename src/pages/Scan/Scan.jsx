@@ -151,10 +151,10 @@ const Scan = () => {
         try {
           const response = await getScanInfo(domain);
           console.log(response);
-          setdata(response.data.results);
+          setdata(response.data);
           console.log(check);
-          
-          if(check){
+
+          if (check) {
             setloading(true);
           }
         } catch (error) {
@@ -192,7 +192,7 @@ const Scan = () => {
   const fetchStream = async (domain) => {
     try {
       const response = await fetch(
-        `http://171.244.21.38:65534/scan/${domain}/status/stream`,
+        `https://tools.caasm.tech/scan/${domain}/status/stream`,
         {
           headers: {
             Accept: "text/event-stream", // Optional, depends on your API
@@ -372,7 +372,7 @@ const Scan = () => {
             try {
               const scanInfoResponse = await fetchScanInfoAPI(domain);
               console.log(scanInfoResponse);
-              setdata(scanInfoResponse.data.results);
+              setdata(scanInfoResponse.data);
               localStorage.setItem("domain", domain);
               setloading(true);
             } catch (error) {
@@ -701,10 +701,14 @@ const Scan = () => {
                                   className="sticky left-0 text-left w-96 px-4 rounded-l-lg shadow-[34px_0px_29px_1px_rgba(11,11,13,0.8)] bg-[#18181b] cursor-pointer z-10"
                                   onClick={() => {
                                     navigate(
-                                      `/result/${getDomain(data.domain)}`,
+                                      `/result/${getDomain(
+                                        data.results.domain
+                                      )}`,
                                       {
                                         state: {
-                                          domain: getDomain(data.domain),
+                                          domain: getDomain(
+                                            data.results.domain
+                                          ),
                                         },
                                       }
                                     );
@@ -713,10 +717,10 @@ const Scan = () => {
                                   <span className="px-1 text-green-500 bg-green-800/50 rounded-full">
                                     <FontAwesomeIcon icon={faCheck} />
                                   </span>{" "}
-                                  {getDomain(data.domain)}
+                                  {getDomain(data.results.domain)}
                                 </td>
                                 <td className="px-8 text-center py-2 cursor-pointer">
-                                  {data.ip}
+                                  {data.results.ip}
                                 </td>
                                 <td className="px-8 py-2 text-center  cursor-pointer">
                                   <div className="flex space-x-1 justify-center">
@@ -732,7 +736,7 @@ const Scan = () => {
                                     <div className="px-4 rounded-md text-green-500 bg-green-800/50">
                                       {severity.info}
                                     </div> */}
-                                    {data.is_online ? (
+                                    {data.results.is_online ? (
                                       <>
                                         <div className="flex space-x-5">
                                           <span className="absolute top-3.5 flex h-3 w-3 z-20">
@@ -756,13 +760,16 @@ const Scan = () => {
                                   </div>
                                 </td>
                                 <td className="px-8 py-2 text-center  cursor-pointer">
-                                  {data.technology.length} assets
+                                  {data.results.technology !== null
+                                    ? data.results.technology.length
+                                    : 0}{" "}
+                                  assets
                                 </td>
                                 <td className="px-8 py-2 text-center  cursor-pointer">
-                                  {data.discovery_reason}
+                                  {data.results.discovery_reason}
                                 </td>
                                 <td className="px-8 py-2 text-center  cursor-pointer rounded-r-lg">
-                                  {customDate(data.discovery_on)}
+                                  {customDate(data.results.discovery_on)}
                                 </td>
                               </tr>
                             </>

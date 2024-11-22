@@ -403,7 +403,10 @@ const Asset = () => {
                                 <span className="">
                                   <FontAwesomeIcon icon={faCircle} size="xs" />
                                 </span>
-                                {data.results.technology.length} assets
+                                {data.results.technology
+                                  ? data.results.technology.length
+                                  : 0}{" "}
+                                assets
                               </div>
                             </div>
                             <div>

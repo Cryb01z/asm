@@ -5,7 +5,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useRef, useState } from "react";
 
-const TechInfo = ({ tech, catagory, version, position }) => {
+const TechInfo = ({ tech, name, catagory, version, position }) => {
   const [data, setdata] = useState({
     description: "",
     icon: "",
@@ -17,14 +17,14 @@ const TechInfo = ({ tech, catagory, version, position }) => {
   const [isTop, setIsTop] = useState(true); // To track position of the tooltip
   const tooltipRef = useRef(null);
 
-  console.log(position);
+  console.log(data);
 
   useEffect(() => {
-    setdata(tech[0]);
+    setdata(tech);
   }, []);
   // console.log(data.icon);
-  console.log(catagory);
-  
+  console.log(data);
+
   return (
     <>
       <div className="relative group/techinfo w-auto">
@@ -54,7 +54,7 @@ const TechInfo = ({ tech, catagory, version, position }) => {
                     </div>
                     <div className="flex justify-between">
                       <div className="font-semibold">
-                        {data.name}-({version})
+                        {name}-({version? version : "N/A"})
                       </div>
                       <div className="border border-zinc-700/60 rounded-lg px-1">
                         {catagory.toUpperCase()}
