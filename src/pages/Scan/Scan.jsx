@@ -199,6 +199,8 @@ const Scan = () => {
           },
         }
       );
+      console.log(response);
+      
       return response;
     } catch (error) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -366,6 +368,7 @@ const Scan = () => {
       if (scanResponse.status) {
         try {
           const streamResponse = await fetchStream(domain);
+          console.log(streamResponse);
           const handleStream = await handleFetchStream(streamResponse);
           console.log(handleStream);
           if (handleStream) {

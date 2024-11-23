@@ -525,45 +525,62 @@ const Summary = ({ data }) => {
         {/* Certs */}
         {option === "cert" ? (
           <>
-            {data.ssl && (
-              <div className=" border-2 border-zinc-700 rounded-sm text-sm mt-2 mb-10 p-4">
+            {Object.keys(data.ssl).length !== 0 ? (
+              <>
                 {" "}
-                <div className="flex space-x-5">
-                  <div className="flex-col uppercase">
-                    <div>host:</div>
-                    <div>subject:</div>
-                    <div>subject_cn:</div>
-                    <div>subject_alt_names:</div>
-                    <div>version:</div>
-                    <div>issuerSubject:</div>
-                    <div>cipher:</div>
-                    <div>sigAlg:</div>
-                    <div>expiry_date:</div>
-                    <div>issue_date:</div>
-                    <div>grade:</div>
-                    <div>id:</div>
-                    <div>serialNumber:</div>
-                  </div>
-                  <div className="flex-col text-gray-400">
-                    <div>{data.ssl.host}</div>
-                    <div>{data.ssl.subject}</div>
-                    <div>{data.ssl.subject_cn}</div>
-                    <div>
-                      {data.ssl.subject_alt_names.map((item) => item + " ")}
+                (
+                <div className=" border-2 border-zinc-700 rounded-sm text-sm mt-2 mb-10 p-4">
+                  {" "}
+                  <div className="flex space-x-5">
+                    <div className="flex-col uppercase">
+                      <div>host:</div>
+                      <div>subject:</div>
+                      <div>subject_cn:</div>
+                      <div>subject_alt_names:</div>
+                      <div>version:</div>
+                      <div>issuerSubject:</div>
+                      <div>cipher:</div>
+                      <div>sigAlg:</div>
+                      <div>expiry_date:</div>
+                      <div>issue_date:</div>
+                      <div>grade:</div>
+                      <div>id:</div>
+                      <div>serialNumber:</div>
                     </div>
-                    <div>{data.ssl.version}</div>
-                    <div>{data.ssl.issuerSubject}</div>
-                    <div>{data.ssl.cipher}</div>
-                    <div>{data.ssl.sigAlg}</div>
-                    <div>{data.ssl.expiry_date}</div>
-                    <div>{data.ssl.issue_date}</div>
-                    <div>{data.ssl.grade}</div>
-                    <div>{data.ssl.id}</div>
-                    <div>{data.ssl.serialNumber}</div>
+                    <div className="flex-col text-gray-400">
+                      <div>{data.ssl.host}</div>
+                      <div>{data.ssl.subject}</div>
+                      <div>{data.ssl.subject_cn}</div>
+                      <div>
+                        {data.ssl.subject_alt_names.map((item) => item + " ")}
+                      </div>
+                      <div>{data.ssl.version}</div>
+                      <div>{data.ssl.issuerSubject}</div>
+                      <div>{data.ssl.cipher}</div>
+                      <div>{data.ssl.sigAlg}</div>
+                      <div>{data.ssl.expiry_date}</div>
+                      <div>{data.ssl.issue_date}</div>
+                      <div>{data.ssl.grade}</div>
+                      <div>{data.ssl.id}</div>
+                      <div>{data.ssl.serialNumber}</div>
+                    </div>
+                  </div>
+                  <div className="mt-5 text-center pl-4 w-96">
+                    {data.ssl.raw}
                   </div>
                 </div>
-                <div className="mt-5 text-center pl-4 w-96">{data.ssl.raw}</div>
-              </div>
+                )
+              </>
+            ) : (
+              <>
+                <div className=" border-2 border-zinc-700 rounded-sm text-sm mt-2 mb-10 p-4">
+                  <div className="p-2">
+                    <div className="border-2 border-zinc-700/60 p-2 rounded-sm">
+                      No data!
+                    </div>
+                  </div>
+                </div>
+              </>
             )}
           </>
         ) : (
