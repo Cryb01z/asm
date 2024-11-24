@@ -1,6 +1,7 @@
 import {
   faArrowRightArrowLeft,
   faArrowRightRotate,
+  faBug,
   faCaretDown,
   faCircleExclamation,
   faHome,
@@ -20,6 +21,7 @@ import Redirects from "../../components/ScanResult/Redirects";
 import Summary from "../../components/ScanResult/Summary";
 import Navbar from "../../components/Navbar/Navbar";
 import { getScanInfo } from "../../axios/ScanService/scanService";
+import Vulner from "../../components/ScanResult/Vulner";
 
 const Result = () => {
   const [option, setoption] = useState("result");
@@ -314,7 +316,7 @@ const Result = () => {
                     </span>
                   </span>
                 </div>
-                {/* <div
+                <div
                   className={
                     options === "vulner"
                       ? "px-3 py-1.5 bg-zinc-900 border-2 border-zinc-700 rounded-md cursor-pointer"
@@ -336,7 +338,7 @@ const Result = () => {
                   >
                     Vulnerabilities
                   </span>
-                </div> */}
+                </div>
                 {/* <div
                   className={
                     options === "Redirects"
@@ -464,7 +466,7 @@ const Result = () => {
               {options === "HTTP" && <HTTP data={data.results} />}
               {options === "Redirects" && <Redirects />}
               {options === "Links" && <Links />}
-              {options === "vulner" && <Vulner data={data.results} />}
+              {options === "vulner" && <Vulner domain={data.results.domain} />}
             </main>
           </div>
         </div>

@@ -150,14 +150,22 @@ const DomainInventory = () => {
     : [];
   console.log(displayTech);
 
+  //get domain
+  const getDomain = (domain) => {
+    if (domain.includes("www.")) {
+      return domain.replace("www.", "");
+    }
+    return domain;
+  };
+
   const getStatusColor = (status) => {
     if (status === "200") return "bg-green-500/20 text-green-400";
     if (status === "301") return "bg-[#272748] text-[#7E8CFF]";
     if (status === "403") return "bg-[#3E1B0D] text-[#FF6800]";
     if (status === "404") return "bg-neutral-800/70";
   };
-  console.log("Tech",getTechInfo("asdasd"));
-  
+  console.log("Tech", getTechInfo("asdasd"));
+
   if (loading) {
     return (
       <div className="bg-black  text-gray-400 flex h-screen overflow-hidden">
@@ -262,7 +270,7 @@ const DomainInventory = () => {
               <table className="w-[130%] border-separate border-spacing-y-0 overflow-x-scroll scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-black">
                 <thead className="sticky top-0">
                   <tr className="bg-[#18181b] rounded-lg uppercase font-extralight font-mono">
-                    <th className="sticky left-0 text-left w-96 px-4 rounded-l-lg shadow-[34px_0px_29px_1px_rgba(11,11,13,0.8)] bg-[#18181b] cursor-pointer z-10">
+                    <th className="sticky left-0 text-left w-96 px-4 rounded-l-lg shadow-[34px_0px_29px_1px_rgba(11,11,13,0.8)] bg-[#18181b] cursor-pointer z-10 ">
                       asset <FontAwesomeIcon icon={faSort} />
                     </th>
                     <th className="px-8 cursor-pointer">
@@ -292,13 +300,27 @@ const DomainInventory = () => {
                       return (
                         <>
                           <tr className="transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted border border-x-0 border-neutral-700 bg-[#0E0E12] group group-hover:bg-[#18181B] group-hover:border-neutral-900 relative h-12">
-                            <td className="bg-[#121215] border-b px-4 border-zinc-700/60 m-0 group-first:border-t group-hover:bg-[#18181B] group-hover:border-neutral-900 border-l sticky left-0 group-first:rounded-tl-lg shadow-[34px_0px_29px_1px_rgba(11,11,13,0.8)] group-hover:shadow-none z-10 group-hover:z-20">
+                            <td className="bg-[#121215] border-b px-4 border-zinc-700/60 m-0 group-first:border-t group-hover:bg-[#18181B] group-hover:border-neutral-900 border-l sticky left-0 group-first:rounded-tl-lg shadow-[34px_0px_29px_1px_rgba(11,11,13,0.8)] group-hover:shadow-none z-10 group-hover:z-20 cursor-pointer">
                               <div className="flex justify-between ">
                                 <div className="flex items-center space-x-2">
                                   <div className="bg-neutral-800 px-1 rounded-md">
                                     <FontAwesomeIcon icon={faHouse} size="xs" />
                                   </div>
-                                  <div>{item.domain}</div>
+                                  <div
+                                    className="text-white font-bold"
+                                    onClick={() => {
+                                      navigate(
+                                        `/result/${getDomain(item.domain)}`,
+                                        {
+                                          state: {
+                                            domain: getDomain(item.domain),
+                                          },
+                                        }
+                                      );
+                                    }}
+                                  >
+                                    {item.domain}
+                                  </div>
                                   <div>
                                     <span class="relative flex h-2 w-2">
                                       <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-700/70 opacity-75"></span>

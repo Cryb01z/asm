@@ -19,6 +19,7 @@ import Asset from "./pages/Asset/Asset";
 import DomainInventory from "./components/Asset/DomainInventory";
 import Inventory from "./components/Asset/Inventory";
 import Navbar from "./components/Navbar/Navbar";
+import CredentialLeak from "./pages/Credential/CredentialLeak";
 
 
 function App() {
@@ -40,6 +41,7 @@ function App() {
     { path: "/inventory", component: <Inventory /> },
     { path: "/inventory/:id", component: <DomainInventory /> },
     { path: "/test", component: <Navbar /> },
+    { path: "/credential", component: <CredentialLeak /> },
     { path: "/digitalfootprint", component: <DigitalFootprint /> },
     { path: "/darkwebmonitoring", component: <BlackMarket /> },
   ];

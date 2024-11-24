@@ -3,6 +3,7 @@ import {
   faHouseFire,
   faServer,
   faShieldHalved,
+  faUserSecret,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useRef, useState, useEffect } from "react";
@@ -201,6 +202,24 @@ const Navbar = ({ site }) => {
               </span>{" "}
               <span className={`${options === "CVE" ? "text-white" : ""}`}>
                 Vulnerabilities
+              </span>
+            </div>
+            <div
+              className={`px-5 rounded-md cursor-pointer ${
+                options === "credential"
+                  ? "bg-neutral-700/60"
+                  : "hover:bg-neutral-700/45"
+              }`}
+              onClick={() => {
+                setoptions("credential");
+                navigate("/credential");
+              }}
+            >
+              <span className={`${options === "credential" ? "text-indigo-400" : ""}`}>
+                <FontAwesomeIcon icon={faUserSecret} />
+              </span>{" "}
+              <span className={`${options === "credential" ? "text-white" : ""}`}>
+                Credential Leak
               </span>
             </div>
           </div>

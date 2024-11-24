@@ -16,15 +16,10 @@ const TechInfo = ({ tech, name, catagory, version, position }) => {
   });
   const [isTop, setIsTop] = useState(true); // To track position of the tooltip
   const tooltipRef = useRef(null);
-
-  console.log(data);
-
   useEffect(() => {
     setdata(tech);
   }, []);
   // console.log(data.icon);
-  console.log(data);
-
   return (
     <>
       <div className="relative group/techinfo w-auto">

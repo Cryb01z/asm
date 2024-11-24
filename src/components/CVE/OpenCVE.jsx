@@ -13,7 +13,7 @@ const OpenCVE = () => {
   const itemsPerPage = 10;
   const [loading, setloading] = useState(false);
   const [cveData, setcveData] = useState({
-    cves: [
+    data: [
       {
         id: "",
         descriptions: [
@@ -186,7 +186,7 @@ const OpenCVE = () => {
         </thead>
         <tbody>
           {loading ? (
-            cveData.cves.map((cve) => (
+            cveData.data.map((cve) => (
               <>
                 <tr className="border-t-2 border-zinc-700">
                   <td

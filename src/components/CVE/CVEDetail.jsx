@@ -6,7 +6,8 @@ import {
   faStar,
   faStarOfLife,
 } from "@fortawesome/free-solid-svg-icons";
-
+import { ToastContainer, toast, Bounce } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -135,6 +136,18 @@ const CVEDetail = () => {
   }, [cveid]);
   console.log(data);
   console.log(cveid);
+
+  //Get stroke for cvss circle name
+  const getCVSSType = (metrics) => {
+    if (metrics.cvssMetricV31 !== null) {
+      return "CVSSv3.1";
+    } else if (metrics.cvssMetricV2 !== null) {
+      return "CVSSv2.0";
+    } else if (metrics.cvssMetricV30 !== null) {
+      return "CVSSv3.0";
+    }
+    return "Undefined";
+  };
 
   //Get stroke for cvss circle
   const getStroke = (metrics, type) => {
@@ -313,7 +326,7 @@ const CVEDetail = () => {
                       </svg>
                       <div className="absolute top-1/2 start-1/2 transform -translate-y-1/2 -translate-x-1/2">
                         <span className="text-center text-2xl font-bold">
-                          CVSSv3
+                          {getCVSSType(data.metrics)}
                         </span>
                         <div className="text-center">
                           {getStroke(data.metrics, "score")}
@@ -586,7 +599,6 @@ const CVEDetail = () => {
 
                 {/* Repos */}
                 {option === "repos" && <Repos />}
-                
               </div>
             </div>
             <div className="flex-col space-y-5">
@@ -683,6 +695,7 @@ const CVEDetail = () => {
           </div>
         </main>
       </div>
+      <ToastContainer />
     </div>
   );
 };
