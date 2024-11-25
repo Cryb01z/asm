@@ -4,22 +4,20 @@ import "react-toastify/dist/ReactToastify.css";
 import "./charts/ChartjsConfig";
 import "./css/style.css";
 // Import pages
-import Login from "./components/Login/Login";
-import Register from "./components/Register/Register";
-import Layout from "./Layout/Layout";
-import BlackMarket from "./pages/BlackMarket/BlackMarket";
-import CVE from "./pages/CVE/CVE";
-import CVEDetail from "./components/CVE/CVEDetail";
-import Dashboard from "./pages/Dashboard/Dashboard";
-import DigitalFootprint from "./pages/DigitalFootprint/DigitalFootprint";
-import Result from "./pages/Result/Result";
-import Scan from "./pages/Scan/Scan";
-import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
-import Asset from "./pages/Asset/Asset";
 import DomainInventory from "./components/Asset/DomainInventory";
 import Inventory from "./components/Asset/Inventory";
+import CVEDetail from "./components/CVE/CVEDetail";
+import Login from "./components/Login/Login";
 import Navbar from "./components/Navbar/Navbar";
+import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
+import Register from "./components/Register/Register";
+import Layout from "./Layout/Layout";
+import Asset from "./pages/Asset/Asset";
 import CredentialLeak from "./pages/Credential/CredentialLeak";
+import CVE from "./pages/CVE/CVE";
+import Dashboard from "./pages/Dashboard/Dashboard";
+import Result from "./pages/Result/Result";
+import Scan from "./pages/Scan/Scan";
 
 
 function App() {
@@ -42,8 +40,6 @@ function App() {
     { path: "/inventory/:id", component: <DomainInventory /> },
     { path: "/test", component: <Navbar /> },
     { path: "/credential", component: <CredentialLeak /> },
-    { path: "/digitalfootprint", component: <DigitalFootprint /> },
-    { path: "/darkwebmonitoring", component: <BlackMarket /> },
   ];
 
   return (

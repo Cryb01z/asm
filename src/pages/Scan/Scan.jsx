@@ -3,28 +3,32 @@ import {
   faCheck,
   faClock,
   faCodeCompare,
-  faGear,
   faMagnifyingGlass,
   faPlus,
   faRotate,
-  faSquarePollVertical,
   faTrashCan,
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { testData, scanResult } from "../../axios/test";
-import { ToastContainer, toast, Bounce } from "react-toastify";
+import { Bounce, ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import useAuthStore from "../../store/useAuthStore";
-import AllResult from "../../components/Scan/AllResult";
-import Navbar from "../../components/Navbar/Navbar";
 import { getScanInfo, scanDomain } from "../../axios/ScanService/scanService";
-import { dataCVE } from "../../axios/data";
+import Navbar from "../../components/Navbar/Navbar";
+import AllResult from "../../components/Scan/AllResult";
+import useAuthStore from "../../store/useAuthStore";
+import ExportPDF from "../../components/ExportPDF/ExportPDF";
 const Scan = () => {
   const [option, setoption] = useState("scan");
   const [scanModal, setscanModal] = useState(false);
+  const totalScan = useRef({
+    totalScan: 0,
+    runningScan: 0,
+    completedScan: 0,
+    scheduledScan: 0,
+    failedScan: 0,
+  });
   const modalRef = useRef(null);
   const navigate = useNavigate();
   const [loading, setloading] = useState(false);
@@ -200,7 +204,7 @@ const Scan = () => {
         }
       );
       console.log(response);
-      
+
       return response;
     } catch (error) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -377,6 +381,9 @@ const Scan = () => {
               console.log(scanInfoResponse);
               setdata(scanInfoResponse.data);
               localStorage.setItem("domain", domain);
+              totalScan.current.totalScan = totalScan.current.totalScan + 1;
+              totalScan.current.completedScan =
+                totalScan.current.completedScan + 1;
               setloading(true);
             } catch (error) {
               console.error("Scan fetching error:", error);
@@ -607,7 +614,9 @@ const Scan = () => {
                           </span>{" "}
                           total scans
                         </div>
-                        <div className="text-xl text-white">0</div>
+                        <div className="text-xl text-white">
+                          {totalScan.current.totalScan}
+                        </div>
                       </div>
                       <div className="flex-col space-y-2 py-4 px-4 border-2 border-zinc-700/60 rounded-md w-60 hover:bg-zinc-900 hover:border-zinc-700">
                         <div>
@@ -625,7 +634,9 @@ const Scan = () => {
                           </span>{" "}
                           completed scans
                         </div>
-                        <div className="text-xl text-white">0</div>
+                        <div className="text-xl text-white">
+                          {totalScan.current.completedScan}
+                        </div>
                       </div>
                       <div className="flex-col space-y-2 py-4 px-4 border-2 border-zinc-700/60 rounded-md w-60 hover:bg-zinc-900 hover:border-zinc-700">
                         <div>
@@ -660,9 +671,10 @@ const Scan = () => {
                           <FontAwesomeIcon icon={faMagnifyingGlass} />
                         </div>
                       </div>
-                      <div className="flex items-center justify-center px-4 border-2 border-zinc-700/60 rounded-md hover:bg-zinc-900 hover:border-zinc-700">
+                      {/* <div className="flex items-center justify-center px-4 border-2 border-zinc-700/60 rounded-md hover:bg-zinc-900 hover:border-zinc-700">
                         <FontAwesomeIcon icon={faTrashCan} />
-                      </div>
+                      </div> */}
+                      <ExportPDF domain={data.status? getDomain(data.results.domain):""} />
                       <div
                         className="flex items-center justify-center px-4 border-2 border-zinc-700/60 rounded-md hover:bg-zinc-900 hover:border-zinc-700"
                         onClick={() => {

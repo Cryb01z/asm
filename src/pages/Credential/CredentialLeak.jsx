@@ -1,12 +1,7 @@
 import React, { useState } from "react";
 import Navbar from "../../components/Navbar/Navbar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faMagnifyingGlass,
-  faPlus,
-  faRotate,
-  faTrashCan,
-} from "@fortawesome/free-solid-svg-icons";
+import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import { ToastContainer, toast, Bounce } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { getDorks } from "../../axios/GithubDorkService/githubService";
@@ -79,7 +74,7 @@ const CredentialLeak = () => {
             <div className="flex justify-between">
               <div>
                 <div className="text-xl font-semibold text-white">
-                  Credentail Leak
+                  Credential Leak
                 </div>
                 <div className="text-sm">
                   Credential leakage refers to the unintended exposure of

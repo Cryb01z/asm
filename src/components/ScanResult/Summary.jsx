@@ -760,7 +760,7 @@ const Summary = ({ data }) => {
               </div>
               <div className="text-lg text-gray-400">Subdomains</div>
               <div className="text-2xl text-blue-500">
-                {data.ssl ? data.ssl.version : "None"}
+                {Object.keys(data.ssl).length !== 0 ? data.ssl.version : "None"}
               </div>
               <div className="text-lg text-gray-400">SSL cert</div>
             </div>

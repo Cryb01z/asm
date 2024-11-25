@@ -257,7 +257,7 @@ const DomainCVE = () => {
       ],
     };
     vul.datasets[0].data.push(domain.length);
-    vul.datasets[0].data.push(allDomain.results.length);
+    vul.datasets[0].data.push(allDomain.results.length-domain.length);  
     vul.labels.map((item, index) => {
       vul.datasets[0].backgroundColor.push(getBackgroundColor(item));
       vul.datasets[0].hoverBackgroundColor.push(getHoverBackgroundColor(item));
@@ -587,7 +587,7 @@ const DomainCVE = () => {
                     className="font-semibold text-center cursor-pointer"
                     onClick={() => handleSort("type")}
                   >
-                    Affects_Detail
+                    Parameter
                   </div>
                 </th>
                 <th className="p-2 ">
@@ -699,8 +699,8 @@ const DomainCVE = () => {
                             </div>
                           </>
                         ) : (
-                          <div className="text-center text-green-500">
-                            Updating
+                          <div className="text-center text-gray-400">
+                            None
                           </div>
                         )}
                       </td>

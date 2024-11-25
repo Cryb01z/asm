@@ -267,11 +267,11 @@ const Asset = () => {
                       Asset list.
                     </div>
                   </div>
-                  <div>
+                  {/* <div>
                     <div className="px-4 py-2 rounded-md text-sm bg-white font-semibold text-black cursor-pointer hover:bg-white/80">
                       Add New Assets <FontAwesomeIcon icon={faPlus} size="sm" />
                     </div>
-                  </div>
+                  </div> */}
                 </div>
                 <div className="mt-6">
                   <div className="flex space-x-4">
@@ -285,12 +285,12 @@ const Asset = () => {
                         <FontAwesomeIcon icon={faMagnifyingGlass} />
                       </div>
                     </div>
-                    <div className="flex items-center justify-center px-4 border border-zinc-700/60 rounded-md hover:bg-zinc-900 hover:border-zinc-700">
+                    {/* <div className="flex items-center justify-center px-4 border border-zinc-700/60 rounded-md hover:bg-zinc-900 hover:border-zinc-700">
                       <FontAwesomeIcon icon={faTrashCan} />
                     </div>
                     <div className="flex items-center justify-center px-4 border border-zinc-700/60 rounded-md hover:bg-zinc-900 hover:border-zinc-700">
                       <FontAwesomeIcon icon={faRotate} />
-                    </div>
+                    </div> */}
                   </div>
                 </div>
                 <div className="mt-4">

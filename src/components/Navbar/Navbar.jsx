@@ -227,7 +227,7 @@ const Navbar = ({ site }) => {
 
         <div className="flex items-center space-x-10 text-gray-400">
           {/* changelog */}
-          <div className="relative w-full" ref={changeLogRef}>
+          {/*<div className="relative w-full" ref={changeLogRef}>
             <div
               className="flex justify-center"
               onClick={() => {
@@ -285,7 +285,7 @@ const Navbar = ({ site }) => {
                         </table>
                       </div>
                       <div className="border border-zinc-700 mt-2"></div>
-                      {/* full log */}
+                      /~ full log ~/
                       <div
                         className={`absolute ${
                           index === data.length - 1 ? "bottom-16" : "top-16"
@@ -301,7 +301,7 @@ const Navbar = ({ site }) => {
                 ))}
               </div>
             )}
-          </div>
+          </div>*/}
 
           {/* user */}
           <div className="relative ml-3 w-full" ref={menuRef}>
