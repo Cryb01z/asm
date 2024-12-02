@@ -157,8 +157,7 @@ const Scan = () => {
           console.log(response);
           setdata(response.data);
           console.log(check);
-
-          if (check) {
+          if (response.data.status === "success") {
             setloading(true);
           }
         } catch (error) {
@@ -167,7 +166,7 @@ const Scan = () => {
       }
     };
     fetchData();
-  }, [check]);
+  });
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -605,7 +604,7 @@ const Scan = () => {
                     </div>
                   )}
 
-                  <div className="mt-10">
+                  {/* <div className="mt-10">
                     <div className="flex justify-between uppercase">
                       <div className="flex-col space-y-2 py-4 px-4 border-2 border-zinc-700/60 rounded-md w-60 hover:bg-zinc-900 hover:border-zinc-700">
                         <div>
@@ -657,7 +656,7 @@ const Scan = () => {
                         <div className="text-xl text-white">0</div>
                       </div>
                     </div>
-                  </div>
+                  </div> */}
 
                   <div className="mt-6">
                     <div className="flex space-x-4">
@@ -674,7 +673,15 @@ const Scan = () => {
                       {/* <div className="flex items-center justify-center px-4 border-2 border-zinc-700/60 rounded-md hover:bg-zinc-900 hover:border-zinc-700">
                         <FontAwesomeIcon icon={faTrashCan} />
                       </div> */}
-                      <ExportPDF domain={data.status? getDomain(data.results.domain):""} />
+
+                      <ExportPDF
+                        domain={
+                          data.status === "success"
+                            ? getDomain(data.results.domain)
+                            : ""
+                        }
+                      />
+
                       <div
                         className="flex items-center justify-center px-4 border-2 border-zinc-700/60 rounded-md hover:bg-zinc-900 hover:border-zinc-700"
                         onClick={() => {
@@ -724,6 +731,8 @@ const Scan = () => {
                                           domain: getDomain(
                                             data.results.domain
                                           ),
+                                          optionState: "Summary",
+                                          port: "",
                                         },
                                       }
                                     );

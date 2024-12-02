@@ -164,7 +164,18 @@ const DomainInventory = () => {
     if (status === "403") return "bg-[#3E1B0D] text-[#FF6800]";
     if (status === "404") return "bg-neutral-800/70";
   };
-  console.log("Tech", getTechInfo("asdasd"));
+
+  const navigateToDomain = (domain, port) => {
+    // console.log(domain);
+    // console.log(port);
+    navigate(`/result/${getDomain(domain)}`, {
+      state: {
+        domain: getDomain(domain),
+        optionState: port === "22" ? "vulner" : "Summary",
+        port: port,
+      },
+    });
+  };
 
   if (loading) {
     return (
@@ -307,13 +318,9 @@ const DomainInventory = () => {
                                       <div
                                         className="text-white font-bold"
                                         onClick={() => {
-                                          navigate(
-                                            `/result/${getDomain(item.domain)}`,
-                                            {
-                                              state: {
-                                                domain: getDomain(item.domain),
-                                              },
-                                            }
+                                          navigateToDomain(
+                                            item.domain,
+                                            service.port
                                           );
                                         }}
                                       >
@@ -341,22 +348,28 @@ const DomainInventory = () => {
                                 <td className="px-8 text-[#A1A1AB] border-b border-zinc-700/60 p-0 m-0 group-first:border-t group-hover:bg-[#18181B] group-hover:border-neutral-900 py-[1rem]">
                                   <div className="flex justify-center items-center w-auto">
                                     <div className="flex space-x-2">
-                                      {item.technology.map((tech) =>
-                                        tech.subtech.map((subtech) => (
-                                          <TechInfo
-                                            tech={getTechInfo(
-                                              subtech.technology
-                                            )} // Pass the result of getTechInfo
-                                            name={subtech.technology}
-                                            catagory={tech.categories}
-                                            version={subtech.version}
-                                            position={
-                                              pos >= displayTech.length / 2
-                                                ? "bottom"
-                                                : ""
-                                            }
-                                          />
-                                        ))
+                                      {["80", "443"].includes(service.port) ? (
+                                        <>
+                                          {item.technology.map((tech) =>
+                                            tech.subtech.map((subtech) => (
+                                              <TechInfo
+                                                tech={getTechInfo(
+                                                  subtech.technology
+                                                )} // Pass the result of getTechInfo
+                                                name={subtech.technology}
+                                                catagory={tech.categories}
+                                                version={subtech.version}
+                                                position={
+                                                  pos >= displayTech.length / 2
+                                                    ? "bottom"
+                                                    : ""
+                                                }
+                                              />
+                                            ))
+                                          )}
+                                        </>
+                                      ) : (
+                                        <>--</>
                                       )}
                                     </div>
                                   </div>

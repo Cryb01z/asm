@@ -161,6 +161,33 @@ const data = [
     link: "https://developers.google.com/fonts",
     ps: "web service",
   },
+  {
+    name: "OWL Carousel",
+    icon: "/techIcon/OWLCarousel.png",
+    description:
+      "Owl Carousel is a touch enabled jQuery plugin that lets you create a beautiful responsive carousel slider. Owl can be used for creating beautiful image galleries with thumbnails.",
+    version: "",
+    link: "https://owlcarousel2.github.io/OwlCarousel2/",
+    ps: "web service",
+  },
+  {
+    name: "Express",
+    icon: "/techIcon/express.png",
+    description:
+      "Express is a node js web application framework that provides broad features for building web and mobile applications.",
+    version: "",
+    link: "https://expressjs.com/",
+    ps: "web service",
+  },
+  {
+    name: "Font Awesome",
+    icon: "/techIcon/frontawesome.png",
+    description:
+      "Font Awesome is the internet's icon library and toolkit used by millions of designers, developers, and content creators.",
+    version: "",
+    link: "https://fontawesome.com/",
+    ps: "web service",
+  },
 ];
 
 const getTechInfo = (tech) => {

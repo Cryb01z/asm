@@ -2,7 +2,6 @@ import { create } from "zustand";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 
-
 const useAuthStore = create((set, get) => ({
   user: null,
   token: null,
@@ -11,7 +10,7 @@ const useAuthStore = create((set, get) => ({
   login: (userInfo, token) => {
     // console.log("Login - Token:", token);
 
-    Cookies.set("user", JSON.stringify(userInfo), { expires: 1/ 24 });
+    Cookies.set("user", JSON.stringify(userInfo), { expires: 1 / 24 });
     Cookies.set("token", token, { expires: 1 / 24 });
 
     set({ user: userInfo, token, isLoggedIn: true });
@@ -23,7 +22,7 @@ const useAuthStore = create((set, get) => ({
     set({ user: null, token: null, isLoggedIn: false });
   },
   isAuthenticated: () => get().isLoggedIn,
-  
+
   initializeAuth: () => {
     const user = Cookies.get("user");
     const token = Cookies.get("token");

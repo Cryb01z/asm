@@ -18,4 +18,8 @@ const getSubDomain = async (domain) => {
   return await axios.get(`https://tools.caasm.tech/check/${domain}/all`);
 };
 
-export { getScanInfo, scanDomain, getScanProcess, getSubDomain };
+const getAllScanInfo = async (id) => {
+  return await axios.get(`https://tools.caasm.tech/information?id=${id}`);
+}
+
+export { getScanInfo, scanDomain, getScanProcess, getSubDomain, getAllScanInfo };

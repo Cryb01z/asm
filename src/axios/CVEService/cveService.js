@@ -4,13 +4,14 @@ const getCVE = async (cveId) => {
   return await axiosClient.get(`/Cves/${cveId}`);
 };
 
-const getCVES = async (page, pageSize) => {
-  return await axiosClient.get(`/Cves?page=${page}&pageSize=${pageSize}`);
-};
-
-const searchCVES = async (search, page, pageSize) => {
+const searchCVES = async (search, page, pageSize, scoreFrom, scoreTo) => {
+  if (search) {
+    return await axiosClient.get(
+      `/Cves?search=${search}&page=${page}&pageSize=${pageSize}&ScoreFrom=${scoreFrom}&ScoreTo=${scoreTo}`
+    );
+  }
   return await axiosClient.get(
-    `/Cves?search=${search}&page=${page}&pageSize=${pageSize}`
+    `/Cves?page=${page}&pageSize=${pageSize}&ScoreFrom=${scoreFrom}&ScoreTo=${scoreTo}`
   );
 };
 
@@ -20,7 +21,13 @@ const getTotalCVE = async () => {
 
 const getCVEDetail = async (domain, cveId) => {
   return await axios.get(
-    `https://tools.caasm.tech/vulnerability?url=${domain}&vuln_id=${cveId}`
+    `https://tools.caasm.tech/vulnerability/detail?target=${domain}&vuln_id=${cveId}`
+  );
+};
+
+const getCVEOfDomain = async (domain) => {
+  return await axios.get(
+    `https://tools.caasm.tech/vulnerability?target=${domain}`
   );
 };
 
@@ -30,4 +37,4 @@ const getDomainCVE = async (domain) => {
   );
 };
 
-export { getCVE, getCVES, getTotalCVE, searchCVES, getDomainCVE, getCVEDetail };
+export { getCVE, getTotalCVE, searchCVES, getDomainCVE, getCVEDetail, getCVEOfDomain };

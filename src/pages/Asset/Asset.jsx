@@ -131,6 +131,8 @@ const Asset = () => {
   useEffect(() => {
     const fetchData = async () => {
       const domain = localStorage.getItem("domain");
+      console.log(domain);
+
       if (domain) {
         try {
           const response = await getDomainInfo(domain);

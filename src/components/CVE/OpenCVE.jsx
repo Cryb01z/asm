@@ -2,11 +2,13 @@ import { faFilter, faShieldHalved } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getCVES, searchCVES } from "../../axios/CVEService/cveService";
+import { searchCVES } from "../../axios/CVEService/cveService";
 
 const OpenCVE = () => {
   const [cveFilter, setcveFilter] = useState({
     search: "",
+    scoreFrom: 0,
+    scoreTo: 10,
   });
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
@@ -33,42 +35,44 @@ const OpenCVE = () => {
   });
 
   useEffect(() => {
+    // console.log(cveFilter);
     const searchQuery = cveFilter.search.toUpperCase();
     const fetchData = async () => {
-      if (searchQuery === "") {
-        try {
-          const response = await getCVES(currentPage, itemsPerPage);
-          const cves = response.data;
-          console.log(cves);
-          setcveData(cves);
-        } catch (error) {
-          console.error("Error fetching CVEs:", error);
-        } finally {
-          setloading(true);
-        }
-      } else {
-        try {
-          const response = await searchCVES(
-            searchQuery,
-            currentPage,
-            itemsPerPage
-          );
-          const cves = response.data;
-          setcveData(cves);
-        } catch (error) {
-          console.error("Error fetching CVEs:", error);
-        } finally {
-          setloading(true);
-        }
+      try {
+        const response = await searchCVES(
+          searchQuery,
+          currentPage,
+          itemsPerPage,
+          cveFilter.scoreFrom,
+          cveFilter.scoreTo
+        );
+        const cves = response.data;
+        // console.log(cves);
+        setcveData(cves);
+      } catch (error) {
+        console.error("Error fetching CVEs:", error);
+      } finally {
+        setloading(true);
       }
     };
+
     fetchData();
   }, [currentPage, itemsPerPage, cveFilter]);
   // console.log(cveData);
 
   //Filter change
   const handleFilterChange = async (key, e) => {
-    setcveFilter((prev) => ({ ...prev, [key]: e.target.value }));
+    const score =
+      key === "score"
+        ? e.target.value.split(" - ")
+        : [cveFilter.scoreFrom, cveFilter.scoreTo];
+    const search = key === "search" ? e.target.value : "";
+    setcveFilter((prev) => ({
+      ...prev,
+      search: search,
+      scoreFrom: score[0],
+      scoreTo: score[1],
+    }));
   };
 
   //Render cvss score color
@@ -86,6 +90,18 @@ const OpenCVE = () => {
     } else {
       return "bg-gray-500";
     }
+  };
+
+  //Get cvss score
+  const getCVSS = (vulner) => {
+    if (vulner.scoreV31) {
+      return vulner.scoreV31;
+    } else if (vulner.scoreV30) {
+      return vulner.scoreV30;
+    } else if (vulner.scoreV20) {
+      return vulner.scoreV20;
+    }
+    return null;
   };
 
   //Add score level
@@ -128,24 +144,24 @@ const OpenCVE = () => {
     <>
       <div className="flex mt-4 justify-between">
         <div className="flex space-x-7 p-4 border-2 rounded-lg border-zinc-700/60 hover:border-zinc-700 hover:bg-zinc-900 w-[900px]">
-          <div className="py-2">
+          <div className="py-2 w-32">
             <FontAwesomeIcon icon={faFilter} size="lg" />{" "}
             <span className="text-lg">Filter:</span>
           </div>
-          <select
+          {/* <select
             id="tag"
             value={cveFilter.tag}
             className="w-48 border text-sm rounded-sm block p-2.5 bg-black border-zinc-700/60 placeholder-gray-400"
           >
             <option value="">Select a tag</option>
             <option value="US">No results found</option>
-          </select>
+          </select> */}
           <select
             id="score"
-            value={cveFilter.score}
             className="w-48 border text-sm rounded-sm block p-2.5 bg-black border-zinc-700/60 placeholder-gray-400"
+            onChange={(e) => handleFilterChange("score", e)}
           >
-            <option value="">Empty</option>
+            <option value="0 - 10">Empty</option>
             <option value="0 - 3.9">Low (0 - 3.9)</option>
             <option value="4 - 6.9">Medium (4.0 - 6.9)</option>
             <option value="7 - 8.9">High (7.0 - 8.9)</option>
@@ -155,7 +171,7 @@ const OpenCVE = () => {
             id="search"
             type="text"
             onChange={(e) => handleFilterChange("search", e)}
-            className="w-52 border text-sm rounded-sm block p-2.5 bg-black border-zinc-700/60 placeholder-gray-400"
+            className="w-full h-15 border text-sm rounded-sm block p-2.5 bg-black border-zinc-700/60 placeholder-gray-400"
             placeholder="Search in CVEs"
           />
           <div className="ml-10 font-semibold text-black text-sm rounded-md flex items-center justify-center px-4 bg-white hover:bg-white/80 cursor-pointer">
@@ -181,7 +197,7 @@ const OpenCVE = () => {
             <th className="p-2 text-left w-80">Vendors</th>
             <th className="p-2 text-left w-80">Products</th>
             <th className="p-2 w-48">Updated</th>
-            <th className="p-2 w-44">CVSS v3.1</th>
+            <th className="p-2">Score</th>
           </tr>
         </thead>
         <tbody>
@@ -206,14 +222,16 @@ const OpenCVE = () => {
                   <td className="p-2 text-center">
                     {customDate(cve.lastModified)}
                   </td>
-                  <td className="p-2 text-center">
-                    <span
-                      className={`px-2 text-sm rounded-sm ${getScoreColor(
-                        cve.score
-                      )}`}
-                    >
-                      {getScore(cve.score)}
-                    </span>
+                  <td className="p-2">
+                    <div className="flex justify-center">
+                      <span
+                        className={`text-center w-24 px-2 text-sm rounded-sm inline-block ${getScoreColor(
+                          getCVSS(cve)
+                        )}`}
+                      >
+                        {getScore(getCVSS(cve))}
+                      </span>
+                    </div>
                   </td>
                 </tr>
                 <tr>

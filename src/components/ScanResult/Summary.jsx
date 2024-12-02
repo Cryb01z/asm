@@ -9,6 +9,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useState } from "react";
 import { getSubDomain } from "../../axios/ScanService/scanService";
+import getTechInfo from "../../axios/TechnologyInfo/techinfo";
 const Summary = ({ data }) => {
   const [option, setoption] = useState("ASNs");
   const [expandTech, setexpandTech] = useState([]);
@@ -139,7 +140,7 @@ const Summary = ({ data }) => {
   // console.log(data.ssl);
 
   return (
-    <div className="flex justify-between w-full space-x-20 text-white">
+    <div className="flex justify-between w-full space-x-20 text-white lg:flex-1">
       <div className="flex flex-col">
         <div className="text-xl py-2 font-bold ">Summary</div>
         <div className="border-2 p-3 w-full rounded-sm border-zinc-700/60">
@@ -169,12 +170,12 @@ const Summary = ({ data }) => {
             <span className="font-bold">1 times</span> on asm
           </div>
           {/* <div className="pb-2 border-b-2 border-zinc-700/60">
-            <span className="font-bold">urlscan.io Verdict:</span> No
-            classification
-          </div>
-          <div className="pb-2 border-b-2 border-zinc-700/60 font-bold">
-            Live information
-          </div> */}
+              <span className="font-bold">urlscan.io Verdict:</span> No
+              classification
+            </div>
+            <div className="pb-2 border-b-2 border-zinc-700/60 font-bold">
+              Live information
+            </div> */}
           <div className="pb-2 border-b-2 border-zinc-700/60">
             <span className="font-bold">Google Safe Browsing:</span> No
             classification for {data.domain}
@@ -268,17 +269,17 @@ const Summary = ({ data }) => {
             Certs
           </div>
           {/* <div
-            className={
-              option === "frame"
-                ? "py-2 px-3 rounded-md bg-zinc-900 border border-zinc-700 font-bold cursor-pointer"
-                : "py-2  px-3 rounded-md hover:border hover:border-zinc-700 hover:text-indigo-400 hover:bg-zinc-900 cursor-pointer"
-            }
-            onClick={() => {
-              handdleOption("frame");
-            }}
-          >
-            Frames
-          </div> */}
+              className={
+                option === "frame"
+                  ? "py-2 px-3 rounded-md bg-zinc-900 border border-zinc-700 font-bold cursor-pointer"
+                  : "py-2  px-3 rounded-md hover:border hover:border-zinc-700 hover:text-indigo-400 hover:bg-zinc-900 cursor-pointer"
+              }
+              onClick={() => {
+                handdleOption("frame");
+              }}
+            >
+              Frames
+            </div> */}
         </div>
         {/*IP/ASNs */}
         {option === "ASNs" ? (
@@ -330,8 +331,8 @@ const Summary = ({ data }) => {
                 : ""}
               ){" "}
               {/* <span className="text-orange-500">
-                4 redirects <FontAwesomeIcon icon={faShare} />
-              </span> */}
+                  4 redirects <FontAwesomeIcon icon={faShare} />
+                </span> */}
             </div>
             <div className="space-y-2">
               <div className="px-6">
@@ -528,48 +529,88 @@ const Summary = ({ data }) => {
             {Object.keys(data.ssl).length !== 0 ? (
               <>
                 {" "}
-                (
                 <div className=" border-2 border-zinc-700 rounded-sm text-sm mt-2 mb-10 p-4">
                   {" "}
-                  <div className="flex space-x-5">
-                    <div className="flex-col uppercase">
-                      <div>host:</div>
-                      <div>subject:</div>
-                      <div>subject_cn:</div>
-                      <div>subject_alt_names:</div>
-                      <div>version:</div>
-                      <div>issuerSubject:</div>
-                      <div>cipher:</div>
-                      <div>sigAlg:</div>
-                      <div>expiry_date:</div>
-                      <div>issue_date:</div>
-                      <div>grade:</div>
-                      <div>id:</div>
-                      <div>serialNumber:</div>
-                    </div>
-                    <div className="flex-col text-gray-400">
+                  <div className="flex-col space-y-2 text-gray-400">
+                    <div className="flex">
+                      <div className="uppercase w-40 text-white">host:</div>
                       <div>{data.ssl.host}</div>
+                    </div>
+                    <div className="flex">
+                      <div className="uppercase w-40 text-white">subject:</div>
                       <div>{data.ssl.subject}</div>
-                      <div>{data.ssl.subject_cn}</div>
-                      <div>
-                        {data.ssl.subject_alt_names.map((item) => item + " ")}
+                    </div>
+                    <div className="flex">
+                      <div className="uppercase w-40 text-white">
+                        subject_cn:
                       </div>
+                      <div className="w-1/2 break-words text-wrap overflow-hidden">
+                        {data.ssl.subject_cn}
+                      </div>
+                    </div>
+                    <div className="flex">
+                      <div className="uppercase w-40 text-white">
+                        subject_alt_names:
+                      </div>
+                      <div>
+                        {data.ssl.subject_alt_names.length > 0
+                          ? data.ssl.subject_alt_names.map(item)
+                          : "None"}
+                      </div>
+                    </div>
+                    <div className="flex">
+                      <div className="uppercase w-40 text-white">version:</div>
                       <div>{data.ssl.version}</div>
-                      <div>{data.ssl.issuerSubject}</div>
+                    </div>
+                    <div className="flex">
+                      <div className="uppercase w-40 text-white">
+                        issuerSubject:
+                      </div>
+                      <div className="w-1/2 break-words text-wrap overflow-hidden">
+                        {data.ssl.issuerSubject}
+                      </div>
+                    </div>
+                    <div className="flex">
+                      <div className="uppercase w-40 text-white">cipher:</div>
                       <div>{data.ssl.cipher}</div>
+                    </div>
+                    <div className="flex">
+                      <div className="uppercase w-40 text-white">sigAlg:</div>
                       <div>{data.ssl.sigAlg}</div>
+                    </div>
+                    <div className="flex">
+                      <div className="uppercase w-40 text-white">
+                        expiry_date:
+                      </div>
                       <div>{data.ssl.expiry_date}</div>
+                    </div>
+                    <div className="flex">
+                      <div className="uppercase w-40 text-white">
+                        issue_date:
+                      </div>
                       <div>{data.ssl.issue_date}</div>
+                    </div>
+                    <div className="flex">
+                      <div className="uppercase w-40 text-white">grade:</div>
                       <div>{data.ssl.grade}</div>
+                    </div>
+                    <div className="flex">
+                      <div className="uppercase w-40 text-white">id:</div>
                       <div>{data.ssl.id}</div>
+                    </div>
+                    <div className="flex">
+                      <div className="uppercase w-40 text-white">
+                        serialNumber::
+                      </div>
                       <div>{data.ssl.serialNumber}</div>
                     </div>
                   </div>
-                  <div className="mt-5 text-center pl-4 w-96">
-                    {data.ssl.raw}
+                  <div className="mt-5 text-center">
+                    <pre className="whitespace-pre-wrap inline-block p-4 rounded border-2 border-zinc-700/60">
+                      {data.ssl.raw}
+                    </pre>
                   </div>
                 </div>
-                )
               </>
             ) : (
               <>
@@ -611,33 +652,33 @@ const Summary = ({ data }) => {
         )}
       </div>
 
-      <div className="flex-col">
-        {/* <div className="flex py-2 justify-between space-x-28">
+      <div className="flex-col w-[800px]">
+        <div className="flex py-2 justify-between space-x-28">
           <div className="text-xl font-bold">Screenshot</div>
-          <div className="flex space-x-2">
-            <div className="">
-              <span className="align-middle px-1 text-sm rounded-sm border-2 bg-gray-500">
-                <FontAwesomeIcon icon={faCrosshairs} /> Live screenshot
-              </span>
-            </div>
-            <div className="">
-              <span className="align-middle px-1 text-sm rounded-sm border-2 bg-gray-500">
-                <FontAwesomeIcon icon={faMaximize} /> Full Image
-              </span>
-            </div>
-          </div>
+          {/* <div className="flex space-x-2">
+              <div className="">
+                <span className="align-middle px-1 text-sm rounded-sm border-2 bg-gray-500">
+                  <FontAwesomeIcon icon={faCrosshairs} /> Live screenshot
+                </span>
+              </div>
+              <div className="">
+                <span className="align-middle px-1 text-sm rounded-sm border-2 bg-gray-500">
+                  <FontAwesomeIcon icon={faMaximize} /> Full Image
+                </span>
+              </div>
+            </div> */}
         </div>
         <img
           className="rounded-sm w-full h-[250px]"
-          src="../../../public/img/screenshot.png"
+          src={`https://mini.s-shot.ru/1920x1080/JPEG/1024/Z100/?https://${data.domain}/`}
           alt="screenshot"
-        /> */}
+        />
         <div className="mt-4 min-w-96 space-y-4">
           {/* <div className="font-semibold text-xl">Page Title</div>
-          <div>
-            GIZ – ProSEED Albania | ProSEED - Programme for Sustainable Economic
-            and Regional Development, Promoting Employment, Vocation
-          </div> */}
+            <div>
+              GIZ – ProSEED Albania | ProSEED - Programme for Sustainable Economic
+              and Regional Development, Promoting Employment, Vocation
+            </div> */}
           <div className="flex justify-between">
             <div className="font-semibold text-xl">Page URL History</div>
             <div className="py-1 px-2 text-xs rounded-md bg-zinc-700 hover:bg-zinc-700/60">
@@ -648,12 +689,12 @@ const Summary = ({ data }) => {
             <div>1.</div>
             <div>
               {/* <div>
-                https://
-                <span className="text-green-500">
-                  gizdemo.civiservice.de/
-                </span>{" "}
-                <span className="px-1 rounded-sm bg-orange-400">HTTP 301</span>
-              </div> */}
+                  https://
+                  <span className="text-green-500">
+                    gizdemo.civiservice.de/
+                  </span>{" "}
+                  <span className="px-1 rounded-sm bg-orange-400">HTTP 301</span>
+                </div> */}
               <div>
                 https://
                 <span className="text-green-500">{data.domain}/</span>{" "}
@@ -670,11 +711,22 @@ const Summary = ({ data }) => {
                 <React.Fragment key={index}>
                   <div className="border-b-2 pb-2">
                     <div className="flex justify-between">
-                      <div className="text-green-500">
-                        {item.subtech[0].technology}{" "}
-                        <span className="text-gray-500">
-                          ({item.categories})
-                        </span>
+                      <div className="flex space-x-3">
+                        <img
+                          src={`${
+                            getTechInfo(item.subtech[0].technology).icon
+                          }`}
+                          width={20}
+                          height={20}
+                          alt="Updating"
+                          className="rounded-full"
+                        />
+                        <div className="text-green-500">
+                          {item.subtech[0].technology}{" "}
+                          <span className="text-gray-500">
+                            ({item.categories})
+                          </span>
+                        </div>
                       </div>
                       <div
                         className="px-2 border-2 border-zinc-700/60 rounded-md bg-black hover:bg-zinc-900 cursor-pointer"
@@ -693,7 +745,7 @@ const Summary = ({ data }) => {
                         </div>
                         <div className="font-bold">Discription:</div>
                         <li className="ml-4 max-w-sm">
-                          {item.subtech[0].description}/
+                          {getTechInfo(item.subtech[0].technology).description}
                         </li>
                       </div>
                     )}

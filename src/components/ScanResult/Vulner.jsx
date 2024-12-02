@@ -19,6 +19,10 @@ const Vulner = ({ domain }) => {
   const [filteredVulnerabilities, setFilteredVulnerabilities] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [cveDetails, setCveDetails] = useState({});
+  const [sortConfig, setSortConfig] = useState({
+    key: null,
+    direction: "ascending",
+  });
   const [data, setdata] = useState({
     status: "",
     results: [
@@ -73,20 +77,22 @@ const Vulner = ({ domain }) => {
     fetchCVE();
   }, [domain]);
 
+  //filter and sort vulnerabilities render
   useEffect(() => {
     try {
       let filtered = filterVulnerabilities();
-      if (data.status && filtered.length > 0) {
-        setFilteredVulnerabilities(filtered);
-        setTotalPages(Math.ceil(filtered.length / itemsPerPage));
-        console.log("filtered");
+      let sortedFiltered = sortVulnerabilities(filtered, sortConfig);
+      if (data.status && sortedFiltered.length > 0) {
+        setFilteredVulnerabilities(sortedFiltered);
+        setTotalPages(Math.ceil(sortedFiltered.length / itemsPerPage));
+        console.log("filtered and sorted");
       }
     } catch (error) {
       console.log(error);
     } finally {
       setloading(false);
     }
-  }, [data, searchTerm, currentPage]);
+  }, [data, searchTerm, currentPage, sortConfig]);
 
   console.log(domain);
 
@@ -117,6 +123,31 @@ const Vulner = ({ domain }) => {
       getcveDetail(item.affects_url, item.vuln_id);
     });
     return filtered;
+  };
+
+  //sort vulnerabilities
+  const sortVulnerabilities = (vulnerabilities, sortConfig) => {
+    if (sortConfig.key !== null) {
+      return vulnerabilities.sort((a, b) => {
+        if (a[sortConfig.key] < b[sortConfig.key]) {
+          return sortConfig.direction === "ascending" ? -1 : 1;
+        }
+        if (a[sortConfig.key] > b[sortConfig.key]) {
+          return sortConfig.direction === "ascending" ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+    return vulnerabilities; // Return unsorted if no sortConfig
+  };
+
+  //handle sort
+  const handleSort = (key) => {
+    let direction = "ascending";
+    if (sortConfig.key === key && sortConfig.direction === "ascending") {
+      direction = "descending";
+    }
+    setSortConfig({ key, direction });
   };
 
   //get cve detail
@@ -183,7 +214,7 @@ const Vulner = ({ domain }) => {
         currentPage * itemsPerPage
       )
     : [];
-  
+
   return (
     <div className="bg-black min-h-96 mt-4">
       <div className="bg-zinc-900  shadow-lg rounded-sm border px-5 py-4 border-b border-zinc-700/60 mb-5">
@@ -227,7 +258,7 @@ const Vulner = ({ domain }) => {
                 <th className="p-2 ">
                   <div
                     className="font-semibold text-center cursor-pointer"
-                    onClick={() => handleSort("cvss")}
+                    onClick={() => handleSort("severity")}
                   >
                     Serverity <FontAwesomeIcon icon={faSort} />
                   </div>
@@ -235,7 +266,7 @@ const Vulner = ({ domain }) => {
                 <th className="p-2 ">
                   <div
                     className="font-semibold text-center cursor-pointer"
-                    onClick={() => handleSort("is_exploit")}
+                    onClick={() => handleSort("confidence")}
                   >
                     Confidential <FontAwesomeIcon icon={faSort} />
                   </div>

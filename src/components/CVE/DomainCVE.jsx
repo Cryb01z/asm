@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { data, serviceData } from "../../axios/data";
 import DoughnutChart from "../../charts/DoughnutChart";
 // Import utilities
 import {
@@ -11,15 +10,14 @@ import {
   faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { NavLink, useNavigate } from "react-router-dom";
-import { tailwindConfig } from "../../utils/Utils";
-import ExploitedModal from "./ExploitedModal";
-import { ToastContainer, toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { getCVEDetail, getDomainCVE } from "../../axios/CVEService/cveService";
 import { getSubDomain } from "../../axios/ScanService/scanService";
-import { dom } from "@fortawesome/fontawesome-svg-core";
-import { prototype } from "postcss/lib/previous-map";
+import { tailwindConfig } from "../../utils/Utils";
+import ExploitedModal from "./ExploitedModal";
+import DomainCVEDetail from "./DomainCVEDetail";
 const DomainCVE = () => {
   const itemsPerPage = 10;
   const [modal, setmodal] = useState(false); //Exploited Modal
@@ -32,7 +30,15 @@ const DomainCVE = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedDomain, setSelectedDomain] = useState("");
   const [domain, setdomain] = useState([]); // domain that have vunlnerabilities
-  const [cveDetails, setCveDetails] = useState({});
+  const [cveDetails, setCveDetails] = useState({
+    status: false,
+    domain: "",
+    id: "",
+  });
+  const [sortConfig, setSortConfig] = useState({
+    key: null,
+    direction: "ascending",
+  });
   const [allDomain, setallDomain] = useState({
     status: "",
     results: [],
@@ -127,8 +133,7 @@ const DomainCVE = () => {
           response.data.results
             .flatMap((item) => item.vulnerabilities)
             .forEach((item) => {
-              const host = item.affects_url.split("/")[2]; // Extract the domain
-              domainSet.add(host);
+              domainSet.add(getDomain(item.affects_url, item.port));
             });
           setdomain(Array.from(domainSet));
         } catch (error) {
@@ -137,8 +142,6 @@ const DomainCVE = () => {
       }
     };
     fetchData();
-    console.log(data);
-    console.log(allDomain);
   }, []);
 
   //get the chart data
@@ -155,21 +158,39 @@ const DomainCVE = () => {
     }
   }, [data, allDomain]);
 
-  //filter and search vulnerabilities render
+  //filter and sort vulnerabilities render
   useEffect(() => {
     try {
       let filtered = filterVulnerabilities();
-      if (data.status && filtered.length > 0) {
-        setFilteredVulnerabilities(filtered);
-        setTotalPages(Math.ceil(filtered.length / itemsPerPage));
-        console.log("filtered");
+      let sortedFiltered = sortVulnerabilities(filtered, sortConfig);
+      if (data.status && sortedFiltered.length > 0) {
+        setFilteredVulnerabilities(sortedFiltered);
+        setTotalPages(Math.ceil(sortedFiltered.length / itemsPerPage));
+        setCurrentPage(1);
       }
     } catch (error) {
       console.log(error);
     } finally {
       setloading(false);
     }
-  }, [data, searchTerm, selectedDomain, currentPage]);
+  }, [data, searchTerm, selectedDomain, sortConfig]);
+
+  // get domain from reponse
+  const getDomain = (url, port) => {
+    let domain = "";
+    if (url.includes("http")) {
+      if (url) {
+        domain = url.split("/")[2];
+        if (domain) {
+          domain = domain.includes(":") ? domain.split(":")[0] : domain;
+        }
+      }
+      domain = `${domain}:${port}`;
+    } else {
+      domain = `${url}:${port}`;
+    }
+    return domain;
+  };
 
   // Define a reusable mapping for labels to base colors
   const labelColorMap = {
@@ -244,6 +265,9 @@ const DomainCVE = () => {
 
   //get the chart data for domain
   const domainChart = () => {
+    let domainSet = new Set();
+    domain.map((item) => domainSet.add(item.split(":")[0]));
+    let domainchart = Array.from(domainSet);
     let vul = {
       labels: ["VulnerDomain", "SecureDomain"],
       datasets: [
@@ -256,8 +280,8 @@ const DomainCVE = () => {
         },
       ],
     };
-    vul.datasets[0].data.push(domain.length);
-    vul.datasets[0].data.push(allDomain.results.length-domain.length);  
+    vul.datasets[0].data.push(domainchart.length);
+    vul.datasets[0].data.push(allDomain.results.length - domainchart.length);
     vul.labels.map((item, index) => {
       vul.datasets[0].backgroundColor.push(getBackgroundColor(item));
       vul.datasets[0].hoverBackgroundColor.push(getHoverBackgroundColor(item));
@@ -322,8 +346,8 @@ const DomainCVE = () => {
   const filterVulnerabilities = () => {
     let filtered = data.results.flatMap((item) => item.vulnerabilities);
     if (selectedDomain && selectedDomain !== "All Domain") {
-      filtered = filtered.filter((item) =>
-        item.affects_url.includes(selectedDomain)
+      filtered = filtered.filter(
+        (item) => getDomain(item.affects_url, item.port) === selectedDomain
       );
     }
     if (searchTerm) {
@@ -331,10 +355,32 @@ const DomainCVE = () => {
         getCVEName(item.tags).toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
-    filtered.map((item) => {
-      getcveDetail(item.affects_url, item.vuln_id);
-    });
     return filtered;
+  };
+
+  //sort vulnerabilities
+  const sortVulnerabilities = (vulnerabilities, sortConfig) => {
+    if (sortConfig.key !== null) {
+      return vulnerabilities.sort((a, b) => {
+        if (a[sortConfig.key] < b[sortConfig.key]) {
+          return sortConfig.direction === "ascending" ? -1 : 1;
+        }
+        if (a[sortConfig.key] > b[sortConfig.key]) {
+          return sortConfig.direction === "ascending" ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+    return vulnerabilities; // Return unsorted if no sortConfig
+  };
+
+  //handle sort
+  const handleSort = (key) => {
+    let direction = "ascending";
+    if (sortConfig.key === key && sortConfig.direction === "ascending") {
+      direction = "descending";
+    }
+    setSortConfig({ key, direction });
   };
 
   //pagination vulnerabilities
@@ -345,21 +391,15 @@ const DomainCVE = () => {
       )
     : [];
 
-  //get cve detail
-  const getcveDetail = async (domain, cveId) => {
-    if (domain && cveId) {
-      try {
-        const response = await getCVEDetail(domain.split("/")[2], cveId);
-        // console.log(response.data.request);
-        setCveDetails((prevState) => ({
-          ...prevState,
-          [cveId]: response.data.request, // Store request under vulnId as key
-        }));
-      } catch (error) {
-        console.log(error);
-      }
+  //handle cve detail
+  const handleCVEDetail = async (domain, cveId) => {
+    if (cveDetails.id === cveId && cveDetails.domain === domain) {
+      setCveDetails({ status: false, domain: "", id: "" });
+    } else {
+      setCveDetails({ status: true, domain: domain, id: cveId });
     }
   };
+  console.log(cveDetails);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -459,7 +499,6 @@ const DomainCVE = () => {
               <DoughnutChart data={loadingChart} width={389} height={260} />
               {vulData.labels}
             </>
-            
           )}
         </div>
         <div className="flex flex-col col-span-full sm:col-span-6 xl:col-span-4 bg-zinc-900  shadow-lg rounded-md border border-zinc-700/60">
@@ -475,7 +514,6 @@ const DomainCVE = () => {
               <DoughnutChart data={loadingChart} width={389} height={260} />
               {domainData.labels}
             </>
-            
           )}
         </div>
         <div className="flex flex-col col-span-full sm:col-span-6 xl:col-span-4 bg-zinc-900  shadow-lg rounded-md border border-zinc-700/60">
@@ -565,264 +603,230 @@ const DomainCVE = () => {
         </h2>
       </div>
       {modal && <ExploitedModal modal={modal} setmodal={setmodal} />}
-      <div className="col-span-full xl:col-span-8 bg-zinc-900  shadow-lg rounded-sm border border-zinc-700/60">
-        <header className="px-5 py-4 border-b  border-zinc-700/60">
-          <h2 className="font-semibold  text-slate-100 ">
-            Total CVEs:{" "}
-            {data.status ? <>{filteredVulnerabilities.length}</> : <>0</>}
-          </h2>
-        </header>
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="z-20">
-                <th className="p-2 w-56">
-                  <div className="font-semibold text-left flex items-center">
-                    <input type="checkbox" className="mr-5" />{" "}
-                    <span>Vulnerability</span>
-                  </div>
-                </th>
-                <th className="p-2 ">
-                  <div
-                    className="font-semibold text-center cursor-pointer"
-                    onClick={() => handleSort("type")}
-                  >
-                    Parameter
-                  </div>
-                </th>
-                <th className="p-2 ">
-                  <div
-                    className="font-semibold text-center cursor-pointer"
-                    onClick={() => handleSort("cvss")}
-                  >
-                    Serverity <FontAwesomeIcon icon={faSort} />
-                  </div>
-                </th>
-                <th className="p-2 ">
-                  <div
-                    className="font-semibold text-center cursor-pointer"
-                    onClick={() => handleSort("is_exploit")}
-                  >
-                    Confidential <FontAwesomeIcon icon={faSort} />
-                  </div>
-                </th>
-                <th className="p-2">
-                  <div className="font-semibold text-center">
-                    Assets-Incidents
-                  </div>
-                </th>
-                <th className="p-2">
-                  <div className="font-semibold text-center">Actions</div>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                <>
-                  {" "}
+      <div
+        className={`flex justify-between ${
+          cveDetails.status ? "space-x-5" : ""
+        }`}
+      >
+        <div className="flex-col col-span-full xl:col-span-8 max-h-min bg-zinc-900 w-full shadow-lg rounded-sm border border-zinc-700/60">
+          <header className="px-5 py-4 border-b  border-zinc-700/60">
+            <h2 className="font-semibold  text-slate-100 ">
+              Total CVEs:{" "}
+              {data.status ? <>{filteredVulnerabilities.length}</> : <>0</>}
+            </h2>
+          </header>
+          <div className="overflow-x-auto">
+            <table className="w-full h-96">
+              <thead>
+                <tr className="z-20">
+                  <th className="p-2 w-56">
+                    <div className="font-semibold text-left flex items-center">
+                      <input type="checkbox" className="mr-5" />{" "}
+                      <span>Vulnerability</span>
+                    </div>
+                  </th>
+                  <th className="p-2 ">
+                    <div className="font-semibold text-center cursor-pointer">
+                      Parameter
+                    </div>
+                  </th>
+                  <th className="p-2 ">
+                    <div
+                      className="font-semibold text-center cursor-pointer"
+                      onClick={() => handleSort("severity")}
+                    >
+                      Serverity <FontAwesomeIcon icon={faSort} />
+                    </div>
+                  </th>
+                  <th className="p-2 ">
+                    <div
+                      className="font-semibold text-center cursor-pointer"
+                      onClick={() => handleSort("confidence")}
+                    >
+                      Confidential <FontAwesomeIcon icon={faSort} />
+                    </div>
+                  </th>
+                  <th className="p-2">
+                    <div className="font-semibold text-center">
+                      Assets-Incidents
+                    </div>
+                  </th>
+                  {/* <th className="p-2">
+                    <div className="font-semibold text-center">Actions</div>
+                  </th> */}
+                </tr>
+              </thead>
+              <tbody>
+                {loading ? (
                   <>
-                    <tr>
-                      <td colSpan={6}>
-                        <div className="animate-pulse w-full h-96 bg-zinc-900 flex items-center justify-center">
-                          <div className="flex flex-col gap-4 items-center justify-center">
-                            <div className="w-20 h-20 border-4 border-transparent text-blue-400 text-4xl animate-spin flex items-center justify-center border-t-blue-400 rounded-full">
-                              <div className="w-16 h-16 border-4 border-transparent text-red-400 text-2xl animate-spin flex items-center justify-center border-t-red-400 rounded-full"></div>
+                    {" "}
+                    <>
+                      <tr>
+                        <td colSpan={6}>
+                          <div className="animate-pulse w-full h-96 bg-zinc-900 flex items-center justify-center">
+                            <div className="flex flex-col gap-4 items-center justify-center">
+                              <div className="w-20 h-20 border-4 border-transparent text-blue-400 text-4xl animate-spin flex items-center justify-center border-t-blue-400 rounded-full">
+                                <div className="w-16 h-16 border-4 border-transparent text-red-400 text-2xl animate-spin flex items-center justify-center border-t-red-400 rounded-full"></div>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </td>
-                    </tr>
+                        </td>
+                      </tr>
+                    </>
                   </>
-                </>
-              ) : (
-                <>
-                  {" "}
-                  {displayVulnerabilities.map((cve, index) => (
-                    <tr key={index}>
-                      <td className="p-2">
-                        <div className="flex items-center group relative">
-                          <input type="checkbox" className="mr-5" />{" "}
-                          {getCVEName(cve.tags).includes("CVE") ? (
+                ) : (
+                  <>
+                    {" "}
+                    {displayVulnerabilities.map((cve, index) => (
+                      <tr className="align-top" key={index}>
+                        <td className="p-2">
+                          <div className="flex items-center group relative">
+                            <input type="checkbox" className="mr-5" />{" "}
+                            <div
+                              className="text-blue-500 cursor-pointer line-clamp-1"
+                              onClick={() => {
+                                handleCVEDetail(
+                                  getDomain(cve.affects_url, cve.port),
+                                  cve.vuln_id
+                                );
+                              }}
+                            >
+                              {getCVEName(cve.tags)}
+                            </div>
+                          </div>
+                        </td>
+                        <td className="p-2">
+                          {cve.affects_detail ? (
                             <>
-                              <div
-                                className="text-blue-500 cursor-pointer line-clamp-1"
-                                onClick={() => {
-                                  navigate(`/CVE/${getCVEName(cve.tags)}`, {
-                                    state: { cveid: getCVEName(cve.tags) },
-                                  });
-                                }}
-                              >
-                                {getCVEName(cve.tags)}
+                              <div className="text-center text-green-500">
+                                {cve.affects_detail}
                               </div>
                             </>
                           ) : (
-                            <>
-                              <a
-                                className="text-blue-500 cursor-pointer line-clamp-1"
-                                href={`https://cwe.mitre.org/data/definitions/${
-                                  getCVEName(cve.tags).split("-")[1]
-                                }.html`}
-                                target="_blank"
-                              >
-                                {getCVEName(cve.tags)}
-                              </a>
-                            </>
-                          )}
-                          <div className="invisible group-hover:visible transition-opacity duration-1000 delay-1000">
-                            <div
-                              className={`absolute z-10 pl-4 w-auto ${
-                                index >= displayVulnerabilities.length - 4
-                                  ? "bottom-0"
-                                  : ""
-                              }`}
-                            >
-                              <div className="border flex-col space-y-5 border-zinc-700 px-4 py-2 bg-zinc-900 rounded-md w-[450px] h-52 overflow-auto z-30">
-                                <div className="text-sm text-gray-400">
-                                  vt_Name: {cve.vt_name}
-                                </div>
-                                <div className="text-sm text-gray-400">
-                                  Request:{" "}
-                                  {cveDetails[cve.vuln_id]
-                                    ? cveDetails[cve.vuln_id]
-                                    : "Loading..."}
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="p-2">
-                        {cve.affects_detail ? (
-                          <>
                             <div className="text-center text-gray-400">
-                              {cve.affects_detail}
+                              None
                             </div>
-                          </>
-                        ) : (
-                          <div className="text-center text-gray-400">
-                            None
+                          )}
+                        </td>
+                        <td className="p-2">
+                          <div className="flex justify-center">
+                            <span
+                              className={`w-16 text-center px-2 inline-block rounded-md ${serverityColor(
+                                cve.severity
+                              )}`}
+                            >
+                              {serverityClass(cve.severity)}
+                            </span>
                           </div>
-                        )}
-                      </td>
-                      <td className="p-2">
-                        <div className="flex justify-center">
-                          <span
-                            className={`w-16 text-center px-2 inline-block rounded-md ${serverityColor(
-                              cve.severity
-                            )}`}
-                          >
-                            {serverityClass(cve.severity)}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="p-2">
-                        <div className="text-center">{cve.confidence}</div>
-                      </td>
-                      <td
-                        className="p-2  text-blue-500 hover:text-blue-700 text-center cursor-pointer"
-                        onClick={() => {
-                          navigate("/asset");
-                        }}
-                      >
-                        {" "}
-                        View Assets{" "}
-                        <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
-                      </td>
-                      <td className="p-2 flex justify-center items-center space-x-3 text-center cursor-pointer">
-                        <div className="text-blue-600 hover:text-blue-800">
-                          <FontAwesomeIcon icon={faSquareCheck} />
-                        </div>
-                        <div
-                          className="text-red-500 hover:text-red-800"
-                          onClick={() => setmodal(true)}
+                        </td>
+                        <td className="p-2">
+                          <div className="text-center">{cve.confidence}</div>
+                        </td>
+                        <td
+                          className="p-2  text-blue-500 hover:text-blue-700 text-center cursor-pointer"
+                          onClick={() => {
+                            navigate("/asset");
+                          }}
                         >
-                          <FontAwesomeIcon icon={faTrash} />
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </>
-              )}
-            </tbody>
-          </table>
-          {/* Pagination */}
-          <div className="flex items-center justify-between border-t border-zinc-700/60 bg-zinc-900  px-4 py-3 sm:px-6 text-white">
-            <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-              <div>
-                <p className="text-sm">
-                  Showing{" "}
-                  <span className="font-medium">
-                    {(currentPage - 1) * itemsPerPage + 1}
-                  </span>{" "}
-                  to{" "}
-                  <span className="font-medium">
-                    {Math.min(
-                      currentPage * itemsPerPage,
-                      filteredVulnerabilities.length
-                    )}
-                  </span>{" "}
-                  of{" "}
-                  <span className="font-medium">
-                    {filteredVulnerabilities.length}
-                  </span>{" "}
-                  results
-                </p>
-              </div>
-              <div className="flex space-x-5">
-                <button
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  className={`flex items-center w-28 justify-center px-3 h-8 text-sm font-medium ${
-                    currentPage === 1 ? "cursor-not-allowed" : "cursor-pointer"
-                  } border rounded-lg border-zinc-700/60 text-gray-400 hover:bg-black hover:border-zinc-700 hover:text-white`}
-                >
-                  <svg
-                    className="w-3.5 h-3.5 me-2 rtl:rotate-180"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 14 10"
+                          {" "}
+                          View Assets{" "}
+                          <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
+                        </td>
+                      </tr>
+                    ))}
+                  </>
+                )}
+              </tbody>
+            </table>
+            {/* Pagination */}
+            <div className="flex items-center justify-between border-t border-zinc-700/60 bg-zinc-900  px-4 py-3 sm:px-6 text-white">
+              <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-sm">
+                    Showing{" "}
+                    <span className="font-medium">
+                      {(currentPage - 1) * itemsPerPage + 1}
+                    </span>{" "}
+                    to{" "}
+                    <span className="font-medium">
+                      {Math.min(
+                        currentPage * itemsPerPage,
+                        filteredVulnerabilities.length
+                      )}
+                    </span>{" "}
+                    of{" "}
+                    <span className="font-medium">
+                      {filteredVulnerabilities.length}
+                    </span>{" "}
+                    results
+                  </p>
+                </div>
+                <div className="flex space-x-5">
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className={`flex items-center w-28 justify-center px-3 h-8 text-sm font-medium ${
+                      currentPage === 1
+                        ? "cursor-not-allowed"
+                        : "cursor-pointer"
+                    } border rounded-lg border-zinc-700/60 text-gray-400 hover:bg-black hover:border-zinc-700 hover:text-white`}
                   >
-                    <path
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M13 5H1m0 0 4 4M1 5l4-4"
-                    />
-                  </svg>
-                  Previous
-                </button>
+                    <svg
+                      className="w-3.5 h-3.5 me-2 rtl:rotate-180"
+                      aria-hidden="true"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 14 10"
+                    >
+                      <path
+                        stroke="currentColor"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M13 5H1m0 0 4 4M1 5l4-4"
+                      />
+                    </svg>
+                    Previous
+                  </button>
 
-                <button
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                  className={`flex items-center w-24 justify-center px-3 h-8 text-sm font-medium ${
-                    currentPage === totalPages
-                      ? "cursor-not-allowed"
-                      : "cursor-pointer"
-                  } border rounded-lg border-zinc-700/60 text-gray-400 hover:bg-black hover:border-zinc-700 hover:text-white`}
-                >
-                  Next
-                  <svg
-                    className="w-3.5 h-3.5 ms-2 rtl:rotate-180"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 14 10"
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className={`flex items-center w-24 justify-center px-3 h-8 text-sm font-medium ${
+                      currentPage === totalPages
+                        ? "cursor-not-allowed"
+                        : "cursor-pointer"
+                    } border rounded-lg border-zinc-700/60 text-gray-400 hover:bg-black hover:border-zinc-700 hover:text-white`}
                   >
-                    <path
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M1 5h12m0 0L9 1m4 4L9 9"
-                    />
-                  </svg>
-                </button>
+                    Next
+                    <svg
+                      className="w-3.5 h-3.5 ms-2 rtl:rotate-180"
+                      aria-hidden="true"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 14 10"
+                    >
+                      <path
+                        stroke="currentColor"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M1 5h12m0 0L9 1m4 4L9 9"
+                      />
+                    </svg>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
+        </div>
+        <div className="flex-col">
+          {cveDetails.status && (
+            <DomainCVEDetail
+              cveDetails={cveDetails}
+              setCveDetails={setCveDetails}
+            />
+          )}
         </div>
       </div>
       <ToastContainer />

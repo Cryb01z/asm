@@ -1,35 +1,31 @@
 import {
   faArrowRightArrowLeft,
-  faArrowRightRotate,
   faBug,
-  faCaretDown,
-  faCircleExclamation,
   faHome,
-  faMagnifyingGlass,
-  faMessage,
   faReply,
-  faShare,
   faSquarePollVertical,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { scanResult } from "../../axios/test";
+import {
+  getAllScanInfo,
+  getScanInfo,
+} from "../../axios/ScanService/scanService";
+import Navbar from "../../components/Navbar/Navbar";
 import HTTP from "../../components/ScanResult/HTTP";
 import Links from "../../components/ScanResult/Links";
 import Redirects from "../../components/ScanResult/Redirects";
 import Summary from "../../components/ScanResult/Summary";
-import Navbar from "../../components/Navbar/Navbar";
-import { getScanInfo } from "../../axios/ScanService/scanService";
 import Vulner from "../../components/ScanResult/Vulner";
 
 const Result = () => {
   const [option, setoption] = useState("result");
-  const [options, setoptions] = useState("Summary");
+  const location = useLocation();
+  const { domain, optionState, port } = location.state || {};
+  const [options, setoptions] = useState(optionState);
   const [loading, setloading] = useState(true);
   const navigate = useNavigate();
-  const location = useLocation();
-  const { domain } = location.state;
   const [data, setdata] = useState({
     status: "",
     results: {
@@ -50,6 +46,16 @@ const Result = () => {
               status_reason: "",
               header_location: null,
               html_title: "",
+            },
+            full_info: {
+              message: "",
+              uuid: "",
+              result: "",
+              api: "",
+              visibility: "",
+              options: {},
+              url: "",
+              country: "",
             },
           },
           port: "",
@@ -133,12 +139,22 @@ const Result = () => {
     },
   });
 
+  console.log("Domain:", domain);
+  console.log("OptionState:", options);
+
   useEffect(() => {
     console.log("UseEffect is called");
-
     const fetchData = async () => {
       const response = await getScanInfo(domain);
       console.log(response.data.results);
+      const id = getId(response.data.results.services);
+      console.log(id);
+      if (id) {
+        const allInformation = await getAllScanInfo(
+          response.data.results.services[2].http.uuid
+        );
+        console.log(allInformation);
+      }
       setdata(response.data);
       setloading(false);
     };
@@ -148,6 +164,14 @@ const Result = () => {
   console.log(domain);
   const handdleOption = (option) => {
     setoptions((prev) => (prev = option));
+  };
+
+  //get uuid
+  const getId = async (services) => {
+    const service = services.find((item) =>
+      ["80, 443"].includes(item.http.full_info.uuid)
+    );
+    return service.http.full_info.uuid || null;
   };
 
   // Custom date formatter
@@ -171,7 +195,6 @@ const Result = () => {
             <Navbar site={"scan"} />
           </div>
         </div>
-        ;
       </>
     );
   }
@@ -216,7 +239,7 @@ const Result = () => {
             <main className="mt-5 px-20">
               <div className="flex justify-between">
                 <div className="text-2xl font-bold">{domain}</div>
-                <div className="flex space-x-2 text-sm">
+                {/* <div className="flex space-x-2 text-sm">
                   <div className="bg-black border-2 border-zinc-700/60 px-2 py-1 rounded-md hover:bg-zinc-900 hover:border-zinc-700  cursor-pointer">
                     <FontAwesomeIcon icon={faMagnifyingGlass} /> Lookup{" "}
                     <FontAwesomeIcon icon={faCaretDown} />
@@ -227,7 +250,7 @@ const Result = () => {
                   <div className="bg-black border-2 border-zinc-700/60 px-2 py-1 rounded-md hover:bg-zinc-900 hover:border-zinc-700  cursor-pointer">
                     <FontAwesomeIcon icon={faArrowRightRotate} /> Rescan
                   </div>
-                </div>
+                </div> */}
               </div>
               <div className="flex justify-between my-3">
                 <div className="flex space-x-5">
@@ -239,14 +262,14 @@ const Result = () => {
                   </div>
                 </div>
                 <div className="flex space-x-2 text-sm">
-                  <div className="bg-zinc-700 px-2 py-1 rounded-md hover:bg-zinc-700/60 cursor-pointer">
+                  {/* <div className="bg-zinc-700 px-2 py-1 rounded-md hover:bg-zinc-700/60 cursor-pointer">
                     <FontAwesomeIcon icon={faMessage} size="sm" /> {}
                     Add Verdict
                   </div>
                   <div className="bg-black border-2 border-zinc-700/60 px-2 py-1 rounded-md hover:bg-zinc-900 hover:border-zinc-700  cursor-pointer">
                     <FontAwesomeIcon icon={faCircleExclamation} /> {}
                     Report
-                  </div>
+                  </div> */}
                 </div>
               </div>
               <div className="font-bold">
@@ -265,13 +288,24 @@ const Result = () => {
                 certstream-suspicious
               </div>
               <div className="flex flex-row text-sm">
-                <div
+                <button
                   className={
                     options === "Summary"
-                      ? "px-3 py-1.5 bg-zinc-900 border-2 border-zinc-700 rounded-md cursor-pointer"
-                      : "px-3 py-1.5 bg-black border-2 border-zinc-700/60 rounded-md hover:bg-zinc-900 hover:border-zinc-700 cursor-pointer"
+                      ? `px-3 py-1.5 bg-zinc-900 border-2 border-zinc-700 rounded-md ${
+                          port === "22"
+                            ? "cursor-not-allowed"
+                            : "cursor-pointer"
+                        }`
+                      : `px-3 py-1.5 bg-black border-2 border-zinc-700/60 rounded-md hover:bg-zinc-900 hover:border-zinc-700 ${
+                          port === "22"
+                            ? "cursor-not-allowed"
+                            : "cursor-pointer"
+                        }`
                   }
                   onClick={() => {
+                    if (port === "22") {
+                      return;
+                    }
                     handdleOption("Summary");
                   }}
                 >
@@ -287,14 +321,25 @@ const Result = () => {
                   >
                     Summary
                   </span>
-                </div>
+                </button>
                 <div
                   className={
                     options === "HTTP"
-                      ? "px-3 py-1.5 bg-zinc-900 border-2 border-zinc-700 rounded-md cursor-pointer"
-                      : "px-3 py-1.5 bg-black border-2 border-zinc-700/60 rounded-md hover:bg-zinc-900 hover:border-zinc-700 cursor-pointer"
+                      ? `px-3 py-1.5 bg-zinc-900 border-2 border-zinc-700 rounded-md ${
+                          port === "22"
+                            ? "cursor-not-allowed"
+                            : "cursor-pointer"
+                        }`
+                      : `px-3 py-1.5 bg-black border-2 border-zinc-700/60 rounded-md hover:bg-zinc-900 hover:border-zinc-700 ${
+                          port === "22"
+                            ? "cursor-not-allowed"
+                            : "cursor-pointer"
+                        }`
                   }
                   onClick={() => {
+                    if (port === "22") {
+                      return;
+                    }
                     handdleOption("HTTP");
                   }}
                 >
