@@ -10,7 +10,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useState } from "react";
 import { getSubDomain } from "../../axios/ScanService/scanService";
 import getTechInfo from "../../axios/TechnologyInfo/techinfo";
-const Summary = ({ data }) => {
+import { all } from "axios";
+const Summary = ({ data, allData }) => {
   const [option, setoption] = useState("ASNs");
   const [expandTech, setexpandTech] = useState([]);
   const [showMore, setShowMore] = useState(false);
@@ -139,34 +140,70 @@ const Summary = ({ data }) => {
   };
   // console.log(data.ssl);
 
+  // Format the UNIX timestamp
+  const formatUnixTimestamp = (timestamp) => {
+    const date = new Date(timestamp * 1000);
+    const year = date.getFullYear();
+    const month = date.toLocaleString('default', { month: 'long' }); 
+    const day = date.getDate();
+    return `${month} ${day}, ${year}`;
+  };
+ 
+  // Calculate expire year
+  const calculateExpireYear = (validFrom, validTo) => {
+    const startDate = new Date(validFrom * 1000); 
+    const endDate = new Date(validTo * 1000);
+    const differenceInTime = endDate - startDate;
+    const millisecondsInYear = 1000 * 60 * 60 * 24 * 365.25; 
+    const years = (differenceInTime / millisecondsInYear).toFixed(2);
+    if (parseFloat(years) === 1) {
+      return "a year";
+    }
+
+    return parseFloat(years) + " years";
+  };
+
   return (
     <div className="flex justify-between w-full space-x-20 text-white lg:flex-1">
       <div className="flex flex-col">
         <div className="text-xl py-2 font-bold ">Summary</div>
         <div className="border-2 p-3 w-full rounded-sm border-zinc-700/60">
           <div className="pb-2 border-b-2 border-zinc-700/60">
-            This website contacted <span className="font-bold"> IPs</span> in 1
-            countries across <span className="font-bold">1 domains</span> {}
+            This website contacted{" "}
+            <span className="font-bold">
+              {allData.lists.ips ? allData.lists.ips.length : 0} IPs
+            </span>{" "}
+            in {allData.lists.countries ? allData.lists.countries.length : 0}{" "}
+            {""}
+            countries across{" "}
+            <span className="font-bold">
+              {allData.lists.domains ? allData.lists.domains.length : 0} domains
+            </span>{" "}
+            {}
             to perform{" "}
             <span className="font-bold">
-              {data.services ? data.services.length : 0} HTTP transactions
+              {allData.lists.urls ? allData.lists.urls.length : 0} HTTP
+              transactions
             </span>
             . The main IP is
-            <span className="text-green-500"> {data.ip}</span>, located in{" "}
+            <span className="text-green-500"> {allData.page.ip}</span>, located
+            in{" "}
             <span className="font-bold">
-              {data.autonomous_system
-                ? data.autonomous_system.country_code
-                : ""}
+              {allData.page.city} - {allData.page.country}
             </span>{" "}
             and belongs to{" "}
             <span className="text-green-500 cursor-pointer">
-              {data.autonomous_system ? data.autonomous_system.name : ""}
+              {allData.page.asnname}
             </span>
             . The main domain is
-            <span className="text-green-500"> {data.domain}</span>.
+            <span className="text-green-500"> {allData.page.domain}</span>.
+            <div>
+              TLS certificate: Issued by {allData.lists.certificates[0].issuer} on {formatUnixTimestamp(allData.lists.certificates[0].validFrom)}.
+              Valid for: {calculateExpireYear(allData.lists.certificates[0].validFrom, allData.lists.certificates[0].validTo)}.
+            </div>
           </div>
           <div className="pb-2 border-b-2 border-zinc-700/60">
-            <span className="text-green-500">{data.domain}</span> scanned{" "}
+            <span className="text-green-500">{allData.page.domain}</span> scanned{" "}
             <span className="font-bold">1 times</span> on asm
           </div>
           {/* <div className="pb-2 border-b-2 border-zinc-700/60">
@@ -178,20 +215,13 @@ const Summary = ({ data }) => {
             </div> */}
           <div className="pb-2 border-b-2 border-zinc-700/60">
             <span className="font-bold">Google Safe Browsing:</span> No
-            classification for {data.domain}
+            classification for {allData.page.domain}
           </div>
           <div>
             <span className="font-bold">
-              Current DNS A record: {data.domain}
+              Current DNS A record: {allData.page.domain}
             </span>{" "}
-            (
-            {data.autonomous_system
-              ? data.autonomous_system.bgp_prefix.map((item) => {
-                  return `"${item}"` + " ";
-                })
-              : ""}
-            - {data.autonomous_system ? data.autonomous_system.description : ""}
-            )
+            ({allData.page.asn} - {allData.page.asnname})
           </div>
         </div>
         <div className="text-xl font-bold py-2">Domain & information</div>

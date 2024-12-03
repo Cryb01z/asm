@@ -732,7 +732,7 @@ const Scan = () => {
                                             data.results.domain
                                           ),
                                           optionState: "Summary",
-                                          port: "",
+                                          port: "443",
                                         },
                                       }
                                     );

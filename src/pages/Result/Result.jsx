@@ -18,7 +18,8 @@ import Links from "../../components/ScanResult/Links";
 import Redirects from "../../components/ScanResult/Redirects";
 import Summary from "../../components/ScanResult/Summary";
 import Vulner from "../../components/ScanResult/Vulner";
-
+import "/node_modules/flag-icons/css/flag-icons.min.css";
+import { all } from "axios";
 const Result = () => {
   const [option, setoption] = useState("result");
   const location = useLocation();
@@ -26,6 +27,7 @@ const Result = () => {
   const [options, setoptions] = useState(optionState);
   const [loading, setloading] = useState(true);
   const navigate = useNavigate();
+  const [allData, setallData] = useState({});
   const [data, setdata] = useState({
     status: "",
     results: {
@@ -147,13 +149,12 @@ const Result = () => {
     const fetchData = async () => {
       const response = await getScanInfo(domain);
       console.log(response.data.results);
-      const id = getId(response.data.results.services);
+      const id = await getId(response.data.results.services);
       console.log(id);
       if (id) {
-        const allInformation = await getAllScanInfo(
-          response.data.results.services[2].http.uuid
-        );
-        console.log(allInformation);
+        const allInformation = await getAllScanInfo(id);
+        console.log("asdasd", allInformation);
+        setallData(allInformation.data);
       }
       setdata(response.data);
       setloading(false);
@@ -168,9 +169,12 @@ const Result = () => {
 
   //get uuid
   const getId = async (services) => {
-    const service = services.find((item) =>
-      ["80, 443"].includes(item.http.full_info.uuid)
-    );
+    console.log(services);
+    console.log(port);
+
+    const service = services.find((item) => item.port === port);
+    console.log("found", service);
+
     return service.http.full_info.uuid || null;
   };
 
@@ -185,14 +189,23 @@ const Result = () => {
     return date.toLocaleDateString("en-US", { month: "long", day: "numeric" });
   };
 
+  console.log("All Data", allData);
+
   if (loading) {
     return (
       <>
         {" "}
-        <div className="bg-black text-gray-400 flex overflow-hidden h-[calc(80%)] pb-20">
+        <div className="bg-black text-gray-400 flex overflow-hidden h-screen pb-20">
           <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
             {/*  Site header */}
             <Navbar site={"scan"} />
+            <div className="animate-pulse w-full h-screen bg-black flex items-center justify-center">
+              <div className="flex flex-col gap-4 items-center justify-center">
+                <div className="w-20 h-20 border-4 border-transparent text-blue-400 text-4xl animate-spin flex items-center justify-center border-t-blue-400 rounded-full">
+                  <div className="w-16 h-16 border-4 border-transparent text-red-400 text-2xl animate-spin flex items-center justify-center border-t-red-400 rounded-full"></div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </>
@@ -234,11 +247,12 @@ const Result = () => {
           </div>
           <div className="absolute bottom-2 left-0 w-full border-b-2 border-neutral-800"></div>
         </div>
+
         <div className=" text-white flex px-20">
           <div className="relative flex flex-col flex-1 ">
             <main className="mt-5 px-20">
               <div className="flex justify-between">
-                <div className="text-2xl font-bold">{domain}</div>
+                <div className="text-2xl font-bold">{allData.page.domain}</div>
                 {/* <div className="flex space-x-2 text-sm">
                   <div className="bg-black border-2 border-zinc-700/60 px-2 py-1 rounded-md hover:bg-zinc-900 hover:border-zinc-700  cursor-pointer">
                     <FontAwesomeIcon icon={faMagnifyingGlass} /> Lookup{" "}
@@ -254,7 +268,12 @@ const Result = () => {
               </div>
               <div className="flex justify-between my-3">
                 <div className="flex space-x-5">
-                  <div className="text-gray-400 text-xl">{data.results.ip}</div>
+                  <div className="text-gray-400 text-2xl">
+                    {allData.page.ip}{" "}
+                    <span
+                      class={`fi fi-${allData.page.country.toLowerCase()}`}
+                    ></span>
+                  </div>
                   <div class="flex justify-center items-center">
                     <div class="text-xs bg-indigo-500 rounded-md px-2 py-1 font-bold hover:bg-indigo-700 cursor-pointer">
                       Public Scan
@@ -275,17 +294,29 @@ const Result = () => {
               <div className="font-bold">
                 Submitted URL:{" "}
                 <span className="font-normal text-gray-300">https://</span>
-                <span className="text-green-500">{domain}</span>
+                <span className="text-green-500">{allData.page.domain}</span>
               </div>
               <div className="font-bold">
                 Effective URL:{" "}
                 <span className="font-normal text-gray-300">https://</span>
-                <span className="text-green-500">{domain}/</span>
+                <span className="text-green-500">{allData.page.domain}</span>
               </div>
               <div className="text-sm mb-2">
                 <span className="font-bold">Submission:</span> On{" "}
-                {customDate(data.results.discovery_on)} via automatic, source
-                certstream-suspicious
+                {customDate(data.results.discovery_on)} via api, from{" "}
+                <span className="px-2 rounded-md border border-zinc-700 bg-zinc-900">
+                  {allData.submitter.country}{" "}
+                  <span
+                    class={`fi fi-${allData.submitter.country.toLowerCase()}`}
+                  ></span>{" "}
+                </span>
+                — Scanned from
+                <span className="px-2 rounded-md border border-zinc-700 bg-zinc-900">
+                  {allData.scanner.country}{" "}
+                  <span
+                    class={`fi fi-${allData.scanner.country.toLowerCase()}`}
+                  ></span>{" "}
+                </span>
               </div>
               <div className="flex flex-row text-sm">
                 <button
@@ -507,7 +538,9 @@ const Result = () => {
                   <FontAwesomeIcon icon={faMessage} /> Verdicts
                 </div> */}
               </div>
-              {options === "Summary" && <Summary data={data.results} />}
+              {options === "Summary" && (
+                <Summary data={data.results} allData={allData} />
+              )}
               {options === "HTTP" && <HTTP data={data.results} />}
               {options === "Redirects" && <Redirects />}
               {options === "Links" && <Links />}

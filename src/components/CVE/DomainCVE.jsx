@@ -450,6 +450,8 @@ const DomainCVE = () => {
   //Render cvss score color
   const serverityColor = (score) => {
     switch (score) {
+      case 5:
+        return "text-red-600 bg-red-600/40";
       case 4:
         return "text-red-600 bg-red-600/40";
       case 3:
@@ -466,6 +468,8 @@ const DomainCVE = () => {
   //Render serverity class
   const serverityClass = (score) => {
     switch (score) {
+      case 5:
+        return "Critical";
       case 4:
         return "Critical";
       case 3:
@@ -482,6 +486,7 @@ const DomainCVE = () => {
   // console.log("vulData:", vulData);
   // console.log("domainData:", domainData);
   // console.log("securityData:", securityData);
+  console.log(displayVulnerabilities);
 
   return (
     <>

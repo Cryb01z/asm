@@ -11,8 +11,9 @@ import { Bounce, ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { getCVEDetail } from "../../axios/CVEService/cveService";
 import copy from "copy-to-clipboard";
-const DomainCVEDetail = ({ cveDetails, setcveDetails }) => {
+const DomainCVEDetail = ({ cveDetails, setCveDetails }) => {
   const [expand, setexpand] = useState([]);
+  const [loading, setloading] = useState(true);
   const [data, setdata] = useState({
     affects_detail: "",
     affects_url: "",
@@ -56,31 +57,48 @@ const DomainCVEDetail = ({ cveDetails, setcveDetails }) => {
     vuln_id: "",
   });
   const [copied, setCopied] = useState(false);
-
+  const toastId = "error-toast";
   console.log("CVE Detail", cveDetails);
   useEffect(() => {
     const fetchApi = async () => {
       try {
         const response = await getCVEDetail(cveDetails.domain, cveDetails.id);
-        console.log(response);
-        setdata(response.data);
+        console.log("asdasdas", response);
+        if (response.data.status_code) {
+          throw new Error("Not Availabel");
+        } else {
+          setloading(false);
+          setdata(response.data);
+        }
       } catch (error) {
-        toast.error("Not Availabel", {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "dark",
-          transition: Bounce,
-        });
+        if (!toast.isActive(toastId)) {
+          toast.error("Not Available", {
+            toastId,
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+            transition: Bounce,
+          });
+        }
       }
     };
     fetchApi();
-  }, [cveDetails]);
+  }, []);
   console.log(data);
+
+  // close modal
+  const closeModal = () => {
+    setCveDetails({
+      status: false,
+      domain: "",
+      id: "",
+    });
+  };
 
   // Copy clipboard
   const copyToClipboard = (text) => {
@@ -237,15 +255,11 @@ const DomainCVEDetail = ({ cveDetails, setcveDetails }) => {
       "M:A": "Modified Attack Vector",
       "M:C": "Modified Confidentiality Impact",
       "M:I": "Modified Integrity Impact",
-      "M:A": "Modified Availability Impact",
 
       "CR:N": "Exploitability: None",
       "CR:L": "Exploitability: Low",
       "CR:H": "Exploitability: High",
       "CR:M": "Exploitability: Moderate",
-
-      "M:I": "Modified Integrity Impact",
-      "M:A": "Modified Availability Impact",
 
       "RC:N": "Remediation Level: None",
       "RC:H": "Remediation Level: High",
@@ -262,17 +276,17 @@ const DomainCVEDetail = ({ cveDetails, setcveDetails }) => {
     return result;
   };
 
+  if (loading) {
+    return <div></div>;
+  }
+
   return (
     <div className="relative bg-zinc-900 max-w-lg min-w-[32rem] p-4 shadow-lg text-gray-400 rounded-sm border border-zinc-700/60">
       <button
         type="button"
         className="absolute top-3 end-2.5 text-gray-400 bg-transparent rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center hover:bg-gray-600 hover:text-white"
         onClick={() => {
-          setcveDetails({
-            status: false,
-            domain: "",
-            id: "",
-          });
+          closeModal();
         }}
       >
         <svg
