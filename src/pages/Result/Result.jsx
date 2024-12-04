@@ -1,7 +1,9 @@
 import {
   faArrowRightArrowLeft,
   faBug,
+  faHandPointRight,
   faHome,
+  faMessage,
   faReply,
   faSquarePollVertical,
 } from "@fortawesome/free-solid-svg-icons";
@@ -20,6 +22,8 @@ import Summary from "../../components/ScanResult/Summary";
 import Vulner from "../../components/ScanResult/Vulner";
 import "/node_modules/flag-icons/css/flag-icons.min.css";
 import { all } from "axios";
+import Behaviour from "../../components/ScanResult/Behaviour";
+import { dom } from "@fortawesome/fontawesome-svg-core";
 const Result = () => {
   const [option, setoption] = useState("result");
   const location = useLocation();
@@ -141,40 +145,43 @@ const Result = () => {
     },
   });
 
-  console.log("Domain:", domain);
-  console.log("OptionState:", options);
+  // console.log("Domain:", domain);
+  // console.log("OptionState:", options);
 
   useEffect(() => {
     console.log("UseEffect is called");
     const fetchData = async () => {
       const response = await getScanInfo(domain);
-      console.log(response.data.results);
+      // console.log(response.data.results);
       const id = await getId(response.data.results.services);
-      console.log(id);
+      // console.log(id);
       if (id) {
         const allInformation = await getAllScanInfo(id);
-        console.log("asdasd", allInformation);
+        // console.log("asdasd", allInformation);
         setallData(allInformation.data);
       }
       setdata(response.data);
       setloading(false);
     };
-    fetchData();
+    if (domain && port !== "22") {
+      fetchData();
+    } else {
+      setallData(null)
+      setloading(false);
+    }
   }, [domain]);
   // console.log(data);
-  console.log(domain);
+  // console.log(domain);
   const handdleOption = (option) => {
     setoptions((prev) => (prev = option));
   };
 
   //get uuid
   const getId = async (services) => {
-    console.log(services);
-    console.log(port);
-
+    // console.log(services);
+    // console.log(port);
     const service = services.find((item) => item.port === port);
-    console.log("found", service);
-
+    // console.log("found", service);
     return service.http.full_info.uuid || null;
   };
 
@@ -189,7 +196,7 @@ const Result = () => {
     return date.toLocaleDateString("en-US", { month: "long", day: "numeric" });
   };
 
-  console.log("All Data", allData);
+  // console.log("All Data", allData);
 
   if (loading) {
     return (
@@ -251,9 +258,17 @@ const Result = () => {
         <div className=" text-white flex px-20">
           <div className="relative flex flex-col flex-1 ">
             <main className="mt-5 px-20">
-              <div className="flex justify-between">
-                <div className="text-2xl font-bold">{allData.page.domain}</div>
-                {/* <div className="flex space-x-2 text-sm">
+              {port === "22" ? (
+                <>
+                  <div className="text-3xl font-bold mb-4">This is SSH service of {domain}</div>
+                </>
+              ) : (
+                <>
+                  <div className="flex justify-between">
+                    <div className="text-2xl font-bold">
+                      {allData.page.domain}
+                    </div>
+                    {/* <div className="flex space-x-2 text-sm">
                   <div className="bg-black border-2 border-zinc-700/60 px-2 py-1 rounded-md hover:bg-zinc-900 hover:border-zinc-700  cursor-pointer">
                     <FontAwesomeIcon icon={faMagnifyingGlass} /> Lookup{" "}
                     <FontAwesomeIcon icon={faCaretDown} />
@@ -265,23 +280,23 @@ const Result = () => {
                     <FontAwesomeIcon icon={faArrowRightRotate} /> Rescan
                   </div>
                 </div> */}
-              </div>
-              <div className="flex justify-between my-3">
-                <div className="flex space-x-5">
-                  <div className="text-gray-400 text-2xl">
-                    {allData.page.ip}{" "}
-                    <span
-                      class={`fi fi-${allData.page.country.toLowerCase()}`}
-                    ></span>
                   </div>
-                  <div class="flex justify-center items-center">
-                    <div class="text-xs bg-indigo-500 rounded-md px-2 py-1 font-bold hover:bg-indigo-700 cursor-pointer">
-                      Public Scan
+                  <div className="flex justify-between my-3">
+                    <div className="flex space-x-5">
+                      <div className="text-gray-400 text-2xl">
+                        {allData.page.ip}{" "}
+                        <span
+                          class={`fi fi-${allData.page.country.toLowerCase()}`}
+                        ></span>
+                      </div>
+                      <div class="flex justify-center items-center">
+                        <div class="text-xs bg-indigo-500 rounded-md px-2 py-1 font-bold hover:bg-indigo-700 cursor-pointer">
+                          Public Scan
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-                <div className="flex space-x-2 text-sm">
-                  {/* <div className="bg-zinc-700 px-2 py-1 rounded-md hover:bg-zinc-700/60 cursor-pointer">
+                    <div className="flex space-x-2 text-sm">
+                      {/* <div className="bg-zinc-700 px-2 py-1 rounded-md hover:bg-zinc-700/60 cursor-pointer">
                     <FontAwesomeIcon icon={faMessage} size="sm" /> {}
                     Add Verdict
                   </div>
@@ -289,47 +304,53 @@ const Result = () => {
                     <FontAwesomeIcon icon={faCircleExclamation} /> {}
                     Report
                   </div> */}
-                </div>
-              </div>
-              <div className="font-bold">
-                Submitted URL:{" "}
-                <span className="font-normal text-gray-300">https://</span>
-                <span className="text-green-500">{allData.page.domain}</span>
-              </div>
-              <div className="font-bold">
-                Effective URL:{" "}
-                <span className="font-normal text-gray-300">https://</span>
-                <span className="text-green-500">{allData.page.domain}</span>
-              </div>
-              <div className="text-sm mb-2">
-                <span className="font-bold">Submission:</span> On{" "}
-                {customDate(data.results.discovery_on)} via api, from{" "}
-                <span className="px-2 rounded-md border border-zinc-700 bg-zinc-900">
-                  {allData.submitter.country}{" "}
-                  <span
-                    class={`fi fi-${allData.submitter.country.toLowerCase()}`}
-                  ></span>{" "}
-                </span>
-                — Scanned from
-                <span className="px-2 rounded-md border border-zinc-700 bg-zinc-900">
-                  {allData.scanner.country}{" "}
-                  <span
-                    class={`fi fi-${allData.scanner.country.toLowerCase()}`}
-                  ></span>{" "}
-                </span>
-              </div>
+                    </div>
+                  </div>
+                  <div className="font-bold">
+                    Submitted URL:{" "}
+                    <span className="font-normal text-gray-300">https://</span>
+                    <span className="text-green-500">
+                      {allData.page.domain}
+                    </span>
+                  </div>
+                  <div className="font-bold">
+                    Effective URL:{" "}
+                    <span className="font-normal text-gray-300">https://</span>
+                    <span className="text-green-500">
+                      {allData.page.domain}
+                    </span>
+                  </div>
+                  <div className="text-sm mb-2">
+                    <span className="font-bold">Submission:</span> On{" "}
+                    {customDate(data.results.discovery_on)} via api, from{" "}
+                    <span className="px-2 rounded-md border border-zinc-700 bg-zinc-900">
+                      {allData.submitter.country}{" "}
+                      <span
+                        class={`fi fi-${allData.submitter.country.toLowerCase()}`}
+                      ></span>{" "}
+                    </span>
+                    — Scanned from
+                    <span className="px-2 rounded-md border border-zinc-700 bg-zinc-900">
+                      {allData.scanner.country}{" "}
+                      <span
+                        class={`fi fi-${allData.scanner.country.toLowerCase()}`}
+                      ></span>{" "}
+                    </span>
+                  </div>
+                </>
+              )}
               <div className="flex flex-row text-sm">
                 <button
                   className={
                     options === "Summary"
                       ? `px-3 py-1.5 bg-zinc-900 border-2 border-zinc-700 rounded-md ${
                           port === "22"
-                            ? "cursor-not-allowed"
+                            ? "cursor-not-allowed hidden"
                             : "cursor-pointer"
                         }`
                       : `px-3 py-1.5 bg-black border-2 border-zinc-700/60 rounded-md hover:bg-zinc-900 hover:border-zinc-700 ${
                           port === "22"
-                            ? "cursor-not-allowed"
+                            ? "cursor-not-allowed hidden"
                             : "cursor-pointer"
                         }`
                   }
@@ -358,12 +379,12 @@ const Result = () => {
                     options === "HTTP"
                       ? `px-3 py-1.5 bg-zinc-900 border-2 border-zinc-700 rounded-md ${
                           port === "22"
-                            ? "cursor-not-allowed"
+                            ? "cursor-not-allowed hidden"
                             : "cursor-pointer"
                         }`
                       : `px-3 py-1.5 bg-black border-2 border-zinc-700/60 rounded-md hover:bg-zinc-900 hover:border-zinc-700 ${
                           port === "22"
-                            ? "cursor-not-allowed"
+                            ? "cursor-not-allowed hidden"
                             : "cursor-pointer"
                         }`
                   }
@@ -386,9 +407,7 @@ const Result = () => {
                         options === "HTTP" ? "bg-indigo-500" : "bg-zinc-700 "
                       } rounded-md`}
                     >
-                      {data.results.services !== null
-                        ? data.results.services.length
-                        : 0}
+                      {allData ? allData.data.requests.length : ""}
                     </span>
                   </span>
                 </div>
@@ -437,14 +456,25 @@ const Result = () => {
                   >
                     Redirects
                   </span>
-                </div>
+                </div> */}
                 <div
                   className={
                     options === "Links"
-                      ? "px-3 py-1.5 bg-zinc-900 border-2 border-zinc-700 rounded-md cursor-pointer"
-                      : "px-3 py-1.5 bg-black border-2 border-zinc-700/60 rounded-md hover:bg-zinc-900 hover:border-zinc-700 cursor-pointer"
+                      ? `px-3 py-1.5 bg-zinc-900 border-2 border-zinc-700 rounded-md ${
+                          port === "22"
+                            ? "cursor-not-allowed hidden"
+                            : "cursor-pointer"
+                        }`
+                      : `px-3 py-1.5 bg-black border-2 border-zinc-700/60 rounded-md hover:bg-zinc-900 hover:border-zinc-700 ${
+                          port === "22"
+                            ? "cursor-not-allowed hidden"
+                            : "cursor-pointer"
+                        }`
                   }
                   onClick={() => {
+                    if (port === "22") {
+                      return;
+                    }
                     handdleOption("Links");
                   }}
                 >
@@ -455,96 +485,53 @@ const Result = () => {
                   >
                     <FontAwesomeIcon icon={faHandPointRight} />
                   </span>{" "}
-                  <span
-                    className={`${options === "Links" ? "font-bold" : ""}`}
-                  >
+                  <span className={`${options === "Links" ? "font-bold" : ""}`}>
                     Links{" "}
-                    <span className={`px-1.5 ${options === "Links" ? "bg-indigo-500" : "bg-zinc-700 "} rounded-md`}>4</span>
+                    <span
+                      className={`px-1.5 ${
+                        options === "Links" ? "bg-indigo-500" : "bg-zinc-700 "
+                      } rounded-md`}
+                    >
+                      {allData ? allData.data.links.length : ""}
+                    </span>
                   </span>
-                </div> */}
-                {/* <div
+                </div>
+                <div
                   className={
                     options === "Behaviour"
-                      ? "px-3 py-1.5 bg-zinc-900 border-2 border-zinc-700 rounded-md cursor-pointer"
-                      : "px-3 py-1.5 bg-black border-2 border-zinc-700/60 rounded-md hover:bg-zinc-900 hover:border-zinc-700 cursor-pointer"
+                      ? `px-3 py-1.5 bg-zinc-900 border-2 border-zinc-700 rounded-md ${
+                          port === "22"
+                            ? "cursor-not-allowed hidden"
+                            : "cursor-pointer"
+                        }`
+                      : `px-3 py-1.5 bg-black border-2 border-zinc-700/60 rounded-md hover:bg-zinc-900 hover:border-zinc-700 ${
+                          port === "22"
+                            ? "cursor-not-allowed hidden"
+                            : "cursor-pointer"
+                        }`
                   }
                   onClick={() => {
+                    if (port === "22") {
+                      return;
+                    }
                     handdleOption("Behaviour");
                   }}
                 >
                   <FontAwesomeIcon icon={faMessage} /> Behaviour
                 </div>
-                <div
-                  className={
-                    options === "Indicators"
-                      ? "px-3 py-1.5 bg-zinc-900 border-2 border-zinc-700 rounded-md cursor-pointer"
-                      : "px-3 py-1.5 bg-black border-2 border-zinc-700/60 rounded-md hover:bg-zinc-900 hover:border-zinc-700 cursor-pointer"
-                  }
-                  onClick={() => {
-                    handdleOption("Indicators");
-                  }}
-                >
-                  <FontAwesomeIcon icon={faCrosshairs} /> Indicators
-                </div>
-                <div
-                  className={
-                    options === "Similar"
-                      ? "px-3 py-1.5 bg-zinc-900 border-2 border-zinc-700 rounded-md cursor-pointer ml-1"
-                      : "px-3 py-1.5 bg-black border-2 border-zinc-700/60 rounded-md hover:bg-zinc-900 hover:border-zinc-700 cursor-pointer ml-1"
-                  }
-                  onClick={() => {
-                    handdleOption("Similar");
-                  }}
-                >
-                  <FontAwesomeIcon icon={faLink} /> Similar
-                </div>
-                <div
-                  className={
-                    options === "DOM"
-                      ? "px-3 py-1.5 bg-zinc-900 border-2 border-zinc-700 rounded-md cursor-pointer"
-                      : "px-3 py-1.5 bg-black border-2 border-zinc-700/60 rounded-md hover:bg-zinc-900 hover:border-zinc-700 cursor-pointer"
-                  }
-                  onClick={() => {
-                    handdleOption("DOM");
-                  }}
-                >
-                  <FontAwesomeIcon icon={faRectangleList} /> DOM
-                </div>
-                <div
-                  className={
-                    options === "Content"
-                      ? "px-3 py-1.5 bg-zinc-900 border-2 border-zinc-700 rounded-md cursor-pointer"
-                      : "px-3 py-1.5 bg-black border-2 border-zinc-700/60 rounded-md hover:bg-zinc-900 hover:border-zinc-700 cursor-pointer"
-                  }
-                  onClick={() => {
-                    handdleOption("Content");
-                  }}
-                >
-                  <FontAwesomeIcon icon={faFile} /> Content
-                </div>
-                <div
-                  className={
-                    options === "API"
-                      ? "px-3 py-1.5 bg-zinc-900 border-2 border-zinc-700 rounded-md cursor-pointer"
-                      : "px-3 py-1.5 bg-black border-2 border-zinc-700/60 rounded-md hover:bg-zinc-900 hover:border-zinc-700 cursor-pointer"
-                  }
-                  onClick={() => {
-                    handdleOption("API");
-                  }}
-                >
-                  <FontAwesomeIcon icon={faQrcode} /> API
-                </div>
-                <div className="px-3 py-1.5 border-2 rounded-sm bg-gray-400 ml-1 cursor-pointer">
-                  <FontAwesomeIcon icon={faMessage} /> Verdicts
-                </div> */}
               </div>
               {options === "Summary" && (
                 <Summary data={data.results} allData={allData} />
               )}
-              {options === "HTTP" && <HTTP data={data.results} />}
+              {options === "HTTP" && (
+                <HTTP data={data.results} allData={allData} />
+              )}
               {options === "Redirects" && <Redirects />}
-              {options === "Links" && <Links />}
-              {options === "vulner" && <Vulner domain={data.results.domain} />}
+              {options === "Links" && <Links allData={allData} />}
+              {options === "Behaviour" && <Behaviour allData={allData} />}
+              {options === "vulner" && (
+                <Vulner domain={data.results.domain} port={port} />
+              )}
             </main>
           </div>
         </div>

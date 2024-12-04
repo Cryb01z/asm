@@ -342,7 +342,7 @@ const DomainCVEDetail = ({ cveDetails, setCveDetails }) => {
           </span>
         </div>
         <div
-          className={`${expand.includes("detail") ? "" : "hidden"}`}
+          className={`${expand.includes("detail") ? "break-words text-pretty overflow-hidden" : "hidden"}`}
           dangerouslySetInnerHTML={{
             __html: DOMPurify.sanitize(data.details ? data.details : "None"),
           }}

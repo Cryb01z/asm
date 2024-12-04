@@ -144,30 +144,63 @@ const Summary = ({ data, allData }) => {
   const formatUnixTimestamp = (timestamp) => {
     const date = new Date(timestamp * 1000);
     const year = date.getFullYear();
-    const month = date.toLocaleString('default', { month: 'long' }); 
+    const month = date.toLocaleString("default", { month: "long" });
     const day = date.getDate();
     return `${month} ${day}, ${year}`;
   };
- 
+
+  // Format the UNIX timestamp in certificate
+  const formatTimestampForCert = (timestamp) => {
+    const date = new Date(timestamp * 1000);
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const day = date.getDate();
+    if (month === 0) {
+      return `${year - 1} - 12 - ${day}`;
+    }
+    return `${year} - ${month} - ${day}`;
+  };
+
   // Calculate expire year
   const calculateExpireYear = (validFrom, validTo) => {
-    const startDate = new Date(validFrom * 1000); 
+    const startDate = new Date(validFrom * 1000);
     const endDate = new Date(validTo * 1000);
     const differenceInTime = endDate - startDate;
-    const millisecondsInYear = 1000 * 60 * 60 * 24 * 365.25; 
+    const millisecondsInYear = 1000 * 60 * 60 * 24 * 365.25;
     const years = (differenceInTime / millisecondsInYear).toFixed(2);
     if (parseFloat(years) === 1) {
       return "a year";
+    }
+    if (parseFloat(years) < 1) {
+      return Math.floor(parseFloat(years) * 12) + " months";
     }
 
     return parseFloat(years) + " years";
   };
 
+  // find ASN
+  const findAsn = (ip) => {
+    return allData.meta.processors.asn.data.find((item) => item.ip === ip);
+  };
+
+  // format the size
+  const formatSize = (sizeInBytes) => {
+    const sizeInKb = sizeInBytes / 1024;
+
+    if (sizeInKb < 1024) {
+      return `${sizeInKb.toFixed(2)} KB`; // If less than 1024 KB, it's KB
+    } else {
+      const sizeInMb = sizeInKb / 1024;
+      return `${sizeInMb.toFixed(2)} MB`; // If 1024 KB or more, it's MB
+    }
+  };
+  console.log(allData);
+
   return (
     <div className="flex justify-between w-full space-x-20 text-white lg:flex-1">
-      <div className="flex flex-col">
+      <div className="flex flex-col max-w-[1300px]">
         <div className="text-xl py-2 font-bold ">Summary</div>
-        <div className="border-2 p-3 w-full rounded-sm border-zinc-700/60">
+        <div className="border-2 p-3 max-w-[1300px] rounded-sm border-zinc-700/60">
           <div className="pb-2 border-b-2 border-zinc-700/60">
             This website contacted{" "}
             <span className="font-bold">
@@ -198,13 +231,24 @@ const Summary = ({ data, allData }) => {
             . The main domain is
             <span className="text-green-500"> {allData.page.domain}</span>.
             <div>
-              TLS certificate: Issued by {allData.lists.certificates[0].issuer} on {formatUnixTimestamp(allData.lists.certificates[0].validFrom)}.
-              Valid for: {calculateExpireYear(allData.lists.certificates[0].validFrom, allData.lists.certificates[0].validTo)}.
+              {allData.lists.certificates.length > 0 && (
+                <>
+                  TLS certificate: Issued by{" "}
+                  {allData.lists.certificates[0].issuer} on{" "}
+                  {formatUnixTimestamp(allData.lists.certificates[0].validFrom)}
+                  . Valid for:{" "}
+                  {calculateExpireYear(
+                    allData.lists.certificates[0].validFrom,
+                    allData.lists.certificates[0].validTo
+                  )}
+                  .
+                </>
+              )}
             </div>
           </div>
           <div className="pb-2 border-b-2 border-zinc-700/60">
-            <span className="text-green-500">{allData.page.domain}</span> scanned{" "}
-            <span className="font-bold">1 times</span> on asm
+            <span className="text-green-500">{allData.page.domain}</span>{" "}
+            scanned <span className="font-bold">1 times</span> on asm
           </div>
           {/* <div className="pb-2 border-b-2 border-zinc-700/60">
               <span className="font-bold">urlscan.io Verdict:</span> No
@@ -298,18 +342,18 @@ const Summary = ({ data, allData }) => {
           >
             Certs
           </div>
-          {/* <div
-              className={
-                option === "frame"
-                  ? "py-2 px-3 rounded-md bg-zinc-900 border border-zinc-700 font-bold cursor-pointer"
-                  : "py-2  px-3 rounded-md hover:border hover:border-zinc-700 hover:text-indigo-400 hover:bg-zinc-900 cursor-pointer"
-              }
-              onClick={() => {
-                handdleOption("frame");
-              }}
-            >
-              Frames
-            </div> */}
+          <div
+            className={
+              option === "frame"
+                ? "py-2 px-3 rounded-md bg-zinc-900 border border-zinc-700 font-bold cursor-pointer"
+                : "py-2  px-3 rounded-md hover:border hover:border-zinc-700 hover:text-indigo-400 hover:bg-zinc-900 cursor-pointer"
+            }
+            onClick={() => {
+              handdleOption("frame");
+            }}
+          >
+            Frames
+          </div>
         </div>
         {/*IP/ASNs */}
         {option === "ASNs" ? (
@@ -319,32 +363,30 @@ const Summary = ({ data, allData }) => {
                 <th className="text-left p-2">
                   <FontAwesomeIcon icon={faArrowRightArrowLeft} />
                 </th>
-                <th className="text-left p-2">IP Address</th>
-                <th className="text-left p-2">AS Autonomous System</th>
+                <th className="text-right p-2">IP Address</th>
+                <th className="text-left p-2">
+                  AS <span className="">Autonomous System</span>
+                </th>
               </tr>
             </thead>
             <tbody>
-              <tr className="border-b-2">
-                <td className="text-left p-2 font-bold">
-                  {data.services ? data.services.length : 0}
-                </td>
-                <td className="text-left p-2 text-green-500">{data.ip}</td>
-                <td className="text-left p-2">
-                  (
-                  <span className="text-green-500">
-                    {data.autonomous_system
-                      ? data.autonomous_system.bgp_prefix.map((item) => {
-                          return `"${item}"` + " ";
-                        })
-                      : ""}
-                  </span>{" "}
-                  (
-                  {data.autonomous_system
-                    ? data.autonomous_system.description
-                    : ""}
-                  ))
-                </td>
-              </tr>
+              {allData.stats.ipStats.map((item, index) => (
+                <tr className="border-b-2">
+                  <td className="text-left p-2 font-bold">
+                    {item.requests ? item.requests : 0}
+                  </td>
+                  <td className="text-right p-2 text-green-500">
+                    {item.ip} {""}
+                    <span
+                      class={`fi fi-${item.countries[0].toLowerCase()}`}
+                    ></span>
+                  </td>
+                  <td className="text-left p-2">
+                    <span className="text-green-500">{item.asn.asn} </span> (
+                    {item.asn.name})
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </div>
         ) : (
@@ -352,90 +394,39 @@ const Summary = ({ data, allData }) => {
         )}
         {/* IP detail */}
         {option === "detail" ? (
-          <div className="border-2 border-zinc-700 rounded-sm text-sm mt-2 mb-10 p-2">
-            <div className="font-bold px-6">
-              {data.services ? data.services.length : 0}{" "}
-              <FontAwesomeIcon icon={faArrowRightArrowLeft} /> {data.ip}(
-              {data.autonomous_system
-                ? data.autonomous_system.country_code
-                : ""}
-              ){" "}
-              {/* <span className="text-orange-500">
-                  4 redirects <FontAwesomeIcon icon={faShare} />
-                </span> */}
-            </div>
-            <div className="space-y-2">
-              <div className="px-6">
-                <div className="flex justify-between">
-                  <div className="px-4 text-green-500">{data.domain} </div>
-                  <div className="px-2 bg-gray-400 rounded-sm">
-                    Domain Lookup <FontAwesomeIcon icon={faCaretDown} />
+          <div className="block space-y-2">
+            {allData.stats.ipStats.map((item, index) => (
+              <div className="border-2 border-zinc-700 rounded-sm text-sm mt-2 p-2">
+                <div className="flex space-x-2">
+                  <span className="font-bold">
+                    {item.requests}{" "}
+                    <FontAwesomeIcon icon={faArrowRightArrowLeft} />
+                  </span>
+                  <span
+                    class={`fi fi-${item.countries[0].toLowerCase()}`}
+                  ></span>
+                  <div>{item.ip}</div>
+                  <div>
+                    ({item.geoip.city || "N/A"} - {item.geoip.country_name})
                   </div>
                 </div>
-                <div className="px-4 mt-2">
-                  <div className="flex justify-around">
-                    <div className="flex space-x-5">
-                      <div className="text-green-500">Resolver:</div>
-                      <div className="font-semibold">
-                        {data.dns
-                          ? data.dns.resolver.map((item) => <div>{item}</div>)
-                          : ""}
-                      </div>
-                    </div>
-                    <div className="">
-                      <div className="text-green-500 uppercase">
-                        soa Record for {data.dns ? data.dns.soa[0].name : ""}
-                      </div>
-                      <div className="font-semibold">
-                        <div className="flex space-x-4">
-                          <div className="flex-col">
-                            <div>name:</div>
-                            <div>ns:</div>
-                            <div>mailbox:</div>
-                            <div>serial:</div>
-                            <div>refresh:</div>
-                            <div>retry:</div>
-                            <div>expire:</div>
-                            <div>minttl:</div>
-                          </div>
-                          <div className="flex-col">
-                            {}
-                            <div>{data.dns ? data.dns.soa[0].name : ""}</div>
-                            <div>{data.dns ? data.dns.soa[0].ns : ""}</div>
-                            <div>
-                              {data.dns
-                                ? data.dns.soa[0].mailbox.replace(".", "@")
-                                : ""}
-                            </div>
-                            <div>
-                              {data.dns
-                                ? formatSerialDate(data.dns.soa[0].serial)
-                                : ""}
-                            </div>
-                            <div>
-                              {data.dns ? data.dns.soa[0].refresh / 3600 : ""}{" "}
-                              hours
-                            </div>
-                            <div>
-                              {data.dns ? data.dns.soa[0].retry / 3600 : ""}{" "}
-                              hours
-                            </div>
-                            <div>
-                              {data.dns ? data.dns.soa[0].expire / 86400 : ""}{" "}
-                              hours
-                            </div>
-                            <div>
-                              {data.dns ? data.dns.soa[0].minttl / 3600 : ""}{" "}
-                              hours
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                <div>
+                  <span className="text-green-500">ASN{item.asn.asn}</span>(
+                  {item.asn.description})
                 </div>
+                {item.rdns ? (
+                  <>
+                    <div>
+                      PTR:{" "}
+                      <span className="text-green-500">{item.rdns.ptr}</span>
+                    </div>
+                  </>
+                ) : (
+                  <></>
+                )}
+                <div className="text-green-500">{item.domains[0]}</div>
               </div>
-            </div>
+            ))}
           </div>
         ) : (
           ""
@@ -452,38 +443,36 @@ const Summary = ({ data, allData }) => {
                     <FontAwesomeIcon icon={faArrowRightArrowLeft} />
                   </th>
                   <th className="text-left px-2">Subdomains</th>
-                  {/* <th className="text-left px-2">Transfer</th> */}
+                  <th className="text-right px-2">Transfer</th>
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td className="text-right font-bold px-2 align-top">
-                    {subDomain.results.length}
-                  </td>
-                  <td className="text-left text-green-500 px-2 ">
-                    <span>{getDomain(data.domain)}</span>
-                    {displayedItems.map((item, index) => (
-                      <div>
-                        <a
-                          key={index}
-                          href={`http://${item}`}
-                          target="_blank"
-                          className="ml-4 text-gray-500 cursor-pointer hover:text-green-500"
-                        >
-                          {item}
-                        </a>
-                      </div>
-                    ))}
-                    {subDomain.results.length > 10 && (
-                      <button
-                        className="ml-4 text-blue-500"
-                        onClick={() => setShowMore(!showMore)}
-                      >
-                        {showMore ? "Show Less" : "Show More"}
-                      </button>
-                    )}
-                  </td>
-                </tr>
+                {allData.stats.domainStats.map((item, index) => (
+                  <tr>
+                    <td className="text-right font-bold px-2 align-top">
+                      {item.count}
+                    </td>
+                    <td className="text-left text-green-500 px-2 ">
+                      <span>{item.domain}</span>
+                      {item.initiators.map((domain, index) => (
+                        <div className="flex space-x-2">
+                          <span
+                            className={`fi fi-${item.countries[0].toLowerCase()}`}
+                          ></span>
+                          <a
+                            key={index}
+                            href={`http://${domain}`}
+                            target="_blank"
+                            className="ml-4 text-gray-500 cursor-pointer hover:text-green-500"
+                          >
+                            {domain}
+                          </a>
+                        </div>
+                      ))}
+                    </td>
+                    <td className="text-right px-2">{formatSize(item.size)}</td>
+                  </tr>
+                ))}
               </tbody>
             </div>
           </div>
@@ -505,24 +494,18 @@ const Summary = ({ data, allData }) => {
                 </tr>
               </thead>
               <tbody className="">
-                {displayedItems.map((item, index) => (
+                {allData.stats.domainStats.map((item, index) => (
                   <tr key={index}>
-                    <td className="text-right font-bold px-2">{index + 1}</td>
-                    <td className="text-left text-green-500 px-2">{item}</td>
+                    <td className="text-right font-bold px-2">{item.count}</td>
+                    <td className="text-left text-green-500 px-2">
+                      {item.domain}
+                    </td>
                     <td className="text-left px-2 text-gray-500">
-                      {data.domain}
+                      {item.initiators[0]}
                     </td>
                   </tr>
                 ))}
               </tbody>
-              {subDomain.results.length > 10 && (
-                <button
-                  className="mt-2 ml-4 text-blue-500"
-                  onClick={() => setShowMore(!showMore)} // Toggle showMore state
-                >
-                  {showMore ? "Show Less" : "Show More"}
-                </button>
-              )}
             </div>
           </div>
         ) : (
@@ -544,7 +527,7 @@ const Summary = ({ data, allData }) => {
                 Domain
                 <br />
                 <span className="text-green-500 hover:underline cursor-pointer">
-                  {data.domain}
+                  {allData.lists.linkDomains[0]}
                 </span>
               </div>
             </div>
@@ -556,7 +539,38 @@ const Summary = ({ data, allData }) => {
         {/* Certs */}
         {option === "cert" ? (
           <>
-            {Object.keys(data.ssl).length !== 0 ? (
+            <div className="border-2 border-zinc-700 rounded-sm text-sm mt-2 mb-10 p-2">
+              <div className="table-auto text-sm">
+                <thead>
+                  <tr>
+                    <th className="text-left px-2">
+                      Subject <span className="text-gray-400">Issuer</span>
+                    </th>
+                    <th className="text-left px-2">Validity</th>
+                    <th className="text-left px-2">Valid</th>
+                  </tr>
+                </thead>
+                <tbody className="">
+                  {allData.lists.certificates.map((item, index) => (
+                    <tr key={index}>
+                      <td className="text-left font-bold px-2">
+                        {item.subjectName}-{" "}
+                        <span className="text-gray-400">{item.issuer}</span>
+                      </td>
+                      <td className="text-left text-green-500 px-2">
+                        {formatTimestampForCert(item.validFrom)} -{" "}
+                        {formatTimestampForCert(item.validTo)}
+                      </td>
+                      <td className="text-left px-2 text-gray-500">
+                        {calculateExpireYear(item.validFrom, item.validTo)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </div>
+            </div>
+
+            {/* {Object.keys(data.ssl).length !== 0 ? (
               <>
                 {" "}
                 <div className=" border-2 border-zinc-700 rounded-sm text-sm mt-2 mb-10 p-4">
@@ -652,7 +666,7 @@ const Summary = ({ data, allData }) => {
                   </div>
                 </div>
               </>
-            )}
+            )} */}
           </>
         ) : (
           ""
@@ -665,14 +679,14 @@ const Summary = ({ data, allData }) => {
               <div className="px-1 border-2 border-zinc-700 mt-3 rounded-md">
                 <div>
                   <span className="font-bold">Primary Page:</span> https://
-                  <span className="text-green-500">{data.domain}/</span>
+                  <span className="text-green-500">{allData.page.domain}/</span>
                 </div>
                 <div className="text-gray-400">
-                  Frame ID: F3A268DA933FB0DC32E22C13DAE9DE05
+                  Frame ID: {allData.data.requests[0].request.frameId}
                 </div>
                 <div>
                   <span className="font-bold">Requests:</span>{" "}
-                  {data.services.length} HTTP requests in this frame
+                  {allData.data.requests.length} HTTP requests in this frame
                 </div>
               </div>
             </div>
@@ -682,7 +696,7 @@ const Summary = ({ data, allData }) => {
         )}
       </div>
 
-      <div className="flex-col w-[800px]">
+      <div className="flex-col max-w-xl">
         <div className="flex py-2 justify-between space-x-28">
           <div className="text-xl font-bold">Screenshot</div>
           {/* <div className="flex space-x-2">
@@ -700,7 +714,7 @@ const Summary = ({ data, allData }) => {
         </div>
         <img
           className="rounded-sm w-full h-[250px]"
-          src={`https://mini.s-shot.ru/1920x1080/JPEG/1024/Z100/?https://${data.domain}/`}
+          src={`https://mini.s-shot.ru/1920x1080/JPEG/1024/Z100/?https://${allData.page.domain}/`}
           alt="screenshot"
         />
         <div className="mt-4 min-w-96 space-y-4">
@@ -718,16 +732,11 @@ const Summary = ({ data, allData }) => {
           <div className="flex flex-row">
             <div>1.</div>
             <div>
-              {/* <div>
-                  https://
-                  <span className="text-green-500">
-                    gizdemo.civiservice.de/
-                  </span>{" "}
-                  <span className="px-1 rounded-sm bg-orange-400">HTTP 301</span>
-                </div> */}
               <div>
                 https://
-                <span className="text-green-500">{data.domain}/</span>{" "}
+                <span className="text-green-500">
+                  {allData.page.domain}/
+                </span>{" "}
                 <span className="px-1 rounded-md bg-indigo-500 cursor-pointer">
                   Page URL
                 </span>
@@ -735,26 +744,24 @@ const Summary = ({ data, allData }) => {
             </div>
           </div>
           <div className="font-bold text-xl">Detected technologies</div>
-          {data.technology ? (
+          {allData.meta.processors.wappa ? (
             <>
-              {data.technology.map((item, index) => (
+              {allData.meta.processors.wappa.data.map((item, index) => (
                 <React.Fragment key={index}>
                   <div className="border-b-2 pb-2">
                     <div className="flex justify-between">
                       <div className="flex space-x-3">
                         <img
-                          src={`${
-                            getTechInfo(item.subtech[0].technology).icon
-                          }`}
+                          src={`${getTechInfo(item.app).icon}`}
                           width={20}
                           height={20}
                           alt="Updating"
                           className="rounded-full"
                         />
                         <div className="text-green-500">
-                          {item.subtech[0].technology}{" "}
+                          {item.app}{" "}
                           <span className="text-gray-500">
-                            ({item.categories})
+                            ({item.categories[0].name})
                           </span>
                         </div>
                       </div>
@@ -770,13 +777,15 @@ const Summary = ({ data, allData }) => {
                     {expandTech.includes(index) && (
                       <div className="text-md text-gray-400">
                         <div>
-                          <span className="font-bold">Version:</span>{" "}
-                          {item.subtech[0].version}
+                          <span className="font-bold">Overall confidence:</span>{" "}
+                          {item.confidenceTotal}%
                         </div>
-                        <div className="font-bold">Discription:</div>
-                        <li className="ml-4 max-w-sm">
-                          {getTechInfo(item.subtech[0].technology).description}
-                        </li>
+                        <div className="font-bold">Detected patterns:</div>
+                        {item.confidence.map((confidence, index) => (
+                          <li className="ml-4 max-w-sm">
+                            {confidence.pattern}
+                          </li>
+                        ))}
                       </div>
                     )}
                   </div>
@@ -790,51 +799,42 @@ const Summary = ({ data, allData }) => {
           <div className="flex justify-around">
             <div className="flex flex-col text-center">
               <div className="text-2xl text-blue-500">
-                {data.services ? data.services.length : 0}
+                {allData.data.requests.length}
               </div>
               <div className="text-lg text-gray-400">Requests</div>
               <div className="text-2xl text-blue-500">
-                {data.autonomous_system
-                  ? data.autonomous_system.bgp_prefix.length
-                  : 0}
+                {allData.stats.ipStats ? allData.stats.ipStats.length : 0}
               </div>
-              <div className="text-lg text-gray-400">Prefix</div>
+              <div className="text-lg text-gray-400">IPs</div>
             </div>
             <div className="flex flex-col text-center">
               <div className="text-2xl text-blue-500">
-                {data.services ? data.services.length : 0}
+                {allData.stats.securePercentage}%
               </div>
-              <div className="text-lg text-gray-400">ASSETS</div>
-              <div className="text-2xl text-blue-500">1</div>
+              <div className="text-lg text-gray-400">HTTPS</div>
+              <div className="text-2xl text-blue-500">
+                {allData.stats.uniqCountries ? allData.stats.uniqCountries : 0}
+              </div>
               <div className="text-lg text-gray-400">Countries</div>
             </div>
             <div className="flex flex-col text-center">
               <div className="text-2xl text-blue-500">
-                {data.dns ? data.dns.resolver.length : 0}
+                {allData.stats.IPv6Percentage
+                  ? allData.stats.IPv6Percentage + "%"
+                  : 0}
               </div>
-              <div className="text-lg text-gray-400">DNS</div>
+              <div className="text-lg text-gray-400">IPv6</div>
               <div className="text-2xl text-blue-500">
-                <div className="relative flex space-x-5">
-                  {data.is_online ? (
-                    <>
-                      <span className="absolute top-3.5 flex h-3 w-3 z-20">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-700 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-3 w-3 bg-green-400/70"></span>
-                      </span>
-                      <div>On</div>
-                    </>
-                  ) : (
-                    <>
-                      <span className="absolute top-3.5 flex h-3 w-3 z-20">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-700 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-3 w-3 bg-red-400/70"></span>
-                      </span>
-                      <div>Down</div>
-                    </>
-                  )}
-                </div>
+                {allData.stats.tlsStats
+                  ? formatSize(allData.stats.tlsStats[0].size).split(" ")[0]
+                  : 0}
+                <span className="text-base text-gray-400">
+                  {allData.stats.tlsStats
+                    ? formatSize(allData.stats.tlsStats[0].size).split(" ")[1]
+                    : ""}
+                </span>
               </div>
-              <div className="text-lg text-gray-400">Status</div>
+              <div className="text-lg text-gray-400">Transfer</div>
             </div>
             <div className="flex flex-col text-center">
               <div className="text-2xl text-blue-500">
