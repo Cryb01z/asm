@@ -93,13 +93,11 @@ const Vulner = ({ domain, port }) => {
       if (sortedFiltered.length > 0) {
         setFilteredVulnerabilities(sortedFiltered);
         setTotalPages(Math.ceil(sortedFiltered.length / itemsPerPage));
+        setloading(false);
         // console.log("filtered and sorted");
       }
-      setloading(false);
     } catch (error) {
       console.log(error);
-    } finally {
-      setloading(false);
     }
   }, [data, searchTerm, currentPage, sortConfig]);
 
@@ -238,6 +236,8 @@ const Vulner = ({ domain, port }) => {
     currentPage * itemsPerPage
   );
   // console.log("dasdasd", displayVulnerabilities);
+  console.log("domain", domain);
+  console.log("port", port);
 
   return (
     <div className="bg-black min-h-96 mt-4">

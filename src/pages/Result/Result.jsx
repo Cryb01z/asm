@@ -530,7 +530,7 @@ const Result = () => {
               {options === "Links" && <Links allData={allData} />}
               {options === "Behaviour" && <Behaviour allData={allData} />}
               {options === "vulner" && (
-                <Vulner domain={data.results.domain} port={port} />
+                <Vulner domain={domain} port={port} />
               )}
             </main>
           </div>

@@ -714,7 +714,7 @@ const Summary = ({ data, allData }) => {
         </div>
         <img
           className="rounded-sm w-full h-[250px]"
-          src={`https://mini.s-shot.ru/1920x1080/JPEG/1024/Z100/?https://${allData.page.domain}/`}
+          src={`https://mini.s-shot.ru/1920x1080/JPEG/1024/Z100/?${allData.task.url}`}
           alt="screenshot"
         />
         <div className="mt-4 min-w-96 space-y-4">

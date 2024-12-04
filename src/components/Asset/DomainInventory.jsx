@@ -143,12 +143,12 @@ const DomainInventory = () => {
     };
     fetchApi();
   }, [domain]);
-  console.log(data);
+
 
   const displayTech = data.status
     ? data.results.filter((item) => item.technology !== null)
     : [];
-  console.log(displayTech);
+ 
 
   //get domain
   const getDomain = (domain) => {
