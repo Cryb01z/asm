@@ -95,6 +95,7 @@ const DomainCVEDetail = ({ cveDetails, setCveDetails }) => {
   const closeModal = () => {
     setCveDetails({
       status: false,
+      action:"",
       domain: "",
       id: "",
     });

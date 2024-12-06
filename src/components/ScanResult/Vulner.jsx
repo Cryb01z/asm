@@ -16,10 +16,12 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Bounce, ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import DomainCVEDetail from "../CVE/DomainCVEDetail";
+import ExploitedModal from "../CVE/ExploitedModal";
 
 const Vulner = ({ domain, port }) => {
   const itemsPerPage = 10;
   const navigate = useNavigate();
+  const [modal, setmodal] = useState(false); //Exploited Modal
   const [loading, setloading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -27,8 +29,11 @@ const Vulner = ({ domain, port }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [cveDetails, setCveDetails] = useState({
     status: false,
+    action: "",
     domain: "",
     id: "",
+    flag: false,
+    vt_name: "",
   });
   const [sortConfig, setSortConfig] = useState({
     key: null,
@@ -81,7 +86,7 @@ const Vulner = ({ domain, port }) => {
     };
 
     fetchCVE();
-  }, [domain]);
+  }, [domain, cveDetails.flag]);
 
   //filter and sort vulnerabilities render
   useEffect(() => {
@@ -125,7 +130,7 @@ const Vulner = ({ domain, port }) => {
     let filtered = data.vulnerabilities;
     if (searchTerm) {
       filtered = filtered.filter((item) =>
-        getCVEName(item.tags).toLowerCase().includes(searchTerm.toLowerCase())
+        item.vt_name.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
     return filtered;
@@ -212,11 +217,25 @@ const Vulner = ({ domain, port }) => {
   };
 
   //handle cve detail
-  const handleCVEDetail = async (domain, cveId) => {
+  const handleCVEDetail = async (domain, cveId, action, vt_name) => {
     if (cveDetails.id === cveId && cveDetails.domain === domain) {
-      setCveDetails({ status: false, domain: "", id: "" });
+      setCveDetails({
+        status: false,
+        action: "",
+        domain: "",
+        id: "",
+        flag: false,
+        vt_name: "",
+      });
     } else {
-      setCveDetails({ status: true, domain: domain, id: cveId });
+      setCveDetails({
+        status: true,
+        action: action,
+        domain: domain,
+        id: cveId,
+        flag: false,
+        vt_name: vt_name,
+      });
     }
   };
   console.log(cveDetails);
@@ -256,7 +275,7 @@ const Vulner = ({ domain, port }) => {
       </div>
       <div
         className={`flex justify-between ${
-          cveDetails.status ? "space-x-5" : ""
+          cveDetails.status && cveDetails.action === "detail" ? "space-x-5" : ""
         }`}
       >
         <div className="flex-col col-span-full xl:col-span-8 max-h-min bg-zinc-900 w-full shadow-lg rounded-sm border border-zinc-700/60">
@@ -270,6 +289,12 @@ const Vulner = ({ domain, port }) => {
               )}
             </h2>
           </header>
+          {cveDetails.status && cveDetails.action === "delete" && (
+            <ExploitedModal
+              cveDetails={cveDetails}
+              setCveDetails={setCveDetails}
+            />
+          )}
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
@@ -309,9 +334,9 @@ const Vulner = ({ domain, port }) => {
                       Assets-Incidents
                     </div>
                   </th>
-                  {/* <th className="p-2">
-                  <div className="font-semibold text-center">Actions</div>
-                </th> */}
+                  <th className="p-2">
+                    <div className="font-semibold text-center">Actions</div>
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -343,13 +368,15 @@ const Vulner = ({ domain, port }) => {
                             onClick={() => {
                               handleCVEDetail(
                                 getDomain(cve.affects_url, cve.port),
-                                cve.vuln_id
+                                cve.vuln_id,
+                                "detail",
+                                cve.vt_name
                               );
                             }}
                           >
                             <input type="checkbox" className="mr-5" />{" "}
                             <span className="text-blue-500 cursor-pointer">
-                              {getCVEName(cve.tags)}
+                              {cve.vt_name}
                             </span>
                           </div>
                         </td>
@@ -390,17 +417,22 @@ const Vulner = ({ domain, port }) => {
                           View Assets{" "}
                           <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
                         </td>
-                        {/* <td className="p-2 flex justify-center items-center space-x-3 text-center cursor-pointer">
-                        <div className="text-blue-600 hover:text-blue-800">
-                          <FontAwesomeIcon icon={faSquareCheck} />
-                        </div>
-                        <div
-                          className="text-red-500 hover:text-red-800"
-                          onClick={() => setmodal(true)}
-                        >
-                          <FontAwesomeIcon icon={faTrash} />
-                        </div>
-                      </td> */}
+                        <td className="p-2 flex justify-center items-center space-x-3 text-center cursor-pointer">
+                          <div
+                            className="text-red-500 hover:text-red-800"
+                            onClick={() => {
+                              handleCVEDetail(
+                                getDomain(cve.affects_url, cve.port),
+                                cve.vuln_id,
+                                "delete",
+                                cve.vt_name
+                              );
+                              setmodal(true);
+                            }}
+                          >
+                            <FontAwesomeIcon icon={faTrash} />
+                          </div>
+                        </td>
                       </tr>
                     ))}
                   </>
@@ -490,7 +522,7 @@ const Vulner = ({ domain, port }) => {
           </div>
         </div>
         <div className="flex-col">
-          {cveDetails.status && (
+          {cveDetails.status && cveDetails.action === "detail" && (
             <DomainCVEDetail
               cveDetails={cveDetails}
               setCveDetails={setCveDetails}

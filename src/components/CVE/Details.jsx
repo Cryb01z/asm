@@ -15,16 +15,19 @@ const Details = ({ references, config }) => {
   }, [references]);
   console.log(reference);
   console.log(references);
+  console.log(config);
 
   const getRefIcon = (url) => {
     if (url.includes("vuldb.com")) {
       return "/icon/vuldb.png";
     } else if (url.includes("github.com")) {
       return "/icon/github.png";
-    } else if (url.includes("x.com")){
+    } else if (url.includes("x.com")) {
       return "/icon/twitter.png";
-    } else if (url.includes("dlink.com")){
-      return "/icon/dlink.png";      
+    } else if (url.includes("dlink.com")) {
+      return "/icon/dlink.png";
+    } else if (url.includes("splunk")){
+      return "/icon/splunk.png";
     }
     return "/icon/info.svg";
   };
@@ -34,42 +37,39 @@ const Details = ({ references, config }) => {
       <div className="flex space-x-10 justify-between">
         <div className="w-full hover:bg-zinc-900 border border-zinc-700 rounded-sm ">
           <div className="p-2 text-white font-semibold">
-            <FontAwesomeIcon icon={faMicrochip} /> Affected Software
+            <FontAwesomeIcon icon={faMicrochip} /> Configuration
           </div>
           <div className="border-t-2 border-zinc-700"></div>
-          <div className="p-2">
-            <div className="py-2 font-bold text-white">Configuration 1</div>
-            <table className="w-full text-white">
-              <thead>
-                <tr>
-                  <td className="text-left px-2">Type</td>
-                  <td className="text-left px-2">Vendor</td>
-                  <td className="text-left px-2">Products</td>
-                  <td className="text-left px-2">Action</td>
-                </tr>
-              </thead>
-            </table>
-          </div>
-          {config === null ? (
+          {config !== null ? (
             <>
-              <div className="border-t-2 border-zinc-700"></div>
+              {config[0].nodes.map((node, index) => (
+                <div className="p-2">
+                  <div className="py-2 font-bold text-white">
+                    Nodes {index + 1}
+                  </div>
+                  <table className="w-full text-white">
+                    <thead>
+                      <tr className="border-b-2 border-zinc-700">
+                        <th className="text-left px-2">Operator</th>
+                        <th className="text-left px-2">Negate</th>
+                        <th className="text-left px-2">CPEMatch</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr className="border-b-2 border-zinc-700">
+                        <td className="text-left px-2">{node.operator}</td>
+                        <td className="text-left px-2">{node.negate ? "True":"False"}</td>
+                        <td className="text-left px-2">{node.cpeMatch.map((item) => (
+                          <div className="text-left px-2">{item.criteria}</div>
+                        ))}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              ))}
             </>
           ) : (
-            <>
-              <tr className="border-t-2 border-zinc-700"></tr>
-              <div className="p-2">
-                <div className="flex text-sm">
-                  <div className="text-left w-20">App</div>
-                  <div className="text-left w-20">Apache</div>
-                  <div className="text-left w-36">Http Server</div>
-                  <div className="text-left w-24">
-                    <span className="p-1 text-black bg-white hover:bg-white/80 rounded-sm cursor-pointer ">
-                      Show Cpe List
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </>
+            <></>
           )}
         </div>
         <div className="w-full rounded-sm border-2 hover:bg-zinc-900 border-zinc-700 overflow-y-scroll scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-black">
@@ -101,7 +101,7 @@ const Details = ({ references, config }) => {
                   <a
                     href={ref.url}
                     target="_blank"
-                    className="p-2 text-left break-all hover:text-blue-500 cursor-pointer "
+                    className="p-2 text-left text-pretty break-words overflow-hidden hover:text-blue-500 cursor-pointer "
                   >
                     {ref.url}
                   </a>

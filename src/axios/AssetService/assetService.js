@@ -1,12 +1,12 @@
 import axios from "axios";
-
+const toolApi = "https://tools.caasm.tech";
 const getDomainInfo = async (domain) => {
-  return await axios.get(`https://tools.caasm.tech/info/${domain}`);
+  return await axios.get(`${toolApi}/info/${domain}`);
 };
 
 const getSubDomainInfo = async (domain) => {
   return await axios.get(
-    `https://tools.caasm.tech/result/domain/all?domain=${domain}`
+    `${toolApi}/result/domain/all?domain=${domain}`
   );
 };
 

@@ -18,6 +18,7 @@ import POC from "./POC";
 import Navbar from "../Navbar/Navbar";
 import { faGithub } from "@fortawesome/free-brands-svg-icons";
 import Repos from "./Repos";
+import CVEHistory from "./CVEHistory";
 const CVEDetail = () => {
   const [option, setoption] = useState("cvss");
   const [cvss, setcvss] = useState(3);
@@ -107,6 +108,22 @@ const CVEDetail = () => {
       },
     ],
     configurations: null,
+    changes: [
+      {
+        cveChangeId: "",
+        eventName: "",
+        created: "",
+        details: [
+          {
+            action: "",
+            type: "",
+            oldValue: null,
+            newValue:
+              "",
+          },
+        ],
+      },
+    ],
   });
 
   useEffect(() => {
@@ -290,7 +307,7 @@ const CVEDetail = () => {
               <div className="w-full max-w-screen-xl border border-zinc-700 bg-black hover:bg-zinc-900 rounded-sm p-2">
                 <div className="text-xl font-bold text-white">Description</div>
                 <div className="flex p-2 justify-between relative">
-                  <div className="break-all w-full pr-20">
+                  <div className="break-words text-pretty overflow-hidden w-full pr-20">
                     {data.descriptions[0].value}
                   </div>
                   <div className="align-middle">
@@ -599,6 +616,10 @@ const CVEDetail = () => {
 
                 {/* Repos */}
                 {option === "repos" && <Repos />}
+              </div>
+              <div className="bg-black border border-zinc-700  p-2 pb-4">
+                <div className="text-xl text-white font-bold">History</div>
+                <CVEHistory change={data.changes} />
               </div>
             </div>
             <div className="flex-col space-y-5">

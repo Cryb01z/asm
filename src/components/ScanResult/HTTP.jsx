@@ -58,7 +58,7 @@ const HTTP = ({ data, allData }) => {
       setexpandHeader([]);
     } else {
       // Expand all
-      const allIndexes = data.services.map((_, index) => index);
+      const allIndexes = allData.data.requests.map((_, index) => index);
       console.log(allIndexes);
       setExpandedRows(allIndexes);
       setexpandHeader(allIndexes);
@@ -107,7 +107,9 @@ const HTTP = ({ data, allData }) => {
         </div>
         <div className="flex space-x-0.5 text-sm">
           <div
-            className="border-2 border-zinc-700 rounded-md px-1 bg-indigo-500 cursor-pointer"
+            className={`border-2 border-zinc-700 rounded-md px-1  cursor-pointer ${
+              filter === "all" ? "bg-indigo-500" : ""
+            }`}
             onClick={() => {
               setfilter("all");
             }}
@@ -115,7 +117,9 @@ const HTTP = ({ data, allData }) => {
             <FontAwesomeIcon icon={faFile} /> Everything
           </div>
           <div
-            className="border-2 border-zinc-700 rounded-md px-1 bg-black cursor-pointer"
+            className={`border-2 border-zinc-700 rounded-md px-1  cursor-pointer ${
+              filter === "Document" ? "bg-indigo-500" : ""
+            }`}
             onClick={() => {
               setfilter("Document");
             }}
@@ -123,7 +127,9 @@ const HTTP = ({ data, allData }) => {
             <FontAwesomeIcon icon={faFile} /> HTML
           </div>
           <div
-            className="border-2 border-zinc-700 rounded-md px-1 bg-black cursor-pointer"
+           className={`border-2 border-zinc-700 rounded-md px-1  cursor-pointer ${
+            filter === "Script" ? "bg-indigo-500" : ""
+          }`}
             onClick={() => {
               setfilter("Script");
             }}
@@ -134,7 +140,9 @@ const HTTP = ({ data, allData }) => {
             <FontAwesomeIcon icon={faFile} /> AJAX
           </div> */}
           <div
-            className="border-2 border-zinc-700 rounded-md px-1 bg-black cursor-pointer"
+            className={`border-2 border-zinc-700 rounded-md px-1  cursor-pointer ${
+              filter === "Stylesheet" ? "bg-indigo-500" : ""
+            }`}
             onClick={() => {
               setfilter("Stylesheet");
             }}
@@ -142,7 +150,9 @@ const HTTP = ({ data, allData }) => {
             <FontAwesomeIcon icon={faFile} /> CSS
           </div>
           <div
-            className="border-2 border-zinc-700 rounded-md px-1 bg-black cursor-pointer"
+            className={`border-2 border-zinc-700 rounded-md px-1  cursor-pointer ${
+              filter === "Image" ? "bg-indigo-500" : ""
+            }`}
             onClick={() => {
               setfilter("Image");
             }}

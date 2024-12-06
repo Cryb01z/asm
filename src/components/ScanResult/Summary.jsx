@@ -714,7 +714,11 @@ const Summary = ({ data, allData }) => {
         </div>
         <img
           className="rounded-sm w-full h-[250px]"
-          src={`https://mini.s-shot.ru/1920x1080/JPEG/1024/Z100/?${allData.task.url}`}
+          src={`https://mini.s-shot.ru/1920x1080/JPEG/1024/Z100/?${
+            allData.task.url.includes("http://fa24asm.tech/")
+              ? "https://fa24asm.tech/"
+              : allData.task.url
+          }`}
           alt="screenshot"
         />
         <div className="mt-4 min-w-96 space-y-4">

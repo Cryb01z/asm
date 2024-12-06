@@ -14,7 +14,11 @@ import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Bounce, ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { getScanInfo, scanDomain } from "../../axios/ScanService/scanService";
+import {
+  getScanInfo,
+  reScanDomain,
+  scanDomain,
+} from "../../axios/ScanService/scanService";
 import Navbar from "../../components/Navbar/Navbar";
 import AllResult from "../../components/Scan/AllResult";
 import useAuthStore from "../../store/useAuthStore";
@@ -22,13 +26,6 @@ import ExportPDF from "../../components/ExportPDF/ExportPDF";
 const Scan = () => {
   const [option, setoption] = useState("scan");
   const [scanModal, setscanModal] = useState(false);
-  const totalScan = useRef({
-    totalScan: 0,
-    runningScan: 0,
-    completedScan: 0,
-    scheduledScan: 0,
-    failedScan: 0,
-  });
   const modalRef = useRef(null);
   const navigate = useNavigate();
   const [loading, setloading] = useState(false);
@@ -147,10 +144,9 @@ const Scan = () => {
     },
   });
   const flag = useRef(false);
-
+  const domain = localStorage.getItem("domain");
   useEffect(() => {
     const fetchData = async () => {
-      const domain = localStorage.getItem("domain");
       if (domain) {
         try {
           const response = await getScanInfo(domain);
@@ -166,7 +162,7 @@ const Scan = () => {
       }
     };
     fetchData();
-  });
+  }, [domain]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -188,6 +184,59 @@ const Scan = () => {
       return response;
     } catch (error) {
       throw new Error("Failed to trigger scan");
+    }
+  };
+
+  //call rescan api
+  const handleReScan = async () => {
+    // console.log("clicked");
+    setloading(false);
+    let toastId = null;
+    toastId = toast.loading("Rescanning ...", {
+      position: "top-right",
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "dark",
+      transition: Bounce,
+    });
+    const domain = localStorage.getItem("domain") || "";
+    if (domain) {
+      try {
+        const response = await reScanDomain(domain);
+        console.log(response);
+        if (response.status === 200) {
+          toast.update(toastId, {
+            render: "Recan completed!",
+            type: "success",
+            autoClose: 5000,
+            isLoading: false,
+            position: "top-right",
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+            transition: Bounce,
+          });
+          setloading(true);
+        }
+      } catch (error) {
+        toast.error("Rescan fail!", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+          transition: Bounce,
+        });
+      }
     }
   };
 
@@ -380,9 +429,6 @@ const Scan = () => {
               console.log(scanInfoResponse);
               setdata(scanInfoResponse.data);
               localStorage.setItem("domain", domain);
-              totalScan.current.totalScan = totalScan.current.totalScan + 1;
-              totalScan.current.completedScan =
-                totalScan.current.completedScan + 1;
               setloading(true);
             } catch (error) {
               console.error("Scan fetching error:", error);
@@ -590,7 +636,8 @@ const Scan = () => {
                                 data-modal-hide="popup-modal"
                                 type="button"
                                 className="text-black w-20 font-semibold text-center bg-white hover:bg-white/80 focus:ring-4 focus:outline-none rounded-lg text-sm items-center px-5 py-2.5"
-                                onClick={() => {
+                                onClick={(e) => {
+                                  e.preventDefault();
                                   handleScan();
                                   handleModal();
                                 }}
@@ -685,7 +732,7 @@ const Scan = () => {
                       <div
                         className="flex items-center justify-center px-4 border-2 border-zinc-700/60 rounded-md hover:bg-zinc-900 hover:border-zinc-700"
                         onClick={() => {
-                          setcheck(true);
+                          handleReScan();
                         }}
                       >
                         <FontAwesomeIcon icon={faRotate} />

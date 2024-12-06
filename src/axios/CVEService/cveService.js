@@ -1,5 +1,6 @@
 import axios from "axios";
 import { axiosClient } from "../AxiosClient";
+const toolApi = "https://tools.caasm.tech";
 const getCVE = async (cveId) => {
   return await axiosClient.get(`/Cves/${cveId}`);
 };
@@ -22,23 +23,23 @@ const getTotalCVE = async () => {
 const getCVEDetail = async (domain, cveId) => {
   if (cveId) {
     return await axios.get(
-      `https://tools.caasm.tech/vulnerability/detail?target=${domain}&vuln_id=${cveId}`
+      `${toolApi}/vulnerability/detail?target=${domain}&vuln_id=${cveId}`
     );
   }
-  return await axios.get(
-    `https://tools.caasm.tech/vulnerability/detail?target=${domain}`
-  );
+  return await axios.get(`${toolApi}/vulnerability/detail?target=${domain}`);
 };
 
 const getCVEOfDomain = async (domain) => {
-  return await axios.get(
-    `https://tools.caasm.tech/vulnerability?target=${domain}`
-  );
+  return await axios.get(`${toolApi}/vulnerability?target=${domain}`);
 };
 
 const getDomainCVE = async (domain) => {
-  return await axios.get(
-    `https://tools.caasm.tech/result/domain/vuln/all?domain=${domain}`
+  return await axios.get(`${toolApi}/result/domain/vuln/all?domain=${domain}`);
+};
+
+const deleteDomainCVE = async (domain, id) => {
+  return await axios.delete(
+    `${toolApi}/vulnerability?target=${domain}&vuln_id=${id}`
   );
 };
 
@@ -49,4 +50,5 @@ export {
   getDomainCVE,
   getCVEDetail,
   getCVEOfDomain,
+  deleteDomainCVE,
 };

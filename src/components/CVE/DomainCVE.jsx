@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { act, useEffect, useState } from "react";
 import DoughnutChart from "../../charts/DoughnutChart";
 // Import utilities
 import {
@@ -32,8 +32,11 @@ const DomainCVE = () => {
   const [domain, setdomain] = useState([]); // domain that have vunlnerabilities
   const [cveDetails, setCveDetails] = useState({
     status: false,
+    action: "",
     domain: "",
     id: "",
+    flag: false,
+    vt_name: "",
   });
   const [sortConfig, setSortConfig] = useState({
     key: null,
@@ -142,7 +145,7 @@ const DomainCVE = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [cveDetails.flag]);
 
   //get the chart data
   useEffect(() => {
@@ -352,7 +355,7 @@ const DomainCVE = () => {
     }
     if (searchTerm) {
       filtered = filtered.filter((item) =>
-        getCVEName(item.tags).toLowerCase().includes(searchTerm.toLowerCase())
+        item.vt_name.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
     return filtered;
@@ -392,11 +395,25 @@ const DomainCVE = () => {
     : [];
 
   //handle cve detail
-  const handleCVEDetail = async (domain, cveId) => {
+  const handleCVEDetail = async (domain, cveId, action, vt_name) => {
     if (cveDetails.id === cveId && cveDetails.domain === domain) {
-      setCveDetails({ status: false, domain: "", id: "" });
+      setCveDetails({
+        status: false,
+        action: "",
+        domain: "",
+        id: "",
+        flag: false,
+        vt_name: "",
+      });
     } else {
-      setCveDetails({ status: true, domain: domain, id: cveId });
+      setCveDetails({
+        status: true,
+        action: action,
+        domain: domain,
+        id: cveId,
+        flag: false,
+        vt_name: vt_name,
+      });
     }
   };
   console.log(cveDetails);
@@ -607,10 +624,12 @@ const DomainCVE = () => {
           />
         </h2>
       </div>
-      {modal && <ExploitedModal modal={modal} setmodal={setmodal} />}
+      {cveDetails.status && cveDetails.action === "delete" && (
+        <ExploitedModal cveDetails={cveDetails} setCveDetails={setCveDetails} />
+      )}
       <div
         className={`flex justify-between ${
-          cveDetails.status ? "space-x-5" : ""
+          cveDetails.status && cveDetails.action === "detail" ? "space-x-5" : ""
         }`}
       >
         <div className="flex-col col-span-full xl:col-span-8 max-h-min bg-zinc-900 w-full shadow-lg rounded-sm border border-zinc-700/60">
@@ -656,9 +675,9 @@ const DomainCVE = () => {
                       Assets-Incidents
                     </div>
                   </th>
-                  {/* <th className="p-2">
+                  <th className="p-2">
                     <div className="font-semibold text-center">Actions</div>
-                  </th> */}
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -692,11 +711,13 @@ const DomainCVE = () => {
                               onClick={() => {
                                 handleCVEDetail(
                                   getDomain(cve.affects_url, cve.port),
-                                  cve.vuln_id
+                                  cve.vuln_id,
+                                  "detail",
+                                  cve.vt_name
                                 );
                               }}
                             >
-                              {getCVEName(cve.tags)}
+                              {cve.vt_name}
                             </div>
                           </div>
                         </td>
@@ -736,6 +757,25 @@ const DomainCVE = () => {
                           {" "}
                           View Assets{" "}
                           <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
+                        </td>
+                        <td className="p-2 flex justify-center items-center space-x-3 text-center cursor-pointer">
+                          {/* <div className="text-blue-600 hover:text-blue-800">
+                            <FontAwesomeIcon icon={faSquareCheck} />
+                          </div> */}
+                          <div
+                            className="text-red-500 hover:text-red-800"
+                            onClick={() => {
+                              handleCVEDetail(
+                                getDomain(cve.affects_url, cve.port),
+                                cve.vuln_id,
+                                "delete",
+                                cve.vt_name
+                              );
+                              setmodal(true);
+                            }}
+                          >
+                            <FontAwesomeIcon icon={faTrash} />
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -826,7 +866,7 @@ const DomainCVE = () => {
           </div>
         </div>
         <div className="flex-col">
-          {cveDetails.status && (
+          {cveDetails.status && cveDetails.action === "detail" && (
             <DomainCVEDetail
               cveDetails={cveDetails}
               setCveDetails={setCveDetails}

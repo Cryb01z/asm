@@ -1,29 +1,34 @@
 import axios from "axios";
+const toolApi = "https://tools.caasm.tech";
 
 const scanDomain = async (domain) => {
-  return await axios.get(`https://tools.caasm.tech/scan/${domain}`);
+  return await axios.get(`${toolApi}/scan/${domain}`);
+};
+
+const reScanDomain = async (domain) => {
+  return await axios.get(`${toolApi}/rescan/${domain}`);
 };
 
 const getScanInfo = async (domain) => {
-  return await axios.get(`https://tools.caasm.tech/info/${domain}`);
+  return await axios.get(`${toolApi}/info/${domain}`);
 };
 
 const getURLScanInfo = async (id) => {
-  return await axios.get(`https://tools.caasm.tech/information/${id}`);
+  return await axios.get(`${toolApi}/information/${id}`);
 };
 
 const getScanProcess = async (domain) => {
   return await axios.get(
-    `https://tools.caasm.tech/scan/${domain}/status/stream`
+    `${toolApi}/scan/${domain}/status/stream`
   );
 };
 
 const getSubDomain = async (domain) => {
-  return await axios.get(`https://tools.caasm.tech/check/${domain}/all`);
+  return await axios.get(`${toolApi}/check/${domain}/all`);
 };
 
 const getAllScanInfo = async (id) => {
-  return await axios.get(`https://tools.caasm.tech/information?id=${id}`);
+  return await axios.get(`${toolApi}/information?id=${id}`);
 };
 
 export {
@@ -33,4 +38,5 @@ export {
   getSubDomain,
   getAllScanInfo,
   getURLScanInfo,
+  reScanDomain,
 };
