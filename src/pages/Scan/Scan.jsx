@@ -144,7 +144,7 @@ const Scan = () => {
     },
   });
   const flag = useRef(false);
-  const domain = localStorage.getItem("domain");
+  const domain = localStorage.getItem("domain") || null;
   useEffect(() => {
     const fetchData = async () => {
       if (domain) {
@@ -202,7 +202,7 @@ const Scan = () => {
       theme: "dark",
       transition: Bounce,
     });
-    const domain = localStorage.getItem("domain") || "";
+    const domain = localStorage.getItem("domain") || null;
     if (domain) {
       try {
         const response = await reScanDomain(domain);
