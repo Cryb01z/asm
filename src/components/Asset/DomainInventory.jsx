@@ -176,7 +176,7 @@ const DomainInventory = () => {
   };
 
   return (
-    <div className="bg-black  text-gray-400 flex h-screen overflow-hidden">
+    <div className="bg-black text-gray-400 flex h-screen overflow-hidden">
       {/* Content area */}
       <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
         {/*  Site header */}

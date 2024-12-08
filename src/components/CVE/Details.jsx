@@ -34,7 +34,7 @@ const Details = ({ references, config }) => {
 
   return (
     <div className="flex flex-wrap justify-between px-2 mt-4 w-full max-w-7xl">
-      <div className="overflow-x-auto hover:bg-zinc-900 border border-zinc-700 rounded-sm ">
+      <div className="max-w-md overflow-x-auto hover:bg-zinc-900 border border-zinc-700 rounded-sm ">
         <div className="p-2 w-full text-white font-semibold">
           <FontAwesomeIcon icon={faMicrochip} /> Configuration
         </div>
