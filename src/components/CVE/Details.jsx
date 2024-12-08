@@ -77,7 +77,7 @@ const Details = ({ references, config }) => {
           <></>
         )}
       </div>
-      <div className="max-w-lg rounded-sm border-2 h-96 hover:bg-zinc-900 border-zinc-700 overflow-y-scroll scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-black">
+      <div className="max-w-md rounded-sm border-2 h-96 hover:bg-zinc-900 border-zinc-700 overflow-y-scroll scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-black">
         <div className="p-2 text-white font-semibold">
           <FontAwesomeIcon icon={faCube} /> References
         </div>
