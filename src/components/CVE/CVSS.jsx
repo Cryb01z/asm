@@ -111,7 +111,7 @@ const CVSS = ({ metric }) => {
   return (
     <>
       {data[0].cvssData.version !== "" ? (
-        <div className="flex justify-around mt-4 space-x-5 pr-4">
+        <div className="flex justify-around mt-4 space-x-5 pr-4 max-w-5xl">
           <div className="flex-col space-y-3">
             {Object.entries(data[0].cvssData)
               .slice(0, Math.ceil(Object.entries(data[0].cvssData).length / 2))

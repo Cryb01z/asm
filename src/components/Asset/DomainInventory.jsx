@@ -388,32 +388,29 @@ const DomainInventory = () => {
                                           className={`inline-block px-3 text-center rounded-md`}
                                         >
                                           {item.is_online ? (
-                                            <>
-                                              <div className="flex space-x-5">
-                                                <span className="absolute top-6 flex h-3 w-3 z-20">
-                                                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-700 opacity-75"></span>
-                                                  <span className="relative inline-flex rounded-full h-3 w-3 bg-green-400/70"></span>
-                                                </span>
-                                                <div>Online</div>{" "}
-                                              </div>
-                                            </>
+                                            <div className="flex space-x-5 items-center">
+                                              <span className="relative flex h-3 w-3">
+                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-700 opacity-75"></span>
+                                                <span className="relative inline-flex rounded-full h-3 w-3 bg-green-400/70"></span>
+                                              </span>
+                                              <div>Online</div>
+                                            </div>
                                           ) : (
-                                            <>
-                                              <div className="flex space-x-5">
-                                                <span className="absolute top-6 flex h-3 w-3 z-20">
-                                                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-700 opacity-75"></span>
-                                                  <span className="relative inline-flex rounded-full h-3 w-3 bg-red-400/70"></span>
-                                                </span>
-                                                <div>Down</div>{" "}
-                                              </div>
-                                            </>
+                                            <div className="flex space-x-5 items-center">
+                                              <span className="relative flex h-3 w-3">
+                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-700 opacity-75"></span>
+                                                <span className="relative inline-flex rounded-full h-3 w-3 bg-red-400/70"></span>
+                                              </span>
+                                              <div>Down</div>
+                                            </div>
                                           )}
                                         </div>
                                       </div>
                                     </td>
+
                                     <td className="px-8 text-[#A1A1AB] border-b border-zinc-700/60 p-0 m-0 group-first:border-t group-hover:bg-[#18181B] group-hover:border-neutral-900 py-[1rem]">
                                       <div className="flex justify-center items-center">
-                                        <div className="text-center">
+                                        <div className="text-center break-words text-pretty overflow-hidden">
                                           {item.autonomous_system.name}
                                         </div>
                                       </div>
