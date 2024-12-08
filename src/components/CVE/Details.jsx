@@ -34,7 +34,7 @@ const Details = ({ references, config }) => {
 
   return (
     <div className="px-2 mt-4">
-      <div className="flex space-x-10 justify-between">
+      <div className="flex space-x-10 max-w-6xl justify-between">
         <div className="w-full hover:bg-zinc-900 border border-zinc-700 rounded-sm ">
           <div className="p-2 text-white font-semibold">
             <FontAwesomeIcon icon={faMicrochip} /> Configuration
@@ -72,7 +72,7 @@ const Details = ({ references, config }) => {
             <></>
           )}
         </div>
-        <div className="w-full rounded-sm border-2 hover:bg-zinc-900 border-zinc-700 overflow-y-scroll scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-black">
+        <div className="w-full rounded-sm border-2 h-96 hover:bg-zinc-900 border-zinc-700 overflow-y-scroll scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-black">
           <div className="p-2 text-white font-semibold">
             <FontAwesomeIcon icon={faCube} /> References
           </div>

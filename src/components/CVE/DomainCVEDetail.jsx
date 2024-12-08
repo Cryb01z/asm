@@ -14,6 +14,7 @@ import copy from "copy-to-clipboard";
 const DomainCVEDetail = ({ cveDetails, setCveDetails }) => {
   const [expand, setexpand] = useState([]);
   const [loading, setloading] = useState(true);
+  const [name, setname] = useState(cveDetails.name);
   const [data, setdata] = useState({
     affects_detail: "",
     affects_url: "",
@@ -71,24 +72,24 @@ const DomainCVEDetail = ({ cveDetails, setCveDetails }) => {
           setdata(response.data);
         }
       } catch (error) {
-        if (!toast.isActive(toastId)) {
-          toast.error("Not Available", {
-            toastId,
-            position: "top-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "dark",
-            transition: Bounce,
-          });
-        }
+        // if (!toast.isActive(toastId)) {
+        //   toast.error("Not Available", {
+        //     toastId,
+        //     position: "top-right",
+        //     autoClose: 5000,
+        //     hideProgressBar: false,
+        //     closeOnClick: true,
+        //     pauseOnHover: true,
+        //     draggable: true,
+        //     progress: undefined,
+        //     theme: "dark",
+        //     transition: Bounce,
+        //   });
+        // }
       }
     };
     fetchApi();
-  }, []);
+  }, [cveDetails]);
   console.log(data);
 
   // close modal
@@ -282,7 +283,7 @@ const DomainCVEDetail = ({ cveDetails, setCveDetails }) => {
   }
 
   return (
-    <div className="relative bg-zinc-900 max-w-lg min-w-[32rem] p-4 shadow-lg text-gray-400 rounded-sm border border-zinc-700/60">
+    <div className="relative ml-5 bg-zinc-900 max-w-lg min-w-[32rem] p-4 shadow-lg text-gray-400 rounded-sm border border-zinc-700/60">
       <button
         type="button"
         className="absolute top-3 end-2.5 text-gray-400 bg-transparent rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center hover:bg-gray-600 hover:text-white"

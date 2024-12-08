@@ -144,11 +144,9 @@ const DomainInventory = () => {
     fetchApi();
   }, [domain]);
 
-
   const displayTech = data.status
     ? data.results.filter((item) => item.technology !== null)
     : [];
- 
 
   //get domain
   const getDomain = (domain) => {
@@ -176,18 +174,6 @@ const DomainInventory = () => {
       },
     });
   };
-
-  if (loading) {
-    return (
-      <div className="bg-black  text-gray-400 flex h-screen overflow-hidden">
-        {/* Content area */}
-        <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
-          {/*  Site header */}
-          <Navbar site={"asset"} />
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="bg-black  text-gray-400 flex h-screen overflow-hidden">
@@ -297,147 +283,164 @@ const DomainInventory = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {displayTech.length > 0 &&
-                    displayTech.map((item, index) => {
-                      let pos = index;
-                      return (
-                        <>
-                          {/* Loop through services for each domain */}
-                          {item.services && item.services.length > 0 ? (
-                            item.services.map((service, serviceIndex) => (
-                              <tr className="transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted border border-x-0 border-neutral-700 bg-[#0E0E12] group group-hover:bg-[#18181B] group-hover:border-neutral-900 relative h-12">
-                                <td className="bg-[#121215] border-b px-4 border-zinc-700/60 m-0 group-first:border-t group-hover:bg-[#18181B] group-hover:border-neutral-900 border-l sticky left-0 group-first:rounded-tl-lg shadow-[34px_0px_29px_1px_rgba(11,11,13,0.8)] group-hover:shadow-none z-10 group-hover:z-20 cursor-pointer">
-                                  <div className="flex justify-between ">
-                                    <div className="flex items-center space-x-2">
-                                      <div className="bg-neutral-800 px-1 rounded-md">
-                                        <FontAwesomeIcon
-                                          icon={faHouse}
-                                          size="xs"
-                                        />
+                  {loading ? (
+                    <>
+                      <tr className="transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted border border-x-0 border-neutral-700 bg-[#0E0E12] group-hover:bg-[#18181B] group-hover:border-neutral-900 relative">
+                        <td colSpan={7}>
+                          <div className="animate-pulse">
+                            <div className="w-full h-96 bg-neutral-700 rounded-lg"></div>
+                          </div>
+                        </td>
+                      </tr>
+                    </>
+                  ) : (
+                    <>
+                      {displayTech.length > 0 &&
+                        displayTech.map((item, index) => {
+                          let pos = index;
+                          return (
+                            <>
+                              {/* Loop through services for each domain */}
+                              {item.services && item.services.length > 0 ? (
+                                item.services.map((service, serviceIndex) => (
+                                  <tr className="transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted border border-x-0 border-neutral-700 bg-[#0E0E12] group group-hover:bg-[#18181B] group-hover:border-neutral-900 relative h-12">
+                                    <td className="bg-[#121215] border-b px-4 border-zinc-700/60 m-0 group-first:border-t group-hover:bg-[#18181B] group-hover:border-neutral-900 border-l sticky left-0 group-first:rounded-tl-lg shadow-[34px_0px_29px_1px_rgba(11,11,13,0.8)] group-hover:shadow-none z-10 group-hover:z-20 cursor-pointer">
+                                      <div className="flex justify-between ">
+                                        <div className="flex items-center space-x-2">
+                                          <div className="bg-neutral-800 px-1 rounded-md">
+                                            <FontAwesomeIcon
+                                              icon={faHouse}
+                                              size="xs"
+                                            />
+                                          </div>
+                                          <div
+                                            className="text-white font-bold"
+                                            onClick={() => {
+                                              navigateToDomain(
+                                                item.domain,
+                                                service.port
+                                              );
+                                            }}
+                                          >
+                                            {item.domain}
+                                          </div>
+                                          <div>
+                                            <span class="relative flex h-2 w-2">
+                                              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-700/70 opacity-75"></span>
+                                              <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-400/70"></span>
+                                            </span>
+                                          </div>
+                                        </div>
+                                        <div className="px-1 bg-[#3E3D3D] rounded-md">
+                                          {service.port || "None"}
+                                        </div>
                                       </div>
-                                      <div
-                                        className="text-white font-bold"
-                                        onClick={() => {
-                                          navigateToDomain(
-                                            item.domain,
+                                    </td>
+                                    <td className="px-8 text-[#A1A1AB] border-b border-zinc-700/60 p-0 m-0 group-first:border-t group-hover:bg-[#18181B] group-hover:border-neutral-900 py-[1rem]">
+                                      <div className="flex justify-center items-center">
+                                        <div className="bg-[#3E3D3D] inline-block px-3 text-center rounded-md">
+                                          {item.ip[0]}
+                                        </div>
+                                      </div>
+                                    </td>
+                                    <td className="px-8 text-[#A1A1AB] border-b border-zinc-700/60 p-0 m-0 group-first:border-t group-hover:bg-[#18181B] group-hover:border-neutral-900 py-[1rem]">
+                                      <div className="flex justify-center items-center w-auto">
+                                        <div className="flex space-x-2">
+                                          {["80", "443"].includes(
                                             service.port
-                                          );
-                                        }}
-                                      >
-                                        {item.domain}
-                                      </div>
-                                      <div>
-                                        <span class="relative flex h-2 w-2">
-                                          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-700/70 opacity-75"></span>
-                                          <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-400/70"></span>
-                                        </span>
-                                      </div>
-                                    </div>
-                                    <div className="px-1 bg-[#3E3D3D] rounded-md">
-                                      {service.port || "None"}
-                                    </div>
-                                  </div>
-                                </td>
-                                <td className="px-8 text-[#A1A1AB] border-b border-zinc-700/60 p-0 m-0 group-first:border-t group-hover:bg-[#18181B] group-hover:border-neutral-900 py-[1rem]">
-                                  <div className="flex justify-center items-center">
-                                    <div className="bg-[#3E3D3D] inline-block px-3 text-center rounded-md">
-                                      {item.ip[0]}
-                                    </div>
-                                  </div>
-                                </td>
-                                <td className="px-8 text-[#A1A1AB] border-b border-zinc-700/60 p-0 m-0 group-first:border-t group-hover:bg-[#18181B] group-hover:border-neutral-900 py-[1rem]">
-                                  <div className="flex justify-center items-center w-auto">
-                                    <div className="flex space-x-2">
-                                      {["80", "443"].includes(service.port) ? (
-                                        <>
-                                          {item.technology.map((tech) =>
-                                            tech.subtech.map((subtech) => (
-                                              <TechInfo
-                                                tech={getTechInfo(
-                                                  subtech.technology
-                                                )} // Pass the result of getTechInfo
-                                                name={subtech.technology}
-                                                catagory={tech.categories}
-                                                version={subtech.version}
-                                                position={
-                                                  pos >= displayTech.length / 2
-                                                    ? "bottom"
-                                                    : ""
-                                                }
-                                              />
-                                            ))
+                                          ) ? (
+                                            <>
+                                              {item.technology.map((tech) =>
+                                                tech.subtech.map((subtech) => (
+                                                  <TechInfo
+                                                    tech={getTechInfo(
+                                                      subtech.technology
+                                                    )} // Pass the result of getTechInfo
+                                                    name={subtech.technology}
+                                                    catagory={tech.categories}
+                                                    version={subtech.version}
+                                                    position={
+                                                      pos >=
+                                                      displayTech.length / 2
+                                                        ? "bottom"
+                                                        : ""
+                                                    }
+                                                  />
+                                                ))
+                                              )}
+                                            </>
+                                          ) : (
+                                            <>--</>
                                           )}
-                                        </>
-                                      ) : (
-                                        <>--</>
-                                      )}
-                                    </div>
-                                  </div>
-                                </td>
-                                <td className="px-8 text-[#A1A1AB] border-b border-zinc-700/60 p-0 m-0 group-first:border-t group-hover:bg-[#18181B] group-hover:border-neutral-900 py-[1rem]">
-                                  <div className="flex justify-center items-center">
-                                    <div className="text-center">
-                                      {item.autonomous_system.asn}
-                                    </div>
-                                  </div>
-                                </td>
-                                <td className="px-8 text-[#A1A1AB] border-b border-zinc-700/60 p-0 m-0 group-first:border-t group-hover:bg-[#18181B] group-hover:border-neutral-900 py-[1rem]">
-                                  <div className="flex justify-center items-center">
-                                    <div
-                                      className={`inline-block px-3 text-center rounded-md`}
-                                    >
-                                      {item.is_online ? (
-                                        <>
-                                          <div className="flex space-x-5">
-                                            <span className="absolute top-6 flex h-3 w-3 z-20">
-                                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-700 opacity-75"></span>
-                                              <span className="relative inline-flex rounded-full h-3 w-3 bg-green-400/70"></span>
-                                            </span>
-                                            <div>Online</div>{" "}
-                                          </div>
-                                        </>
-                                      ) : (
-                                        <>
-                                          <div className="flex space-x-5">
-                                            <span className="absolute top-6 flex h-3 w-3 z-20">
-                                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-700 opacity-75"></span>
-                                              <span className="relative inline-flex rounded-full h-3 w-3 bg-red-400/70"></span>
-                                            </span>
-                                            <div>Down</div>{" "}
-                                          </div>
-                                        </>
-                                      )}
-                                    </div>
-                                  </div>
-                                </td>
-                                <td className="px-8 text-[#A1A1AB] border-b border-zinc-700/60 p-0 m-0 group-first:border-t group-hover:bg-[#18181B] group-hover:border-neutral-900 py-[1rem]">
-                                  <div className="flex justify-center items-center">
-                                    <div className="text-center">
-                                      {item.autonomous_system.name}
-                                    </div>
-                                  </div>
-                                </td>
-                                <td className="px-8 text-[#A1A1AB] border-b border-zinc-700/60 p-0 m-0 group-first:border-t group-hover:bg-[#18181B] group-hover:border-neutral-900 py-[1rem]">
-                                  <div className="flex justify-center items-center">
-                                    <div className="bg-neutral-800/70 inline-block px-2 text-center rounded-md">
-                                      --
-                                    </div>
-                                  </div>
-                                </td>
-                              </tr>
-                            ))
-                          ) : (
-                            <tr
-                              key={index}
-                              className="transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted border border-x-0 border-neutral-700 bg-[#0E0E12] group group-hover:bg-[#18181B] group-hover:border-neutral-900 relative h-12"
-                            >
-                              {/* Single row if no services */}
-                              <td colSpan="8">No services available</td>
-                            </tr>
-                          )}
-                        </>
-                      );
-                    })}
+                                        </div>
+                                      </div>
+                                    </td>
+                                    <td className="px-8 text-[#A1A1AB] border-b border-zinc-700/60 p-0 m-0 group-first:border-t group-hover:bg-[#18181B] group-hover:border-neutral-900 py-[1rem]">
+                                      <div className="flex justify-center items-center">
+                                        <div className="text-center">
+                                          {item.autonomous_system.asn}
+                                        </div>
+                                      </div>
+                                    </td>
+                                    <td className="px-8 text-[#A1A1AB] border-b border-zinc-700/60 p-0 m-0 group-first:border-t group-hover:bg-[#18181B] group-hover:border-neutral-900 py-[1rem]">
+                                      <div className="flex justify-center items-center">
+                                        <div
+                                          className={`inline-block px-3 text-center rounded-md`}
+                                        >
+                                          {item.is_online ? (
+                                            <>
+                                              <div className="flex space-x-5">
+                                                <span className="absolute top-6 flex h-3 w-3 z-20">
+                                                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-700 opacity-75"></span>
+                                                  <span className="relative inline-flex rounded-full h-3 w-3 bg-green-400/70"></span>
+                                                </span>
+                                                <div>Online</div>{" "}
+                                              </div>
+                                            </>
+                                          ) : (
+                                            <>
+                                              <div className="flex space-x-5">
+                                                <span className="absolute top-6 flex h-3 w-3 z-20">
+                                                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-700 opacity-75"></span>
+                                                  <span className="relative inline-flex rounded-full h-3 w-3 bg-red-400/70"></span>
+                                                </span>
+                                                <div>Down</div>{" "}
+                                              </div>
+                                            </>
+                                          )}
+                                        </div>
+                                      </div>
+                                    </td>
+                                    <td className="px-8 text-[#A1A1AB] border-b border-zinc-700/60 p-0 m-0 group-first:border-t group-hover:bg-[#18181B] group-hover:border-neutral-900 py-[1rem]">
+                                      <div className="flex justify-center items-center">
+                                        <div className="text-center">
+                                          {item.autonomous_system.name}
+                                        </div>
+                                      </div>
+                                    </td>
+                                    <td className="px-8 text-[#A1A1AB] border-b border-zinc-700/60 p-0 m-0 group-first:border-t group-hover:bg-[#18181B] group-hover:border-neutral-900 py-[1rem]">
+                                      <div className="flex justify-center items-center">
+                                        <div className="bg-neutral-800/70 inline-block px-2 text-center rounded-md">
+                                          --
+                                        </div>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                ))
+                              ) : (
+                                <tr
+                                  key={index}
+                                  className="transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted border border-x-0 border-neutral-700 bg-[#0E0E12] group group-hover:bg-[#18181B] group-hover:border-neutral-900 relative h-12"
+                                >
+                                  {/* Single row if no services */}
+                                  <td colSpan="8">No services available</td>
+                                </tr>
+                              )}
+                            </>
+                          );
+                        })}
+                    </>
+                  )}
                 </tbody>
               </table>
             </div>

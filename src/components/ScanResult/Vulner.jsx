@@ -249,6 +249,17 @@ const Vulner = ({ domain, port }) => {
     setCurrentPage(1);
   };
 
+  //check redirect to cve detail
+  const handleRedirect = (name, cveId, url) => {
+    if (cveId.includes("nmap")) {
+      if (name.includes("CVE")) {
+        navigate(`/CVE/${name}`, { state: { cveid: name } });
+      } else {
+        window.open(url, "_blank");
+      }
+    }
+  };
+
   //pagination vulnerabilities
   const displayVulnerabilities = filteredVulnerabilities.slice(
     (currentPage - 1) * itemsPerPage,
@@ -261,23 +272,21 @@ const Vulner = ({ domain, port }) => {
   return (
     <div className="bg-black min-h-96 mt-4">
       <div className="bg-zinc-900  shadow-lg rounded-sm border px-5 py-4 border-b border-zinc-700/60 mb-5">
-        <h2 className="font-semibold text-slate-100 flex space-x-5">
+        <h2 className="font-semibold text-slate-100 flex items-center space-x-5">
           <span>
             <FontAwesomeIcon icon={faMagnifyingGlass} />
           </span>
-          <input
-            className="bg-zinc-900 outline-none"
-            type="text"
-            placeholder="Search ..."
-            onChange={handleSearchChange}
-          />
+          <span className="flex-grow">
+            <input
+              className="bg-zinc-900 outline-none w-full h-full px-2 py-1"
+              type="text"
+              placeholder="Search ..."
+              onChange={handleSearchChange}
+            />
+          </span>
         </h2>
       </div>
-      <div
-        className={`flex justify-between ${
-          cveDetails.status && cveDetails.action === "detail" ? "space-x-5" : ""
-        }`}
-      >
+      <div className={`flex justify-between `}>
         <div className="flex-col col-span-full xl:col-span-8 max-h-min bg-zinc-900 w-full shadow-lg rounded-sm border border-zinc-700/60">
           <header className="px-5 py-4 border-b  border-zinc-700/60">
             <h2 className="font-semibold  text-slate-100 ">
@@ -366,6 +375,7 @@ const Vulner = ({ domain, port }) => {
                           <div
                             className="flex items-center group relative"
                             onClick={() => {
+                              handleRedirect(cve.vt_name, cve.vuln_id, cve.url);
                               handleCVEDetail(
                                 getDomain(cve.affects_url, cve.port),
                                 cve.vuln_id,
@@ -375,7 +385,7 @@ const Vulner = ({ domain, port }) => {
                             }}
                           >
                             <input type="checkbox" className="mr-5" />{" "}
-                            <span className="text-blue-500 cursor-pointer">
+                            <span className="text-blue-500 cursor-pointer line-clamp-1">
                               {cve.vt_name}
                             </span>
                           </div>
@@ -417,9 +427,9 @@ const Vulner = ({ domain, port }) => {
                           View Assets{" "}
                           <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
                         </td>
-                        <td className="p-2 flex justify-center items-center space-x-3 text-center cursor-pointer">
+                        <td className="p-2 text-center">
                           <div
-                            className="text-red-500 hover:text-red-800"
+                            className="flex justify-center items-center space-x-3 text-red-500 hover:text-red-800 cursor-pointer"
                             onClick={() => {
                               handleCVEDetail(
                                 getDomain(cve.affects_url, cve.port),

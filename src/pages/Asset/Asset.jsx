@@ -335,7 +335,15 @@ const Asset = () => {
                       </div>
 
                       {loading ? (
-                        <></>
+                        <>
+                          <div className="transition-colors mt-2 hover:bg-muted/50 data-[state=selected]:bg-muted border-2 rounded-lg border-neutral-700 bg-[#0E0E12] group-hover:bg-[#18181B] group-hover:border-neutral-900 relative">
+                            <div colSpan={6}>
+                              <div className="animate-pulse">
+                                <div className="w-full h-10 bg-neutral-700 rounded-lg"></div>
+                              </div>
+                            </div>
+                          </div>
+                        </>
                       ) : (
                         <>
                           <div class="mt-3 grid grid-cols-6 p-2 text-sm font-medium border rounded-lg  bg-black border-zinc-700  hover:bg-zinc-900 cursor-pointer">
