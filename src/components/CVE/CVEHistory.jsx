@@ -37,7 +37,7 @@ const CVEHistory = ({ change }) => {
                     <div className="text-white text-lg font-semibold">
                       Event: {item.eventName}
                     </div>
-                    <div className="flex space-x-2">
+                    <div className="flex space-x-2 items-center">
                       <FontAwesomeIcon icon={faClock} />
                       <div>{convertDate(item.created)}</div>
                     </div>
@@ -61,20 +61,30 @@ const CVEHistory = ({ change }) => {
                           <td className="border px-4 py-2">
                             <div className="block space-y-2 break-words text-pretty overflow-hidden">
                               <div>
-                                <span className="text-gray-200">
-                                  Old Value:{" "}
-                                </span>
-                                {detail.oldValue ? detail.oldValue : "N/A"}
+                                {detail.oldValue ? (
+                                  <span className="text-gray-200">
+                                    Old Value: {detail.oldValue}
+                                  </span>
+                                ) : (
+                                  ""
+                                )}
                               </div>
                               <div>
-                                <span className="text-gray-200">
-                                  New Value:{" "}
-                                </span>
-                                {detail.newValue ? detail.newValue : "N/A"}
+                                {detail.newValue ? (
+                                  <span className="text-gray-200">
+                                    New Value: {detail.newValue}
+                                  </span>
+                                ) : (
+                                  ""
+                                )}
                               </div>
                             </div>
                           </td>
-                          <td className={`border px-4 py-2 text-center align-top ${getActionColor(detail.action)}`}>
+                          <td
+                            className={`border px-4 py-2 text-center align-top ${getActionColor(
+                              detail.action
+                            )}`}
+                          >
                             {detail.action}
                           </td>
                         </tr>

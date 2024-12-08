@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import RadarChart from "../../charts/RadarChart";
 
 const CVSS = ({ metric }) => {
+  const [showMore, setshowMore] = useState(false);
   const flagLabel = ["version", "baseSeverity", "baseScore"];
   const flagData = [
     "HIGH",
@@ -111,27 +112,70 @@ const CVSS = ({ metric }) => {
   return (
     <>
       {data[0].cvssData.version !== "" ? (
-        <div className="flex justify-around mt-4 space-x-5 pr-4 max-w-5xl">
-          <div className="flex-col space-y-3">
-            {Object.entries(data[0].cvssData)
-              .slice(0, Math.ceil(Object.entries(data[0].cvssData).length / 2))
-              .map(
-                ([key, value]) =>
-                  !flagLabel.includes(key) && (
-                    <div className="flex justify-between p-2 bg-zinc-900 border border-zinc-700 rounded-sm">
-                      <span>{key}</span>
-                      <span
-                        className={`ml-5 px-1 ${getColor(
-                          value
-                        )} rounded-sm text-white`}
-                      >
-                        {value}
-                      </span>
-                    </div>
-                  )
+        <div className="flex flex-wrap justify-around mt-4 space-x-5 pr-4 max-w-5xl">
+          <div className="flex-col space-y-3 mt-5">
+            {showMore ? (
+              <>
+                {Object.entries(data[0].cvssData).map(
+                  ([key, value]) =>
+                    !flagLabel.includes(key) && (
+                      <div className="flex justify-between p-2 bg-zinc-900 border border-zinc-700 rounded-sm">
+                        <span>{key}</span>
+                        <span
+                          className={`ml-5 px-1 ${getColor(
+                            value
+                          )} rounded-sm text-white`}
+                        >
+                          {value}
+                        </span>
+                      </div>
+                    )
+                )}
+              </>
+            ) : (
+              <>
+                {Object.entries(data[0].cvssData).splice(0,6).map(
+                  ([key, value]) =>
+                    !flagLabel.includes(key) && (
+                      <div className="flex justify-between p-2 bg-zinc-900 border border-zinc-700 rounded-sm">
+                        <span>{key}</span>
+                        <span
+                          className={`ml-5 px-1 ${getColor(
+                            value
+                          )} rounded-sm text-white`}
+                        >
+                          {value}
+                        </span>
+                      </div>
+                    )
+                )}
+              </>
+            )}
+            <div>
+              {showMore ? (
+                <>
+                  <div
+                    className="text-blue-600 cursor-pointer"
+                    onClick={() => {
+                      setshowMore(!showMore);
+                    }}
+                  >
+                    show less
+                  </div>
+                </>
+              ) : (
+                <div
+                  className="text-blue-600 cursor-pointer"
+                  onClick={() => {
+                    setshowMore(!showMore);
+                  }}
+                >
+                  show more
+                </div>
               )}
+            </div>
           </div>
-          <div className="flex-col space-y-3">
+          {/* <div className="flex-col space-y-3">
             {Object.entries(data[0].cvssData)
               .slice(Math.ceil(Object.entries(data[0].cvssData).length / 2))
               .map(
@@ -149,7 +193,7 @@ const CVSS = ({ metric }) => {
                     </div>
                   )
               )}
-          </div>
+          </div> */}
           <div className="">
             <RadarChart data={chartData} />
           </div>
