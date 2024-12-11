@@ -77,7 +77,7 @@ const OpenCVE = () => {
 
   //Render cvss score color
   const getScoreColor = (cvss) => {
-    if (cvss > 0 && cvss < 4) {
+    if (cvss >= 0 && cvss < 4) {
       return "bg-green-500";
     } else if (cvss >= 4 && cvss < 7) {
       return "bg-yellow-500";
@@ -106,7 +106,7 @@ const OpenCVE = () => {
 
   //Add score level
   const getScore = (cvss) => {
-    if (cvss > 0 && cvss < 4) {
+    if (cvss >= 0 && cvss < 4) {
       return `${cvss} Low`;
     } else if (cvss >= 4 && cvss < 7) {
       return `${cvss} Medium`;
