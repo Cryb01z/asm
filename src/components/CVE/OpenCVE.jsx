@@ -186,7 +186,7 @@ const OpenCVE = () => {
           </div>
           <div className="text-lg p-2">
             TOTAL <br />
-            <span className="font-bold">262540 CVE</span>
+            <span className="font-bold">{cveData.pageCount} CVE</span>
           </div>
         </div>
       </div>
