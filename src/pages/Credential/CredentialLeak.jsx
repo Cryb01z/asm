@@ -91,6 +91,11 @@ const CredentialLeak = () => {
                     type="text"
                     placeholder="Search by keyword"
                     onChange={(e) => handleSearch(e.target.value)}
+                    onKeyUp={(e) => {
+                      if (e.key === "Enter") {
+                        githubDorking(search);
+                      }
+                    }}
                   />
                   <div
                     className="absolute top-2 right-4"

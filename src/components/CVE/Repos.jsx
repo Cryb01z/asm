@@ -72,6 +72,11 @@ const Repos = () => {
             type="text"
             placeholder="Search Key"
             onChange={(e) => handleSearch(e.target.value)}
+            onKeyUp={(e) => {
+              if (e.key === "Enter") {
+                githubDorking(search);
+              }
+            }}
           />
           <div
             className="absolute top-2 right-4"
