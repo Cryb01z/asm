@@ -17,7 +17,7 @@ const searchCVES = async (search, page, pageSize, scoreFrom, scoreTo) => {
 };
 
 const getTotalCVE = async () => {
-  return await axiosClient.get(`/Cve/Count`);
+  return await axiosClient.get(`/Cves/Count`);
 };
 
 const getCVEDetail = async (domain, cveId) => {

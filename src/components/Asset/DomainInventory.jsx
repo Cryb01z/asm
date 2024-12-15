@@ -19,6 +19,7 @@ import {
   getDomainInfo,
   getSubDomainInfo,
 } from "../../axios/AssetService/assetService";
+import ScoringAsset from "./ScoringAsset";
 const DomainInventory = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -272,14 +273,12 @@ const DomainInventory = () => {
                     </th>
                     <th className="px-8 cursor-pointer">ip</th>
                     <th className="px-8 cursor-pointer">Technologies</th>
-                    <th className="px-8 cursor-pointer">tittle</th>
-                    <th className="px-8 cursor-pointer">
-                      status <FontAwesomeIcon icon={faSort} />
-                    </th>
-                    <th className="px-8 cursor-pointer">cname</th>
                     <th className="px-8 cursor-pointer rounded-r-lg">
-                      content length
+                      Scoring
                     </th>
+                    <th className="px-8 cursor-pointer">status</th>
+                    <th className="px-8 cursor-pointer">tittle</th>
+                    <th className="px-8 cursor-pointer">cname</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -377,9 +376,7 @@ const DomainInventory = () => {
                                     </td>
                                     <td className="px-8 text-[#A1A1AB] border-b border-zinc-700/60 p-0 m-0 group-first:border-t group-hover:bg-[#18181B] group-hover:border-neutral-900 py-[1rem]">
                                       <div className="flex justify-center items-center">
-                                        <div className="text-center">
-                                          {item.autonomous_system.asn}
-                                        </div>
+                                        <ScoringAsset domain={item.domain} port={service.port}/>
                                       </div>
                                     </td>
                                     <td className="px-8 text-[#A1A1AB] border-b border-zinc-700/60 p-0 m-0 group-first:border-t group-hover:bg-[#18181B] group-hover:border-neutral-900 py-[1rem]">
@@ -407,18 +404,17 @@ const DomainInventory = () => {
                                         </div>
                                       </div>
                                     </td>
-
                                     <td className="px-8 text-[#A1A1AB] border-b border-zinc-700/60 p-0 m-0 group-first:border-t group-hover:bg-[#18181B] group-hover:border-neutral-900 py-[1rem]">
                                       <div className="flex justify-center items-center">
-                                        <div className="text-center break-words text-pretty overflow-hidden">
-                                          {item.autonomous_system.name}
+                                        <div className="text-center">
+                                          {item.autonomous_system.asn}
                                         </div>
                                       </div>
                                     </td>
                                     <td className="px-8 text-[#A1A1AB] border-b border-zinc-700/60 p-0 m-0 group-first:border-t group-hover:bg-[#18181B] group-hover:border-neutral-900 py-[1rem]">
                                       <div className="flex justify-center items-center">
-                                        <div className="bg-neutral-800/70 inline-block px-2 text-center rounded-md">
-                                          --
+                                        <div className="text-center break-words text-pretty overflow-hidden">
+                                          {item.autonomous_system.name}
                                         </div>
                                       </div>
                                     </td>

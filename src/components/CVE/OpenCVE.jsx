@@ -2,7 +2,7 @@ import { faFilter, faShieldHalved } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { searchCVES } from "../../axios/CVEService/cveService";
+import { getTotalCVE, searchCVES } from "../../axios/CVEService/cveService";
 
 const OpenCVE = () => {
   const [cveFilter, setcveFilter] = useState({
@@ -34,6 +34,8 @@ const OpenCVE = () => {
     pageSize: 0,
   });
 
+  const [totalCVE, settotalCVE] = useState(0);
+
   useEffect(() => {
     // console.log(cveFilter);
     const searchQuery = cveFilter.search.toUpperCase();
@@ -47,6 +49,8 @@ const OpenCVE = () => {
           cveFilter.scoreTo
         );
         const cves = response.data;
+        const total = await getTotalCVE();
+        settotalCVE(total.data);
         // console.log(cves);
         setcveData(cves);
       } catch (error) {
@@ -186,7 +190,7 @@ const OpenCVE = () => {
           </div>
           <div className="text-lg p-2">
             TOTAL <br />
-            <span className="font-bold">{cveData.pageCount} CVE</span>
+            <span className="font-bold">{totalCVE.count ? totalCVE.count : 0} CVEs</span>
           </div>
         </div>
       </div>
