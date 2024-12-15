@@ -106,7 +106,7 @@ const ScoringAsset = ({ domain, port }) => {
         aria-label="Severity Selector"
       >
         {severityLevels.map(({ value, label }) => (
-          <option key={value} value={value}>
+          <option key={value} value={value} className="bg-zinc-900 border border-zinc-700 text-gray-400">
             {label}
           </option>
         ))}
