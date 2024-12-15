@@ -96,9 +96,9 @@ const ScoringAsset = ({ domain, port }) => {
 
   return (
     /* From Uiverse.io by Javierrocadev */
-    <div className="relative group rounded-lg w-20 text-center overflow-hidden border-2 border-zinc-700">
+    <div className="relative group rounded-lg w-20 text-center overflow-hidden ">
       <select
-        className={`appearance-none text-center relative ring-0 outline-none border text-sm font-bold rounded-lg py-2 block w-full ${serverityColor(
+        className={`appearance-none text-center relative ring-0 outline-none border-2 border-zinc-700 text-sm font-bold rounded-lg py-2 block w-full ${serverityColor(
           selectedValue
         )}`}
         value={selectedValue}
